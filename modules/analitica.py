@@ -6,7 +6,6 @@ from utils.data_loader import load_github_data
 def analitica_page():
     st.title("📊 Panel Analítico Avanzado")
     
-    # Cargar datos desde GitHub
     try:
         url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
         df = pd.read_csv(url)
@@ -15,42 +14,23 @@ def analitica_page():
         st.error(f"Error cargando datos: {str(e)}")
         return
 
-    # Sección de Filtros
+    # ========== FILTRO POR JUGADOR ==========
     with st.sidebar.expander("🔍 FILTROS AVANZADOS", expanded=True):
-        # Filtros temporales
-        jornadas = st.multiselect(
-            "Jornadas",
-            options=df['Jornada'].unique(),
-            default=df['Jornada'].unique()
-        )
+        # ... (filtros existentes)
         
-        # Filtros de equipo
-        equipos = st.multiselect(
-            "Equipos",
-            options=df['Equipo'].unique(),
-            default=df['Equipo'].unique()
-        )
-        
-        # Filtros tácticos
-        tipo_accion = st.multiselect(
-            "Tipo de acción",
-            options=df['Acción'].unique(),
-            default=df['Acción'].unique()
-        )
-        
-        # Filtro de resultado
-        resultados = st.multiselect(
-            "Resultados",
-            options=df['Resultado'].unique(),
-            default=df['Resultado'].unique()
+        jugadores = st.multiselect(
+            "Jugadores",
+            options=df['Ejecutor'].unique(),
+            default=df['Ejecutor'].unique()
         )
 
-    # Aplicar filtros
+    # Aplicar filtros (actualizar)
     filtered_df = df[
         (df['Jornada'].isin(jornadas)) &
         (df['Equipo'].isin(equipos)) &
         (df['Acción'].isin(tipo_accion)) &
-        (df['Resultado'].isin(resultados))
+        (df['Resultado'].isin(resultados)) &
+        (df['Ejecutor'].isin(jugadores))  # Nuevo filtro
     ]
 
     # Mostrar estadísticas rápidas
