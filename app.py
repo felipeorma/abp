@@ -100,7 +100,7 @@ if not df.empty:
             half=True
         )
         fig, ax = pitch.draw(figsize=(8, 6))
-        ax.set_ylim(52.5, 0)  # Mostrar la mitad superior del campo (portería arriba)
+        ax.set_ylim(0, 52.5)  # Mostrar la mitad superior del campo (portería arriba)
         pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
         st.pyplot(fig)
