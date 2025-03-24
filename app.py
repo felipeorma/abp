@@ -89,7 +89,7 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO (superior)
+    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO (compatible con mplsoccer 1.1.8)
     # ----------------------------------------
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -97,8 +97,7 @@ if not df.empty:
             pitch_type='statsbomb',
             line_color='white',
             pitch_color='grass',
-            half=True,
-            direction='vertical'
+            half=True
         )
         fig, ax = pitch.draw(figsize=(8, 6))
         ax.invert_yaxis()
@@ -115,4 +114,4 @@ if not df.empty:
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 
 else:
-    st.info("Aún no has registrado ninguna acción.") 
+    st.info("Aún no has registrado ninguna acción.")
