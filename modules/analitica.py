@@ -11,7 +11,7 @@ def analitica_page():
     try:
         df = cargar_datos()
         if df.empty:
-            st.warning("No hay datos registrados. Comienza registrando acciones en el módulo de Registro en Vivo.")
+            st.warning("No se encontraron datos en el repositorio. Verifica la conexión o el formato del CSV.")
             return
     except Exception as e:
         st.error(f"Error cargando datos: {str(e)}")
@@ -25,11 +25,9 @@ def analitica_page():
     configurar_descarga(df_filtrado)
 
 def cargar_datos():
-    # Cargar datos directamente del registro en sesión
-    if 'registro' not in st.session_state or len(st.session_state.registro) == 0:
-        return pd.DataFrame()
-    
-    df = pd.DataFrame(st.session_state.registro)
+    # Cargar datos directamente desde GitHub
+    url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
+    df = pd.read_csv(url)
     
     # Convertir tipos de datos y limpiar
     df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
@@ -45,32 +43,29 @@ def configurar_filtros(df):
         # Filtro de fechas
         date_col1, date_col2 = st.columns(2)
         with date_col1:
-            fecha_min = st.date_input("Fecha inicial", value=df['Fecha'].min().date() if not df.empty else pd.to_datetime('today').date())
+            fecha_min = st.date_input("Fecha inicial", value=df['Fecha'].min().date())
         with date_col2:
-            fecha_max = st.date_input("Fecha final", value=df['Fecha'].max().date() if not df.empty else pd.to_datetime('today').date())
+            fecha_max = st.date_input("Fecha final", value=df['Fecha'].max().date())
         
-        # Selectores múltiples con búsqueda
+        # Selectores múltiples
         equipos = st.multiselect(
             "Equipos", 
-            options=df['Equipo'].unique() if not df.empty else [],
-            default=df['Equipo'].unique() if not df.empty else []
+            options=df['Equipo'].unique(),
+            default=df['Equipo'].unique()
         )
         
         jugadores = st.multiselect(
             "Jugadores",
-            options=df['Ejecutor'].unique() if not df.empty else [],
-            default=df['Ejecutor'].unique() if not df.empty else []
+            options=df['Ejecutor'].unique(),
+            default=df['Ejecutor'].unique()
         )
         
         acciones = st.multiselect(
             "Tipos de acción",
-            options=df['Acción'].unique() if not df.empty else [],
-            default=df['Acción'].unique() if not df.empty else []
+            options=df['Acción'].unique(),
+            default=df['Acción'].unique()
         )
 
-    if df.empty:
-        return pd.DataFrame()
-    
     return df[
         (df['Equipo'].isin(equipos)) &
         (df['Ejecutor'].isin(jugadores)) &
