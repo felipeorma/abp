@@ -13,7 +13,7 @@ img = Image.open("MedioCampo_enumerado.JPG")
 st.set_page_config(layout="centered")
 st.title("⚽ Registro de Acciones de Balón Parado")
 
-st.image(img, caption="Zonas numeradas (portería arriba)", use_column_width=True)
+st.image(img, caption="Zonas numeradas (referencia visual)", use_column_width=True)
 
 # ----------------------------------------
 # FORMULARIO
@@ -62,15 +62,15 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas calibradas (portería arriba, cancha vertical 0-120 en y)
+    # Coordenadas calibradas para MITAD DERECHA del campo horizontal
     zona_coords = {
-        1: (5, 115),   2: (75, 115),
-        3: (10, 95),   4: (70, 95),
-        5: (32, 118),  6: (48, 118), 7: (40, 118), 8: (22, 118), 9: (58, 118),
-        10: (32, 108), 11: (48, 108), 12: (22, 108), 13: (58, 108),
-        14: (30, 92),  15: (50, 92),
-        16: (22, 76),  17: (58, 76),
-        "Penal": (40, 111)
+        1: (105, 75),   2: (105, 5),
+        3: (95, 65),    4: (95, 15),
+        5: (114, 62),   6: (114, 18), 7: (114, 40), 8: (108, 62), 9: (108, 18),
+        10: (108, 48),  11: (114, 48), 12: (102, 48), 13: (120, 48),
+        14: (100, 40),  15: (120, 40),
+        16: (90, 40),   17: (110, 40),
+        "Penal": (116, 40)
     }
 
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
@@ -83,20 +83,14 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    def dibujar_half_pitch(title, x, y, cmap):
+    def dibujar_pitch(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(
-            pitch_type='statsbomb',
-            line_color='white',
-            pitch_color='grass',
-            half=True
-        )
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=False)
         fig, ax = pitch.draw(figsize=(8, 6))
-        ax.invert_yaxis()
 
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
-        if len(x) >= 5:
+        if len(x) >= 2:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
 
         for zona, (x_z, y_z) in zona_coords.items():
@@ -105,8 +99,8 @@ if not df.empty:
 
         st.pyplot(fig)
 
-    dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    dibujar_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+    dibujar_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
