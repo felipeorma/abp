@@ -63,4 +63,30 @@ if not df.empty:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de
+    # Función de graficación con apariencia tipo sofascore
+    def graficar_heatmap(title, x, y, cmap):
+        st.subheader(title)
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
+        fig, ax = pitch.draw(figsize=(6, 9))
+
+        if len(x) >= 2:
+            try:
+                pitch.kdeplot(
+                    x, y, ax=ax,
+                    fill=True, cmap=cmap, levels=100,
+                    alpha=0.6, bw_adjust=0.4
+                )
+            except ValueError:
+                st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
+
+        st.pyplot(fig)
+
+    # Visualizar ambos heatmaps
+    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
+    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
+
+    # Botón de descarga CSV
+    csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode("utf-8")
+    st.download_button("⬇️ Descargar CSV", csv, "acciones_abp.csv", "text/csv")
+else:
+    st.info("No hay acciones registradas todavía. Usa el formulario para comenzar.")
