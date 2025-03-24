@@ -89,7 +89,7 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO (compatible con mplsoccer 1.1.8)
+    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIA CANCHA SUPERIOR
     # ----------------------------------------
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -100,7 +100,7 @@ if not df.empty:
             half=True
         )
         fig, ax = pitch.draw(figsize=(8, 6))
-        ax.invert_yaxis()
+        ax.set_ylim(52.5, 0)  # Mostrar la mitad superior del campo (portería arriba)
         pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
         st.pyplot(fig)
