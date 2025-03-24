@@ -52,25 +52,28 @@ def configurar_filtros(df):
                 default=df['Jornada'].unique()
             )
         with col2:
-            periodos = st.multiselect(
-                "Periodos",
-                options=df['Periodo'].unique(),
-                default=df['Periodo'].unique()
+            condicion = st.multiselect(
+                "Local/Visitante",
+                options=df['Condición'].unique(),
+                default=df['Condición'].unique()
             )
         
-        # Filtros tácticos
-        equipos = st.multiselect(
-            "Equipos", 
-            options=df['Equipo'].unique(),
-            default=df['Equipo'].unique()
-        )
-        
-        rivals = st.multiselect(
-            "Rivales",
-            options=df['Rival'].unique(),
-            default=df['Rival'].unique()
-        )
-        
+        # Nuevos filtros tácticos
+        col3, col4 = st.columns(2)
+        with col3:
+            equipos = st.multiselect(
+                "Equipos", 
+                options=df['Equipo'].unique(),
+                default=df['Equipo'].unique()
+            )
+        with col4:
+            rivals = st.multiselect(
+                "Rivales",
+                options=df['Rival'].unique(),
+                default=df['Rival'].unique()
+            )
+
+        # Resto de filtros
         jugadores = st.multiselect(
             "Jugadores",
             options=df['Ejecutor'].unique(),
@@ -83,27 +86,26 @@ def configurar_filtros(df):
             default=df['Acción'].unique()
         )
         
-        # Filtro de minutos
+        # Filtro temporal mejorado
         min_minuto = int(df['Minuto'].min())
         max_minuto = int(df['Minuto'].max())
         rango_minutos = st.slider(
-            "Rango de minutos",
+            "Rango de minutos (partido)",
             min_minuto, max_minuto,
             (min_minuto, max_minuto)
         )
 
     return df[
         (df['Jornada'].isin(jornadas)) &
-        (df['Periodo'].isin(periodos)) &
+        (df['Condición'].isin(condicion)) &  # Nuevo filtro
         (df['Equipo'].isin(equipos)) &
-        (df['Rival'].isin(rivals)) &  # Nuevo filtro
+        (df['Rival'].isin(rivals)) &
         (df['Ejecutor'].isin(jugadores)) &
         (df['Acción'].isin(acciones)) &
         (df['Minuto'].between(*rango_minutos))
     ]
-
 def mostrar_kpis(df):
-    cols = st.columns(4)
+    cols = st.columns(3)  # Reducido a 3 métricas
     with cols[0]:
         st.metric("Acciones registradas", df.shape[0])
     with cols[1]:
@@ -112,8 +114,6 @@ def mostrar_kpis(df):
     with cols[2]:
         eficacia = (goles/df.shape[0]*100) if df.shape[0] > 0 else 0
         st.metric("Efectividad (%)", f"{eficacia:.1f}%")
-    with cols[3]:
-        st.metric("Acciones/Minuto", f"{df['Minuto'].mean():.1f}")
 
 def generar_seccion_espacial(df):
     st.header("🌍 Mapeo Táctico")
