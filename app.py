@@ -55,9 +55,9 @@ def main():
 
         st.pyplot(fig)
 
-    # Visualizar ambos heatmaps con estilo tipo sofascore
-    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "inferno")
-    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "inferno")
+    # Visualizar ambos heatmaps con colores diferenciados
+    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
+    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
 
 # 👇 Esta línea garantiza que todo se ejecute cuando el script corre en Streamlit
 if __name__ == "__main__":
