@@ -37,23 +37,29 @@ def main():
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función para graficar heatmap
+    # Función para graficar heatmap con estilo tipo sofascore
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='#0e1117', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
+
+        fig.patch.set_facecolor('#0e1117')  # fondo total oscuro
 
         if len(x) >= 2:
             try:
-                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=300, alpha=0.5, bw_adjust=0.5)
+                pitch.kdeplot(
+                    x, y, ax=ax,
+                    fill=True, cmap=cmap, levels=100,
+                    alpha=0.6, bw_adjust=0.4  # reducción del área difusa
+                )
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
 
         st.pyplot(fig)
 
-    # Visualizar ambos heatmaps
-    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
-    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
+    # Visualizar ambos heatmaps con estilo tipo sofascore
+    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "inferno")
+    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "inferno")
 
 # 👇 Esta línea garantiza que todo se ejecute cuando el script corre en Streamlit
 if __name__ == "__main__":
