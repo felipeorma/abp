@@ -66,14 +66,14 @@ if not df.empty:
     # ZONAS CON COORDENADAS AJUSTADAS PARA VerticalPitch
     # -------------------------
     zonas = {
-        1: (0, 80, 20, 20),   2: (78, 80, 18, 20),
-        3: (0, 60, 20, 20),   4: (78, 60, 18, 20),
-        5: (40, 96, 6, 4),    6: (58, 96, 6, 4),    7: (49, 96, 6, 4),
-        8: (34, 96, 6, 4),    9: (64, 96, 6, 4),
-        10: (40, 88, 6, 6),   11: (58, 88, 6, 6),
-        12: (34, 88, 6, 6),   13: (64, 88, 6, 6),
-        14: (46, 60, 6, 28),  15: (58, 60, 6, 28),
-        16: (20, 60, 20, 20), 17: (60, 60, 18, 20),
+        1: (0, 80, 20, 20),   2: (80, 80, 20, 20),
+        3: (0, 60, 20, 20),   4: (80, 60, 20, 20),
+        5: (40, 96, 6, 4),    6: (60, 96, 6, 4),    7: (50, 96, 6, 4),
+        8: (34, 96, 6, 4),    9: (66, 96, 6, 4),
+        10: (40, 88, 6, 6),   11: (60, 88, 6, 6),
+        12: (34, 88, 6, 6),   13: (66, 88, 6, 6),
+        14: (40, 60, 6, 28),  15: (60, 60, 6, 28),
+        16: (20, 40, 20, 20), 17: (60, 40, 20, 20),
         "Penal": (52, 89, 1, 1)
     }
 
@@ -88,10 +88,6 @@ if not df.empty:
 
     df_filtrado[["x_saque", "y_saque"]] = pd.DataFrame(df_filtrado["coords_saque"].tolist(), index=df_filtrado.index)
     df_filtrado[["x_remate", "y_remate"]] = pd.DataFrame(df_filtrado["coords_remate"].tolist(), index=df_filtrado.index)
-
-    # Invertir coordenadas del heatmap para alinearlas con orientación vertical
-    df_filtrado["x_saque"], df_filtrado["y_saque"] = df_filtrado["y_saque"], 100 - df_filtrado["x_saque"]
-    df_filtrado["x_remate"], df_filtrado["y_remate"] = df_filtrado["y_remate"], 100 - df_filtrado["x_remate"]
 
     def graficar(title, x, y, cmap):
         st.subheader(title)
@@ -118,7 +114,4 @@ if not df.empty:
     graficar("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
     graficar("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
-    csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
-    st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
-else:
-    st.info("Aún no has registrado ninguna acción.")
+    csv = df_filtrado.drop(columns=["coords_saque", "coords 
