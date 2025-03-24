@@ -22,7 +22,6 @@ with st.expander("➕ Registrar nueva acción"):
     tipo = st.selectbox("Tipo de balón parado", ["Tiro libre", "Córner", "Lateral", "Penal"])
     minuto = st.number_input("⏱️ Minuto", min_value=0, max_value=120, value=0)
 
-    # Lógica condicional para zona de saque
     if tipo == "Córner":
         zona_saque = st.selectbox("📍 Zona de saque (solo esquinas)", [1, 2])
     elif tipo == "Penal":
@@ -30,7 +29,6 @@ with st.expander("➕ Registrar nueva acción"):
     else:
         zona_saque = st.selectbox("📍 Zona de saque", list(range(1, 18)))
 
-    # Zona de remate
     if tipo == "Penal":
         zona_remate = "Penal"
     else:
@@ -64,20 +62,17 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # ----------------------------------------
-    # COORDENADAS EXACTAS BASADAS EN IMAGEN DE REFERENCIA
-    # ----------------------------------------
+    # Coordenadas calibradas (portería arriba, cancha vertical 0-120 en y)
     zona_coords = {
-        1: (6, 94), 2: (61, 94),
-        3: (12, 77), 4: (54, 77),
-        5: (28, 101), 6: (40, 101), 7: (34, 101), 8: (20, 101), 9: (48, 101),
-        10: (30, 93), 11: (38, 93), 12: (22, 93), 13: (46, 93),
-        14: (27, 83), 15: (41, 83),
-        16: (22, 67), 17: (44, 67),
-        "Penal": (34, 89)
+        1: (5, 115),   2: (75, 115),
+        3: (10, 95),   4: (70, 95),
+        5: (32, 118),  6: (48, 118), 7: (40, 118), 8: (22, 118), 9: (58, 118),
+        10: (32, 108), 11: (48, 108), 12: (22, 108), 13: (58, 108),
+        14: (30, 92),  15: (50, 92),
+        16: (22, 76),  17: (58, 76),
+        "Penal": (40, 111)
     }
 
-    # Asignar coordenadas
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
     df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
@@ -88,16 +83,14 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP EN CAMPO COMPLETO
-    # ----------------------------------------
-    def dibujar_full_pitch(title, x, y, cmap):
+    def dibujar_vertical_pitch(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(
             pitch_type='statsbomb',
             line_color='white',
             pitch_color='grass',
-            half=False
+            half=False,
+            direction='vertical'
         )
         fig, ax = pitch.draw(figsize=(8, 6))
 
@@ -112,11 +105,12 @@ if not df.empty:
 
         st.pyplot(fig)
 
-    dibujar_full_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    dibujar_full_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    dibujar_vertical_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+    dibujar_vertical_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 
 else:
     st.info("Aún no has registrado ninguna acción.")
+
