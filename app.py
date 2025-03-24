@@ -97,7 +97,7 @@ if not df.empty:
             pitch_type='statsbomb',
             line_color='white',
             pitch_color='grass',
-            half=True
+            half=False
         )
         fig, ax = pitch.draw(figsize=(8, 6))
 
