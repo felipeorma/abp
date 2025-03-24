@@ -40,17 +40,15 @@ def main():
     # Función para graficar heatmap con estilo tipo sofascore
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='#0e1117', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
-
-        fig.patch.set_facecolor('#0e1117')  # fondo total oscuro
 
         if len(x) >= 2:
             try:
                 pitch.kdeplot(
                     x, y, ax=ax,
                     fill=True, cmap=cmap, levels=100,
-                    alpha=0.6, bw_adjust=0.4  # reducción del área difusa
+                    alpha=0.6, bw_adjust=0.4
                 )
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
@@ -64,4 +62,3 @@ def main():
 # 👇 Esta línea garantiza que todo se ejecute cuando el script corre en Streamlit
 if __name__ == "__main__":
     main()
-
