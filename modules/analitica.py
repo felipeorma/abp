@@ -127,24 +127,59 @@ def generar_mapa_calor(df, tipo='saque'):
     }
     
     coord_col = 'Zona Saque' if tipo == 'saque' else 'Zona Remate'
-    df_coords = df[coord_col].map(zonas_coords).apply(pd.Series)
+    
+    # Convertir todas las zonas a enteros excepto "Penal"
+    df_temp = df.copy()
+    df_temp[coord_col] = df_temp[coord_col].apply(
+        lambda x: int(x) if str(x).isdigit() else x
+    )
+    
+    # Obtener coordenadas y eliminar inválidas
+    df_coords = df_temp[coord_col].map(zonas_coords).dropna().apply(pd.Series)
+    if df_coords.empty:
+        st.warning(f"No hay datos válidos para {tipo}s")
+        return
+    
     df_coords.columns = ['x', 'y']
     
+    # Configurar pitch con parámetros optimizados
     pitch = VerticalPitch(
         pitch_type='statsbomb',
         pitch_color='grass',
-        line_color='white',
-        half=True
+        line_color='#404040',
+        linewidth=1.5,
+        half=True,
+        goal_type='box'
     )
     
     fig, ax = plt.subplots(figsize=(10, 7))
     pitch.draw(ax=ax)
-    pitch.kdeplot(
+    
+    # Parámetros mejorados para visualización
+    kdeplot = pitch.kdeplot(
         df_coords['x'], df_coords['y'],
-        ax=ax, cmap='RdYlGn' if tipo == 'remate' else 'Blues',
-        levels=50, alpha=0.7, bw_adjust=0.15
+        ax=ax,
+        cmap='viridis' if tipo == 'saque' else 'plasma',
+        levels=100,
+        fill=True,
+        alpha=0.7,
+        bw_adjust=0.1,
+        zorder=2
     )
-    ax.set_title(f"Densidad de {tipo.capitalize()}s", fontsize=14)
+    
+    # Añadir puntos de eventos
+    pitch.scatter(
+        df_coords['x'], df_coords['y'],
+        ax=ax,
+        s=50,
+        color='white',
+        edgecolors='black',
+        zorder=3
+    )
+    
+    ax.set_title(f"Densidad de {tipo.capitalize()}s", fontsize=14, pad=15)
+    plt.close()  # Limpiar memoria de figuras
+    
     st.pyplot(fig)
 
 def generar_seccion_temporal(df):
