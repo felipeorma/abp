@@ -12,8 +12,7 @@ if "registro" not in st.session_state:
     st.session_state.registro = []
 
 # ========== DATOS ORDENADOS ==========
-# Jugadores ordenados por apellido (Marco Carducci al final)
-jugadores_base = [
+jugadores_cavalry = sorted([
     "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
     "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", 
     "Mihail Gherasimencov", "Charlie Trafford", "Jesse Daley", "Sergio Camargo",
@@ -21,17 +20,13 @@ jugadores_base = [
     "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
     "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
     "Myer Bevan"
-]
+], key=lambda x: x.split()[-1]) + ["Marco Carducci"]
 
-jugadores_cavalry = sorted(jugadores_base, key=lambda x: x.split()[-1]) + ["Marco Carducci"]
-
-# Equipos ordenados alfabéticamente
 equipos_cpl = sorted([
     "Atlético Ottawa", "Forge FC", "HFX Wanderers FC",
     "Pacific FC", "Valour FC", "Vancouver FC", "York United FC"
 ])
 
-# Coordenadas de zonas
 zonas_coords = {
     1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
     5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
@@ -40,7 +35,7 @@ zonas_coords = {
     17: (72, 60), "Penal": (108, 40)
 }
 
-# ========== FORMULARIO - ORDEN CRONOLÓGICO ==========
+# ========== FORMULARIO ==========
 st.subheader("📋 Registrar nueva acción")
 
 # Paso 1: Contexto del partido
@@ -61,13 +56,11 @@ with st.container(border=True):
     with col1:
         periodo = st.selectbox("Periodo", ["1T", "2T"])
     with col2:
-        if periodo == "1T":
-            minuto_opts = [str(x) for x in range(0, 46)] + ["45+"]
-        else:
-            minuto_opts = [str(x) for x in range(45, 91)] + ["90+"]
-        minuto_str = st.selectbox("Minuto", minuto_opts)
+        minuto_str = st.selectbox("Minuto", 
+            [str(x) for x in (range(0,46) if periodo == "1T" else range(45,91))] + 
+            (["45+"] if periodo == "1T" else ["90+"]))
 
-# Paso 3: Tipo de acción y equipo
+# Paso 3: Tipo de acción
 with st.container(border=True):
     st.markdown("### ⚽ Acción")
     col1, col2 = st.columns(2)
@@ -89,16 +82,11 @@ with st.container(border=True):
         zona_saque = zona_remate = "Penal"
         st.info("Configuración automática para penales")
         primer_contacto = cuerpo1 = segundo_contacto = "N/A"
-        
     else:
         col1, col2 = st.columns(2)
         with col1:
-            if tipo_accion == "Córner":
-                zona_saque = st.selectbox("Zona de saque", [1, 2])
-            else:
-                zonas_disponibles = [z for z in zonas_coords if z != "Penal"]
-                zona_saque = st.selectbox("Zona de saque", zonas_disponibles)
-        
+            zona_saque = st.selectbox("Zona de saque", 
+                [1, 2] if tipo_accion == "Córner" else [z for z in zonas_coords if z != "Penal"])
         with col2:
             zona_remate = st.selectbox("Zona de remate", [z for z in zonas_coords if z != "Penal"])
         
@@ -106,7 +94,7 @@ with st.container(border=True):
         cuerpo1 = st.selectbox("Parte del cuerpo", ["Cabeza", "Pie derecho", "Pie izquierdo", "Tronco", "Otro"])
         segundo_contacto = st.text_input("Segundo contacto (opcional)")
 
-# Paso 5: Resultados y estrategia
+# Paso 5: Resultados
 with st.container(border=True):
     st.markdown("### 📊 Resultados")
     col1, col2 = st.columns(2)
@@ -148,34 +136,34 @@ if st.button("✅ Registrar Acción", type="primary"):
     st.success("Acción registrada exitosamente!")
     st.balloons()
 
-# ========== VISUALIZACIÓN DE DATOS ==========
+# ========== VISUALIZACIÓN ==========
 if st.session_state.registro:
     st.subheader("📊 Datos Registrados")
     df = pd.DataFrame(st.session_state.registro)
     
     # Eliminar registros
-    col1, col2 = st.columns(2)
-    with col1:
-        index_to_delete = st.number_input("Índice a eliminar", min_value=0, max_value=len(df)-1)
-    with col2:
-        st.write("")
-        st.write("")
-        if st.button("🗑️ Eliminar Registro"):
-            st.session_state.registro.pop(index_to_delete)
-            st.experimental_rerun()
+    index_to_delete = st.number_input("Índice a eliminar", min_value=0, max_value=len(df)-1)
+    if st.button("🗑️ Eliminar Registro"):
+        st.session_state.registro.pop(index_to_delete)
+        st.experimental_rerun()
     
     st.dataframe(df, use_container_width=True)
 
-    # Procesamiento para heatmaps
+    # Procesamiento de coordenadas
     df["coords_saque"] = df["Zona Saque"].map(zonas_coords)
     df["coords_remate"] = df["Zona Remate"].map(zonas_coords)
     df = df.dropna(subset=["coords_saque", "coords_remate"])
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación mejorada
-    def graficar_heatmap(title, x, y, color):
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white', half=True)
+    # Función de graficación corregida
+    def graficar_heatmap(title, x, y, color, tipo):
+        pitch = VerticalPitch(
+            pitch_type='statsbomb', 
+            pitch_color='grass', 
+            line_color='white',
+            half=(tipo == 'remate')  # Media cancha solo para remates
+        )
         fig, ax = pitch.draw(figsize=(10, 7))
         
         try:
@@ -186,23 +174,27 @@ if st.session_state.registro:
             y_valid = y[valid]
             
             if not x_valid.empty:
-                # Heatmap con efecto de mancha suavizado
-                pitch.kdeplot(x_valid, y_valid, ax=ax,
-                            cmap=f'{color.capitalize()}s',
-                            levels=100,
-                            fill=True,
-                            alpha=0.7,
-                            bw_adjust=0.6,
-                            zorder=2)
+                # Heatmap con parámetros optimizados
+                pitch.kdeplot(
+                    x_valid, y_valid, ax=ax,
+                    cmap=f'{color.capitalize()}s',
+                    levels=100,
+                    fill=True,
+                    alpha=0.7,
+                    bw_adjust=0.4 if tipo == 'saque' else 0.6,
+                    zorder=2
+                )
                 
                 # Puntos superpuestos
-                pitch.scatter(x_valid, y_valid, ax=ax,
-                            s=100,
-                            color=color,
-                            edgecolors='white',
-                            linewidth=1,
-                            alpha=0.8,
-                            zorder=3)
+                pitch.scatter(
+                    x_valid, y_valid, ax=ax,
+                    s=100,
+                    color=color,
+                    edgecolors='white',
+                    linewidth=1,
+                    alpha=0.8,
+                    zorder=3
+                )
                 
         except Exception as e:
             st.error(f"Error al generar el gráfico: {str(e)}")
@@ -210,9 +202,9 @@ if st.session_state.registro:
         st.subheader(title)
         st.pyplot(fig)
 
-    # Generación de heatmaps
-    graficar_heatmap("🟢 Densidad de Saques", df["x_saque"], df["y_saque"], "green")
-    graficar_heatmap("🔴 Densidad de Remates", df["x_remate"], df["y_remate"], "red")
+    # Generar ambos heatmaps
+    graficar_heatmap("🟢 Densidad de Saques", df["x_saque"], df["y_saque"], "green", 'saque')
+    graficar_heatmap("🔴 Densidad de Remates", df["x_remate"], df["y_remate"], "red", 'remate')
 
     # Descarga de datos
     csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
