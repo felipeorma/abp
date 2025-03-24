@@ -78,20 +78,26 @@ if not df.empty:
     # Asegurarse de que los valores de zona_saque sean enteros
     df_filtrado["zona_saque"] = df_filtrado["zona_saque"].apply(lambda x: int(x) if isinstance(x, str) else x)
 
-    # Asignar coordenadas
+    # Asignar coordenadas para zona_saque
     if "zona_saque" in df_filtrado.columns and not df_filtrado["zona_saque"].isnull().all():
         df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     else:
         st.warning("No hay datos válidos en 'zona_saque'.")
 
+    # Asegurarse de que las coordenadas no estén vacías
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
     df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
     df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[1])
 
+    # Asignar coordenadas para zona_remate
     df_filtrado["coords_remate"] = df_filtrado["zona_remate"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_remate"])
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
+
+    # Depuración: Verifica si las coordenadas están correctas
+    st.write("Coordenadas zona saque", df_filtrado[["zona_saque", "x_saque", "y_saque"]].head())
+    st.write("Coordenadas zona remate", df_filtrado[["zona_remate", "x_remate", "y_remate"]].head())
 
     # Función para dibujar medio campo
     def dibujar_half_pitch(title, x, y, cmap):
@@ -105,8 +111,15 @@ if not df.empty:
         st.pyplot(fig)
 
     # Heatmaps
-    dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    if not df_filtrado[["x_saque", "y_saque"]].empty:
+        dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+    else:
+        st.warning("No hay datos para el Heatmap de Zona de Saque.")
+
+    if not df_filtrado[["x_remate", "y_remate"]].empty:
+        dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    else:
+        st.warning("No hay datos para el Heatmap de Zona de Remate.")
 
     # Descargar CSV
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
