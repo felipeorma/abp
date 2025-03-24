@@ -1,89 +1,67 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 from mplsoccer import VerticalPitch
+from PIL import Image
 
-# Configuración de la página
-st.set_page_config(layout="centered")
-st.title("⚽ Registro y Heatmap de Balón Parado")
+def main():
+    # Configuración de la página
+    st.set_page_config(layout="centered")
+    st.title("⚽ Heatmaps de Balón Parado - Saque y Remate")
 
-# Inicializar sesión para almacenar datos
-if "registro" not in st.session_state:
-    st.session_state.registro = []
+    # Cargar CSV simulado
+    try:
+        df = pd.read_csv("fake_abp_dataset.csv")
+    except FileNotFoundError:
+        st.error("❌ Archivo 'fake_abp_dataset.csv' no encontrado en el repositorio. Sube el archivo al mismo nivel del script.")
+        st.stop()
 
-# Coordenadas centrales representativas para cada zona (finales)
-zonas_coords = {
-    1:  (120, 0),    2:  (120, 80),   3:  (93, 9),    4:  (93, 71),
-    5:  (114, 30),  6:  (114, 50),  7:  (114, 40),  8:  (111, 15),
-    9:  (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
-   13: (105, 55), 14: (93, 29),  15: (93, 51), 16: (72, 20),
-   17: (72, 60), "Penal": (108, 40)
-}
+    # Coordenadas centrales representativas para cada zona (finales)
+    zonas_coords = {
+        1:  (120, 0),    2:  (120, 80),   3:  (93, 9),    4:  (93, 71),
+        5:  (114, 30),  6:  (114, 50),  7:  (114, 40),  8:  (111, 15),
+        9:  (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
+       13: (105, 55), 14: (93, 29),  15: (93, 51), 16: (72, 20),
+       17: (72, 60), "Penal": (108, 40)
+    }
 
-# Formulario de registro
-st.subheader("📋 Registrar nueva acción")
-tipo = st.selectbox("Tipo de balón parado", ["Tiro libre", "Córner", "Lateral", "Penal"])
-minuto = st.number_input("⏱️ Minuto", min_value=0, max_value=120, value=0)
-
-zona_saque = st.selectbox("📍 Zona de saque", list(zonas_coords.keys()))
-zona_remate = st.selectbox("🎯 Zona de remate", list(zonas_coords.keys()))
-ejecutor = st.text_input("👟 Ejecutante")
-primer_contacto = st.text_input("🤝 Primer contacto")
-segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
-
-if st.button("✅ Agregar acción"):
-    st.session_state.registro.append({
-        "tipo": tipo,
-        "minuto": minuto,
-        "zona_saque": zona_saque,
-        "zona_remate": zona_remate,
-        "ejecutor": ejecutor,
-        "primer_contacto": primer_contacto,
-        "segundo_contacto": segundo_contacto
-    })
-    st.success("Acción registrada correctamente ✅")
-
-# Mostrar tabla de acciones registradas
-df = pd.DataFrame(st.session_state.registro)
-if not df.empty:
-    st.subheader("📊 Acciones registradas")
-
-    # Eliminar registros específicos
-    index_to_delete = st.number_input("🗑️ Eliminar registro por índice", min_value=0, max_value=len(df)-1, step=1)
-    if st.button("Eliminar registro"):
-        st.session_state.registro.pop(index_to_delete)
-        st.experimental_rerun()
-
-    st.dataframe(df)
-
-    # Agregar coordenadas
+    # Asignar coordenadas centrales a cada acción en el dataframe
     df["coords_saque"] = df["zona_saque"].map(zonas_coords)
     df["coords_remate"] = df["zona_remate"].map(zonas_coords)
+
+    # Eliminar filas con coordenadas inválidas
     df = df.dropna(subset=["coords_saque", "coords_remate"])
+
+    # Separar en columnas x/y
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación
+    # Función para graficar heatmap con estilo tipo sofascore
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='#0e1117', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
 
-        if len(x) == 1:
-            pitch.scatter(x, y, ax=ax, s=150, color=cmap, edgecolors='white', zorder=3)
-        elif len(x) >= 2:
+        fig.patch.set_facecolor('#0e1117')  # fondo total oscuro
+
+        if len(x) >= 2:
             try:
-                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=100, alpha=0.6, bw_adjust=0.4)
+                pitch.kdeplot(
+                    x, y, ax=ax,
+                    fill=True, cmap=cmap, levels=100,
+                    alpha=0.6, bw_adjust=0.4  # reducción del área difusa
+                )
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
 
         st.pyplot(fig)
 
-    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
-    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
+    # Visualizar ambos heatmaps con estilo tipo sofascore
+    graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "inferno")
+    graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "inferno")
 
-    # Botón de descarga CSV
-    csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode("utf-8")
-    st.download_button("⬇️ Descargar CSV", csv, "acciones_abp.csv", "text/csv")
-else:
-    st.info("No hay acciones registradas todavía. Usa el formulario para comenzar.")
+# 👇 Esta línea garantiza que todo se ejecute cuando el script corre en Streamlit
+if __name__ == "__main__":
+    main()
+
