@@ -116,4 +116,3 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
-
