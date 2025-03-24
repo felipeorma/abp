@@ -17,7 +17,7 @@ def main():
         st.error("❌ Archivo 'fake_abp_dataset.csv' no encontrado en el repositorio. Sube el archivo al mismo nivel del script.")
         st.stop()
 
-    # Coordenadas centrales representativas para cada zona
+    # Coordenadas centrales representativas para cada zona (finales)
     zonas_coords = {
         1:  (120, 0),    2:  (120, 80),   3:  (93, 9),    4:  (93, 71),
         5:  (114, 30),  6:  (114, 50),  7:  (114, 40),  8:  (111, 15),
@@ -37,19 +37,15 @@ def main():
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función para graficar heatmap con etiquetas
+    # Función para graficar heatmap
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', half=False, pitch_color='grass', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', half=True, half_side='top', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
-
-        # Dibujar los números de zonas para verificación
-        for zona, (x_z, y_z) in zonas_coords.items():
-            pitch.annotate(str(zona), (x_z, y_z), ax=ax, fontsize=10, ha='center', va='center', color='black', bbox=dict(facecolor='white', edgecolor='black', boxstyle='circle'))
 
         if len(x) >= 2:
             try:
-                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=200, alpha=0.4, bw_adjust=0.3)
+                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=300, alpha=0.5, bw_adjust=0.5)
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
 
@@ -62,3 +58,4 @@ def main():
 # 👇 Esta línea garantiza que todo se ejecute cuando el script corre en Streamlit
 if __name__ == "__main__":
     main()
+
