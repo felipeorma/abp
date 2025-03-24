@@ -40,7 +40,7 @@ def main():
     # Función para graficar heatmap
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', half=True, half_side='top', pitch_color='grass', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
 
         if len(x) >= 2:
