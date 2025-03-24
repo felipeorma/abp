@@ -158,88 +158,62 @@ def generar_heatmaps(df, zonas):
         if df.empty:
             st.warning("No hay datos para visualizar con los filtros actuales")
             return
-        
+
         # Procesar coordenadas
         df = df.copy()
         df["coords_saque"] = df["Zona Saque"].map(zonas)
         df["coords_remate"] = df["Zona Remate"].map(zonas)
         df = df.dropna(subset=["coords_saque", "coords_remate"])
         
-        # Convertir coordenadas
         df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
         df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
         
-        # Filtrar coordenadas válidas
-        df = df[(df['x_saque'] >= 0) & (df['x_saque'] <= 120) & 
-                (df['y_saque'] >= 0) & (df['y_saque'] <= 80)]
-        
-        # Configurar pitch con parámetros optimizados
+        # Configuración optimizada del pitch
         pitch = VerticalPitch(
             pitch_type='statsbomb',
             pitch_color='grass',
             line_color='white',
             half=True,
             goal_type='box',
-            linewidth=2,
-            pad_top=10
+            linewidth=1.5,
+            pad_top=15
         )
 
         # Heatmap de Saques
-        fig1, ax1 = plt.subplots(figsize=(10, 7))
+        fig1, ax1 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax1)
         
-        # Gráfico de densidad para saques
+        # Ajustes clave para el heatmap:
         kde1 = pitch.kdeplot(
             df['x_saque'], df['y_saque'],
             ax=ax1,
             cmap='Greens',
-            levels=100,
+            levels=200,  # Más niveles para suavizado
             fill=True,
-            alpha=0.5,
-            bw_adjust=0.3,
+            alpha=0.6,   # Mayor transparencia
+            bw_adjust=0.2,  # Aumentar el ancho de banda
             zorder=2
         )
         
-        # Puntos de saque reales
-        pitch.scatter(
-            df['x_saque'], df['y_saque'],
-            ax=ax1,
-            s=50,
-            color='black',
-            edgecolors='white',
-            zorder=3
-        )
-        
-        ax1.set_title('Distribución de Saques', fontsize=14, pad=15, weight='bold')
+        ax1.set_title('Distribución de Saques', fontsize=16, pad=20, weight='bold')
         st.pyplot(fig1)
 
         # Heatmap de Remates
-        fig2, ax2 = plt.subplots(figsize=(10, 7))
+        fig2, ax2 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax2)
         
-        # Gráfico de densidad para remates
         kde2 = pitch.kdeplot(
             df['x_remate'], df['y_remate'],
             ax=ax2,
             cmap='Reds',
-            levels=100,
+            levels=200,
             fill=True,
-            alpha=0.5,
-            bw_adjust=0.3,
+            alpha=0.6,
+            bw_adjust=0.2,  # Mismo ajuste que para saques
             zorder=2
         )
         
-        # Puntos de remate reales
-        pitch.scatter(
-            df['x_remate'], df['y_remate'],
-            ax=ax2,
-            s=50,
-            color='black',
-            edgecolors='white',
-            zorder=3
-        )
-        
-        ax2.set_title('Zonas de Remate', fontsize=14, pad=15, weight='bold')
+        ax2.set_title('Zonas de Remate', fontsize=16, pad=20, weight='bold')
         st.pyplot(fig2)
 
     except Exception as e:
