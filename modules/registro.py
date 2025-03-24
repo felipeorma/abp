@@ -185,8 +185,8 @@ def generar_heatmaps(df, zonas):
             'levels': 100,
             'fill': True,
             'alpha': 0.7,
-            'bw_adjust': 0.58,  # Control principal de expansión
-            'thresh': 0.01,      # Mostrar áreas de baja densidad
+            'bw_adjust': 0.48,  # Control principal de expansión
+            'thresh': 0.1,      # Mostrar áreas de baja densidad
             'zorder': 2
         }
 
