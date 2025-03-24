@@ -1,32 +1,30 @@
+# app.py (Archivo principal)
 import streamlit as st
-from modules.registro import registro_page
-from modules.analitica import analitica_page
+import pandas as pd
+import matplotlib.pyplot as plt
+from mplsoccer import VerticalPitch
+from modules.registro import formulario_registro, guardar_registro
+from modules.analitica import generar_heatmaps, mostrar_estadisticas
+from utils.data_loader import cargar_datos_iniciales
 
-# Configuración inicial
-st.set_page_config(
-    layout="centered",
-    page_icon="⚽",
-    page_title="Set Piece Analytics Pro",
-    initial_sidebar_state="expanded"
-)
-
-# Cargar estilos CSS
-with open("assets/estilos.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-# Navegación
-pagina = st.sidebar.radio(
-    "Seleccionar módulo:",
-    ("🏟️ Registro en Vivo", "📊 Panel Analítico"),
-    index=0
-)
-
-# Inicializar sesión si no existe
-if "registro" not in st.session_state:
-    st.session_state.registro = []
-
-# Mostrar página seleccionada
-if pagina == "🏟️ Registro en Vivo":
-    registro_page()
-else:
-    analitica_page()
+def main():
+    # Configuración inicial
+    st.set_page_config(layout="centered", page_icon="⚽")
+    st.title("⚽ Plataforma de Análisis Táctico - Cavalry FC")
+    
+    # Cargar datos iniciales
+    jugadores, equipos, zonas_coords = cargar_datos_iniciales()
+    
+    # Sección de registro
+    datos_registro = formulario_registro(jugadores, equipos, zonas_coords)
+    if st.button("Registrar Acción"):
+        guardar_registro(datos_registro)
+    
+    # Sección de visualización
+    if st.session_state.registro:
+        df = pd.DataFrame(st.session_state.registro)
+        generar_heatmaps(df, zonas_coords)
+        mostrar_estadisticas(df)
+        
+if __name__ == "__main__":
+    main()
