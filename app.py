@@ -19,7 +19,7 @@ def main():
 
     # Coordenadas centrales representativas para cada zona
     zonas_coords = {
-        1:  (111, 9),    2:  (111, 71),   3:  (93, 9),    4:  (93, 71),
+        1:  (116, 5),    2:  (116, 75),   3:  (95, 9),    4:  (95, 71),
         5:  (114, 30),  6:  (114, 50),  7:  (114, 40),  8:  (111, 18),
         9:  (111, 62), 10: (114, 15), 11: (114, 65), 12: (105, 15),
        13: (105, 65), 14: (93, 29),  15: (93, 51), 16: (72, 20),
@@ -29,6 +29,9 @@ def main():
     # Asignar coordenadas centrales a cada acción en el dataframe
     df["coords_saque"] = df["zona_saque"].map(zonas_coords)
     df["coords_remate"] = df["zona_remate"].map(zonas_coords)
+
+    # Eliminar filas con coordenadas inválidas
+    df = df.dropna(subset=["coords_saque", "coords_remate"])
 
     # Separar en columnas x/y
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
@@ -42,7 +45,7 @@ def main():
 
         if len(x) >= 2:
             try:
-                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=100, alpha=0.6)
+                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=200, alpha=0.4, bw_adjust=0.3)
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
 
