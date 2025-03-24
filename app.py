@@ -243,7 +243,7 @@ def analytics_page():
     st.title("📈 Análisis Avanzado de Jugadas a Balón Parado")
     
     # Configurar URL de datos
-    GITHUB_RAW_URL = "https://raw.githubusercontent.com/tu_usuario/tu_repositorio/main/master_abp.csv"
+    GITHUB_RAW_URL = "https://github.com/felipeorma/abp/blob/main/master_abp.csv"
     
     @st.cache_data(ttl=3600)
     def load_github_data(url):
