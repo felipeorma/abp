@@ -47,6 +47,13 @@ if st.button("✅ Agregar acción"):
 df = pd.DataFrame(st.session_state.registro)
 if not df.empty:
     st.subheader("📊 Acciones registradas")
+
+    # Eliminar registros específicos
+    index_to_delete = st.number_input("🗑️ Eliminar registro por índice", min_value=0, max_value=len(df)-1, step=1)
+    if st.button("Eliminar registro"):
+        st.session_state.registro.pop(index_to_delete)
+        st.experimental_rerun()
+
     st.dataframe(df)
 
     # Agregar coordenadas
@@ -58,17 +65,15 @@ if not df.empty:
 
     # Función de graficación
     def graficar_heatmap(title, x, y, cmap):
-        st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
-        fig, ax = pitch.draw(figsize=(6, 9))
-
         if len(x) >= 2:
+            st.subheader(title)
+            pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
+            fig, ax = pitch.draw(figsize=(6, 9))
             try:
                 pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=100, alpha=0.6, bw_adjust=0.4)
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
-
-        st.pyplot(fig)
+            st.pyplot(fig)
 
     graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
     graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
@@ -78,4 +83,3 @@ if not df.empty:
     st.download_button("⬇️ Descargar CSV", csv, "acciones_abp.csv", "text/csv")
 else:
     st.info("No hay acciones registradas todavía. Usa el formulario para comenzar.")
-
