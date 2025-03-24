@@ -4,91 +4,135 @@ import plotly.express as px
 from utils.data_loader import load_github_data
 
 def analitica_page():
-    st.title("📈 Análisis Avanzado de Jugadas a Balón Parado")
+    st.title("📊 Panel Analítico Avanzado")
     
-    # Cargar datos
-    df = load_github_data()
-    
-    if not df.empty:
-        # Filtros
-        st.sidebar.header("🔍 Filtros Avanzados")
-        jugador_filtro = st.sidebar.multiselect("Filtrar por jugador", df['Ejecutor'].unique())
-        resultado_filtro = st.sidebar.multiselect("Filtrar por resultado", df['Resultado'].unique())
-        
-        # Aplicar filtros
-        filtered_df = df.copy()
-        if jugador_filtro:
-            filtered_df = filtered_df[filtered_df['Ejecutor'].isin(jugador_filtro)]
-        if resultado_filtro:
-            filtered_df = filtered_df[filtered_df['Resultado'].isin(resultado_filtro)]
-        
-        # KPIs
-        mostrar_kpis(filtered_df)
-        
-        # Gráficos
-        mostrar_heatmaps(filtered_df)
-        mostrar_rankings(filtered_df)
-        
-def mostrar_kpis(df):
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Acciones Totales", len(df))
-    with col2:
-        st.metric("Tasa de Éxito", f"{df['Gol'].eq('Sí').mean()*100:.1f}%")
-    with col3:
-        st.metric("Estrategias Exitosas", df['Estrategia'].eq('Sí').sum())
-    with col4:
-        st.metric("Goles Totales", df['Gol'].eq('Sí').sum())
+    # Cargar datos desde GitHub
+    try:
+        url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
+        df = pd.read_csv(url)
+        df = df.dropna(subset=['Zona Saque', 'Zona Remate'])
+    except Exception as e:
+        st.error(f"Error cargando datos: {str(e)}")
+        return
 
-def mostrar_heatmaps(df):
-    st.header("🔥 Heatmaps Tácticos")
+    # Sección de Filtros
+    with st.sidebar.expander("🔍 FILTROS AVANZADOS", expanded=True):
+        # Filtros temporales
+        jornadas = st.multiselect(
+            "Jornadas",
+            options=df['Jornada'].unique(),
+            default=df['Jornada'].unique()
+        )
+        
+        # Filtros de equipo
+        equipos = st.multiselect(
+            "Equipos",
+            options=df['Equipo'].unique(),
+            default=df['Equipo'].unique()
+        )
+        
+        # Filtros tácticos
+        tipo_accion = st.multiselect(
+            "Tipo de acción",
+            options=df['Acción'].unique(),
+            default=df['Acción'].unique()
+        )
+        
+        # Filtro de resultado
+        resultados = st.multiselect(
+            "Resultados",
+            options=df['Resultado'].unique(),
+            default=df['Resultado'].unique()
+        )
+
+    # Aplicar filtros
+    filtered_df = df[
+        (df['Jornada'].isin(jornadas)) &
+        (df['Equipo'].isin(equipos)) &
+        (df['Acción'].isin(tipo_accion)) &
+        (df['Resultado'].isin(resultados))
+    ]
+
+    # Mostrar estadísticas rápidas
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total de Acciones", filtered_df.shape[0])
+    with col2:
+        goles = filtered_df[filtered_df['Gol'] == 'Sí'].shape[0]
+        st.metric("Goles Marcados", goles)
+    with col3:
+        eficiencia = (goles / filtered_df.shape[0]) * 100 if filtered_df.shape[0] > 0 else 0
+        st.metric("Eficiencia (%)", f"{eficiencia:.1f}%")
+
+    # Sección de Heatmaps
+    st.header("Análisis Espacial")
+    generar_heatmaps_analitica(filtered_df)
+
+    # Análisis adicional
+    st.header("📈 Métricas Clave")
     col1, col2 = st.columns(2)
     
     with col1:
-        fig = px.density_heatmap(
-            df, x='x_saque', y='y_saque',
-            nbinsx=20, nbinsy=20,
-            title="Distribución de Saques"
-        )
+        st.subheader("Distribución de Resultados")
+        fig = px.pie(filtered_df, names='Resultado', hole=0.3)
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
-        fig = px.density_heatmap(
-            df, x='x_remate', y='y_remate',
-            nbinsx=20, nbinsy=20,
-            title="Zonas de Remate"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        st.subheader("Acciones por Jugador")
+        top_jugadores = filtered_df['Ejecutor'].value_counts().head(5)
+        st.bar_chart(top_jugadores)
 
-def mostrar_rankings(df):
-    st.header("🏅 Rankings de Jugadores")
-    stats = df.groupby('Ejecutor').agg(
-        Acciones=('Acción', 'count'),
-        Goles=('Gol', lambda x: sum(x == 'Sí')),
-        Estrategias=('Estrategia', lambda x: sum(x == 'Sí'))
-    ).reset_index()
+def generar_heatmaps_analitica(df):
+    zonas_coords = {
+        1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
+        5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
+        9: (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
+        13: (105, 55), 14: (93, 29), 15: (93, 51), 16: (72, 20),
+        17: (72, 60), "Penal": (108, 40)
+    }
+
+    # Procesamiento de coordenadas
+    df = df.copy()
+    df["coords_saque"] = df["Zona Saque"].map(zonas_coords)
+    df["coords_remate"] = df["Zona Remate"].map(zonas_coords)
     
-    tabs = st.tabs(["Acciones", "Goles", "Estrategias"])
-    with tabs[0]:
-        fig = px.bar(
-            stats.nlargest(10, 'Acciones'),
-            x='Ejecutor', y='Acciones',
-            title="Top 10 por Acciones"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
+    df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
+
+    # Configuración de visualización mejorada
+    pitch = VerticalPitch(
+        pitch_type='statsbomb',
+        pitch_color='grass',
+        line_color='white',
+        half=True,
+        goal_type='box',
+        linewidth=1.2
+    )
+
+    # Parámetros optimizados para análisis
+    heatmap_params = {
+        'cmap': 'YlGnBu',
+        'levels': 150,
+        'fill': True,
+        'alpha': 0.8,
+        'bw_adjust': 0.1,
+        'thresh': 0.05,
+        'zorder': 2
+    }
+
+    # Heatmaps interactivos
+    tab1, tab2 = st.tabs(["🗺️ Heatmap de Saques", "🎯 Heatmap de Remates"])
     
-    with tabs[1]:
-        fig = px.bar(
-            stats.nlargest(10, 'Goles'),
-            x='Ejecutor', y='Goles',
-            title="Top 10 por Goles"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    with tab1:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        pitch.draw(ax=ax)
+        pitch.kdeplot(df['x_saque'], df['y_saque'], ax=ax, **heatmap_params)
+        ax.set_title("Distribución de Saques", fontsize=16, pad=15)
+        st.pyplot(fig)
     
-    with tabs[2]:
-        fig = px.bar(
-            stats.nlargest(10, 'Estrategias'),
-            x='Ejecutor', y='Estrategias',
-            title="Top 10 por Estrategias"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    with tab2:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        pitch.draw(ax=ax)
+        pitch.kdeplot(df['x_remate'], df['y_remate'], ax=ax, **heatmap_params)
+        ax.set_title("Zonas de Remate", fontsize=16, pad=15)
+        st.pyplot(fig)
