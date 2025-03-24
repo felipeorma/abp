@@ -163,7 +163,7 @@ def generar_mapa_calor(df, tipo='saque'):
         levels=100,
         fill=True,
         alpha=0.7,
-        bw_adjust=0.1,
+        bw_adjust=0.45,
         zorder=2
     )
     
