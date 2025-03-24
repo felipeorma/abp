@@ -64,15 +64,17 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas por zona
+    # ----------------------------------------
+    # COORDENADAS ADAPTADAS A MEDIA CANCHA (portería arriba)
+    # ----------------------------------------
     zona_coords = {
-        1: (5, 100),   2: (63, 100),
-        3: (18, 78),   4: (50, 78),
-        5: (30, 95),   6: (38, 95), 7: (34, 95), 8: (22, 95), 9: (46, 95),
-        10: (30, 88), 11: (38, 88), 12: (22, 88), 13: (46, 88),
-        14: (28, 70), 15: (40, 70),
-        16: (20, 55), 17: (48, 55),
-        "Penal": (34, 88)  # Punto penal ficticio para visualización
+        1: (5, 5),     2: (63, 5),
+        3: (18, 10),   4: (50, 10),
+        5: (30, 6),    6: (38, 6),  7: (34, 6),  8: (22, 6), 9: (46, 6),
+        10: (30, 12),  11: (38, 12), 12: (22, 12), 13: (46, 12),
+        14: (28, 18),  15: (40, 18),
+        16: (20, 24),  17: (48, 24),
+        "Penal": (34, 11)  # Punto penal medio cancha
     }
 
     # Asignar coordenadas
@@ -86,7 +88,9 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    # Función para dibujar medio campo
+    # ----------------------------------------
+    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO
+    # ----------------------------------------
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)
