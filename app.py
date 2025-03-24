@@ -80,10 +80,13 @@ if not df.empty:
     # ---------------------------
     st.subheader("🔥 Heatmap sobre cancha real (portería arriba)")
 
-    pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', inverse_y=True)
+    pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
     fig, ax = pitch.draw(figsize=(8, 6))
 
+    # Invertir el eje Y para poner la portería arriba
+    ax.invert_yaxis()
 
+    # Heatmap KDE
     pitch.kdeplot(
         x=df_filtrado["x"],
         y=df_filtrado["y"],
@@ -95,6 +98,7 @@ if not df.empty:
         alpha=0.8
     )
 
+    # Puntos individuales
     pitch.scatter(df_filtrado["x"], df_filtrado["y"], ax=ax, color="black", s=30, edgecolors='white', zorder=2)
 
     st.pyplot(fig)
@@ -107,3 +111,4 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
+
