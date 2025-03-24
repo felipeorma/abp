@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # Configuración inicial
 st.set_page_config(layout="centered")
@@ -174,7 +173,7 @@ if st.session_state.registro:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación mejorada con efecto "mancha"
+    # Función de graficación mejorada
     def graficar_heatmap(title, x, y, color):
         pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white', half=True)
         fig, ax = pitch.draw(figsize=(10, 7))
@@ -187,33 +186,23 @@ if st.session_state.registro:
             y_valid = y[valid]
             
             if not x_valid.empty:
-                # Heatmap con efecto de densidad suavizado
-                kdeplot = pitch.kdeplot(x_valid, y_valid, ax=ax,
-                                      cmap=f'{color.capitalize()}s',
-                                      levels=200,
-                                      fill=True,
-                                      alpha=0.65,
-                                      bw_adjust=0.5,
-                                      zorder=2,
-                                      linewidths=0.1,
-                                      antialiased=True)
+                # Heatmap con efecto de mancha suavizado
+                pitch.kdeplot(x_valid, y_valid, ax=ax,
+                            cmap=f'{color.capitalize()}s',
+                            levels=100,
+                            fill=True,
+                            alpha=0.7,
+                            bw_adjust=0.6,
+                            zorder=2)
                 
                 # Puntos superpuestos
-                scatter = pitch.scatter(x_valid, y_valid, ax=ax,
-                                      s=80,
-                                      color=color,
-                                      edgecolors='white',
-                                      linewidth=0.5,
-                                      alpha=0.7,
-                                      zorder=3)
-                
-                # Barra de densidad
-                divider = make_axes_locatable(ax)
-                cax = divider.append_axes("right", size="3%", pad=0.1)
-                norm = plt.Normalize(vmin=0, vmax=1)
-                sm = plt.cm.ScalarMappable(cmap=f'{color.capitalize()}s', norm=norm)
-                sm.set_array([])
-                fig.colorbar(sm, cax=cax, orientation='vertical', label='Densidad de Acciones')
+                pitch.scatter(x_valid, y_valid, ax=ax,
+                            s=100,
+                            color=color,
+                            edgecolors='white',
+                            linewidth=1,
+                            alpha=0.8,
+                            zorder=3)
                 
         except Exception as e:
             st.error(f"Error al generar el gráfico: {str(e)}")
