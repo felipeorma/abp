@@ -58,23 +58,23 @@ if not df.empty:
     st.dataframe(df_filtrado)
 
     # -------------------------
-    # ZONAS SOBRE EL CAMPO
+    # ZONAS CON COORDENADAS PARA VerticalPitch
     # -------------------------
     zonas = {
-        1: (0, 0, 20, 20),     2: (100, 0, 20, 20),
-        3: (20, 20, 20, 20),   4: (80, 20, 20, 20),
-        5: (40, 0, 10, 12),    6: (70, 0, 10, 12),    7: (55, 0, 10, 12),
-        8: (30, 0, 10, 12),    9: (90, 0, 10, 12),
-        10: (40, 12, 10, 8),   11: (70, 12, 10, 8),
-        12: (30, 12, 10, 8),   13: (90, 12, 10, 8),
-        14: (40, 20, 10, 20),  15: (70, 20, 10, 20),
-        16: (20, 40, 20, 20),  17: (80, 40, 20, 20),
-        "Penal": (60, 11, 1, 1)
+        1: (5, 90, 20, 10),    2: (75, 90, 20, 10),
+        3: (5, 70, 20, 20),    4: (75, 70, 20, 20),
+        5: (37, 95, 6, 5),     6: (57, 95, 6, 5),     7: (47, 95, 6, 5),
+        8: (30, 95, 6, 5),     9: (64, 95, 6, 5),
+        10: (37, 88, 6, 6),    11: (57, 88, 6, 6),
+        12: (30, 88, 6, 6),    13: (64, 88, 6, 6),
+        14: (37, 70, 6, 18),   15: (57, 70, 6, 18),
+        16: (20, 50, 20, 20),  17: (60, 50, 20, 20),
+        "Penal": (50, 89, 1, 1)
     }
 
     def zona_centro(z):
         if z == "Penal":
-            return (60.5, 11.5)
+            return (50.5, 89.5)
         x, y, w, h = zonas[z]
         return (x + w / 2, y + h / 2)
 
@@ -87,7 +87,7 @@ if not df.empty:
     def graficar(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True, half_side='top')
-        fig, ax = pitch.draw(figsize=(6, 10))
+        fig, ax = pitch.draw(figsize=(6, 9))
 
         # Dibujar zonas
         for zona, (x0, y0, w, h) in zonas.items():
@@ -110,8 +110,8 @@ if not df.empty:
     graficar("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
     graficar("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
-    # Descargar CSV
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 else:
     st.info("Aún no has registrado ninguna acción.")
+
