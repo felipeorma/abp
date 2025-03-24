@@ -98,10 +98,10 @@ if not df.empty:
             line_color='white',
             pitch_color='grass',
             half=True,
-            direction='vertical',
-            half_side='top'
+            direction='vertical'
         )
         fig, ax = pitch.draw(figsize=(8, 6))
+        ax.invert_yaxis()
         pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
         st.pyplot(fig)
