@@ -92,9 +92,9 @@ if not df.empty:
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)
         fig, ax = pitch.draw(figsize=(8, 6))
         
-        # Invertir el eje Y para mostrar la mitad superior
-        ax.set_ylim(60, 120)  # Ajustar el límite superior del campo
-        ax.invert_yaxis()
+        # Ajustar el campo para mostrar la mitad superior
+        ax.set_ylim(60, 120)  # Limitar el eje Y a la mitad superior
+        ax.invert_yaxis()      # Invertir el eje Y para que la portería esté arriba
 
         # Ajustar niveles y transparencia para mejorar la visualización
         if not x.empty and not y.empty:
