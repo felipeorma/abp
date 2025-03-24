@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # Configuración inicial
 st.set_page_config(layout="centered")
@@ -31,7 +32,7 @@ equipos_cpl = sorted([
     "Pacific FC", "Valour FC", "Vancouver FC", "York United FC"
 ])
 
-# Coordenadas de zonas (sin cambios)
+# Coordenadas de zonas
 zonas_coords = {
     1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
     5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
@@ -169,13 +170,14 @@ if st.session_state.registro:
     # Procesamiento para heatmaps
     df["coords_saque"] = df["Zona Saque"].map(zonas_coords)
     df["coords_remate"] = df["Zona Remate"].map(zonas_coords)
+    df = df.dropna(subset=["coords_saque", "coords_remate"])
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación mejorada
+    # Función de graficación mejorada con efecto "mancha"
     def graficar_heatmap(title, x, y, color):
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
-        fig, ax = pitch.draw(figsize=(6, 9))
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white', half=True)
+        fig, ax = pitch.draw(figsize=(10, 7))
         
         try:
             x = pd.to_numeric(x, errors='coerce')
@@ -185,28 +187,43 @@ if st.session_state.registro:
             y_valid = y[valid]
             
             if not x_valid.empty:
-                pitch.scatter(x_valid, y_valid, ax=ax,
-                            s=200, color=color,
-                            edgecolors='white', linewidth=1.5,
-                            zorder=3, label='Acciones')
+                # Heatmap con efecto de densidad suavizado
+                kdeplot = pitch.kdeplot(x_valid, y_valid, ax=ax,
+                                      cmap=f'{color.capitalize()}s',
+                                      levels=200,
+                                      fill=True,
+                                      alpha=0.65,
+                                      bw_adjust=0.5,
+                                      zorder=2,
+                                      linewidths=0.1,
+                                      antialiased=True)
                 
-                if len(x_valid) > 1:
-                    pitch.kdeplot(x_valid, y_valid, ax=ax,
-                                cmap=f"{color.capitalize()}s",
-                                levels=50, fill=True, alpha=0.6,
-                                bw_adjust=0.4, zorder=2)
+                # Puntos superpuestos
+                scatter = pitch.scatter(x_valid, y_valid, ax=ax,
+                                      s=80,
+                                      color=color,
+                                      edgecolors='white',
+                                      linewidth=0.5,
+                                      alpha=0.7,
+                                      zorder=3)
                 
-                ax.legend(handles=[scatter], loc='upper left')
+                # Barra de densidad
+                divider = make_axes_locatable(ax)
+                cax = divider.append_axes("right", size="3%", pad=0.1)
+                norm = plt.Normalize(vmin=0, vmax=1)
+                sm = plt.cm.ScalarMappable(cmap=f'{color.capitalize()}s', norm=norm)
+                sm.set_array([])
+                fig.colorbar(sm, cax=cax, orientation='vertical', label='Densidad de Acciones')
                 
         except Exception as e:
-            st.error(f"Error en gráfico: {str(e)}")
+            st.error(f"Error al generar el gráfico: {str(e)}")
         
         st.subheader(title)
         st.pyplot(fig)
 
     # Generación de heatmaps
-    graficar_heatmap("🟢 Zonas de Saque", df["x_saque"], df["y_saque"], "green")
-    graficar_heatmap("🔴 Zonas de Remate", df["x_remate"], df["y_remate"], "red")
+    graficar_heatmap("🟢 Densidad de Saques", df["x_saque"], df["y_saque"], "green")
+    graficar_heatmap("🔴 Densidad de Remates", df["x_remate"], df["y_remate"], "red")
 
     # Descarga de datos
     csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
