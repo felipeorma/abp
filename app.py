@@ -64,7 +64,7 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas por zona
+    # Coordenadas por zona (ajustadas para la mitad superior)
     zona_coords = {
         1: (5, 100),   2: (63, 100),
         3: (18, 78),   4: (50, 78),
