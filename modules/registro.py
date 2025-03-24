@@ -156,7 +156,7 @@ def mostrar_datos_y_visualizaciones(zonas):
 def generar_heatmaps(df, zonas):
     try:
         if df.empty:
-            st.warning("No hay datos para visualizar con los filtros actuales")
+            st.warning("🚨 No hay datos para visualizar con los filtros actuales")
             return
 
         # Procesar coordenadas
@@ -165,56 +165,85 @@ def generar_heatmaps(df, zonas):
         df["coords_remate"] = df["Zona Remate"].map(zonas)
         df = df.dropna(subset=["coords_saque", "coords_remate"])
         
+        # Convertir coordenadas a columnas separadas
         df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
         df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
         
-        # Configuración optimizada del pitch
+        # Configuración del campo (original)
         pitch = VerticalPitch(
             pitch_type='statsbomb',
             pitch_color='grass',
             line_color='white',
             half=True,
             goal_type='box',
-            linewidth=1.5,
-            pad_top=15
+            linewidth=1.5
         )
 
-        # Heatmap de Saques
+        # Parámetros clave para expansión del heatmap
+        heatmap_params = {
+            'cmap': 'Greens',
+            'levels': 100,
+            'fill': True,
+            'alpha': 0.7,
+            'bw_adjust': 0.08,  # Control principal de expansión
+            'thresh': 0.01,      # Mostrar áreas de baja densidad
+            'zorder': 2
+        }
+
+        # ========== HEATMAP DE SAQUES ==========
         fig1, ax1 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax1)
         
-        # Ajustes clave para el heatmap:
-        kde1 = pitch.kdeplot(
-            df['x_saque'], df['y_saque'],
+        # Gráfico de densidad para saques
+        pitch.kdeplot(
+            df['x_saque'], 
+            df['y_saque'],
             ax=ax1,
-            cmap='Greens',
-            levels=200,  # Más niveles para suavizado
-            fill=True,
-            alpha=0.6,   # Mayor transparencia
-            bw_adjust=0.2,  # Aumentar el ancho de banda
-            zorder=2
+            **heatmap_params
         )
         
-        ax1.set_title('Distribución de Saques', fontsize=16, pad=20, weight='bold')
+        # Configuración visual
+        ax1.set_title('Distribución de Saques', 
+                     fontsize=16, 
+                     pad=20,
+                     fontweight='bold')
+        
         st.pyplot(fig1)
 
-        # Heatmap de Remates
+        # ========== HEATMAP DE REMATES ==========
         fig2, ax2 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax2)
         
-        kde2 = pitch.kdeplot(
-            df['x_remate'], df['y_remate'],
+        # Cambiar colores para remates
+        heatmap_params['cmap'] = 'Reds'
+        
+        # Gráfico de densidad para remates
+        pitch.kdeplot(
+            df['x_remate'], 
+            df['y_remate'],
             ax=ax2,
-            cmap='Reds',
-            levels=200,
-            fill=True,
-            alpha=0.6,
-            bw_adjust=0.5,  # Mismo ajuste que para saques
-            zorder=2
+            **heatmap_params
         )
         
-        ax2.set_title('Zonas de Remate', fontsize=16, pad=20, weight='bold')
+        ax2.set_title('Zonas de Remate', 
+                     fontsize=16, 
+                     pad=20,
+                     fontweight='bold')
+        
         st.pyplot(fig2)
 
+        # ========== DESCARGAR DATOS ==========
+        csv = df.drop(columns=["coords_saque", "coords_remate", 
+                             "x_saque", "y_saque", 
+                             "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
+        
+        st.download_button(
+            "⬇️ Descargar CSV Filtrado",
+            csv,
+            "acciones_filtradas.csv",
+            "text/csv",
+            key='download-csv'
+        )
+
     except Exception as e:
-        st.error(f"Error generando visualizaciones: {str(e)}")
+        st.error(f"🔥 Error crítico al generar visualizaciones: {str(e)}")
