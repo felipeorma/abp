@@ -89,9 +89,9 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIA CANCHA SUPERIOR CON ZONAS
+    # FUNCIÓN PARA DIBUJAR HEATMAP CANCHA COMPLETA CON ZONAS
     # ----------------------------------------
-    def dibujar_half_pitch(title, x, y, cmap):
+    def dibujar_full_pitch(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(
             pitch_type='statsbomb',
@@ -100,8 +100,6 @@ if not df.empty:
             half=False
         )
         fig, ax = pitch.draw(figsize=(8, 6))
-
-        ax.set_ylim(105, 52.5)  # Mostrar parte superior de la cancha (portería arriba)
 
         if len(x) >= 5:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
@@ -118,8 +116,8 @@ if not df.empty:
         st.pyplot(fig)
 
     # Heatmaps
-    dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    dibujar_full_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+    dibujar_full_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
     # Descargar CSV
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
