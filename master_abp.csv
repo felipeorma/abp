@@ -1,1 +1,10 @@
-jornada
+Jornada,Rival,Condición,Periodo,Minuto,Acción,Equipo,Ejecutor,Zona Saque,Zona Remate,Primer Contacto,Parte Cuerpo,Segundo Contacto,Gol,Resultado,Perfil,Estrategia,Tipo Ejecución,x_saque,y_saque,x_remate,y_remate
+Rueda 3,Forge FC,Local,1T,37,Tiro libre,Cavalry FC,Tom Field,12,7,Oponente,Cabeza,,No,Despeje,Hábil,Sí,Centro,105,25,114,40
+Rueda 1,Pacific FC,Visitante,2T,63,Córner,Cavalry FC,Ali Musse,1,5,Myer Bevan,Pie derecho,,Sí,Gol,No hábil,Sí,Centro,120,0,114,30
+Rueda 4,York United FC,Local,2T,88,Penal,Cavalty FC,Marco Carducci,Penal,Penal,N/A,N/A,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 2,Valour FC,Visitante,1T,28,Lateral,Rival,Rival,14,9,Oponente,Pie izquierdo,Oponente,No,Posesión rival,No hábil,No,Pase corto,93,29,111,65
+Rueda 1,HFX Wanderers FC,Local,1T,15,Córner,Cavalry FC,Sergio Camargo,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,111,15
+Rueda 3,Vancouver FC,Visitante,2T,67,Tiro libre,Rival,Rival,10,13,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Disparo directo,105,35,105,55
+Rueda 4,Atlético Ottawa,Local,1T,42+,Penal,Cavalry FC,Marco Carducci,Penal,Penal,N/A,N/A,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 2,Pacific FC,Visitante,2T,78,Lateral,Cavalry FC,Charlie Trafford,16,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,20,105,25
+Rueda 1,York United FC,Local,1T,22,Córner,Cavalry FC,Fraser Aird,1,6,Myer Bevan,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,50
