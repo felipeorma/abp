@@ -64,7 +64,7 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas por zona (ajustadas para la mitad superior)
+    # Coordenadas por zona (ajustadas para el campo completo)
     zona_coords = {
         1: (5, 100),   2: (63, 100),
         3: (18, 78),   4: (50, 78),
@@ -86,15 +86,12 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    # Función para dibujar medio campo (mitad superior)
-    def dibujar_half_pitch(title, x, y, cmap):
+    # Función para dibujar el campo completo
+    def dibujar_full_pitch(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)
-        fig, ax = pitch.draw(figsize=(8, 6))
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=False)  # Campo completo
+        fig, ax = pitch.draw(figsize=(8, 12))  # Ajustar el tamaño del campo completo
         
-        # Invertir el eje Y para que la portería esté arriba
-        ax.invert_yaxis()
-
         # Ajustar niveles y transparencia para mejorar la visualización
         if not x.empty and not y.empty:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=50, cmap=cmap, alpha=0.6)
@@ -103,8 +100,8 @@ if not df.empty:
 
     # Heatmaps
     if not df_filtrado.empty:
-        dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-        dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+        dibujar_full_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+        dibujar_full_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
     else:
         st.warning("No hay datos suficientes para generar el heatmap.")
 
