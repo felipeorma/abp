@@ -74,9 +74,8 @@ if not df.empty:
         10: (30, 88),   11: (38, 88), 12: (22, 88), 13: (46, 88),
         14: (28, 75),   15: (40, 75),
         16: (20, 65),   17: (48, 65),
-        \"Penal\": (34, 88)
+        "Penal": (34, 89)
     }
-
     # Asignar coordenadas
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
