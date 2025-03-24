@@ -4,7 +4,7 @@ from modules.analitica import analitica_page
 
 # Configuración inicial
 st.set_page_config(
-    layout="wide",
+    layout="centered",
     page_icon="⚽",
     page_title="Set Piece Analytics Pro",
     initial_sidebar_state="expanded"
@@ -21,10 +21,11 @@ pagina = st.sidebar.radio(
     index=0
 )
 
-# Mostrar página seleccionada
+# Inicializar sesión si no existe
 if "registro" not in st.session_state:
     st.session_state.registro = []
 
+# Mostrar página seleccionada
 if pagina == "🏟️ Registro en Vivo":
     registro_page()
 else:
