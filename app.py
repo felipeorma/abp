@@ -75,29 +75,16 @@ if not df.empty:
         "Penal": (34, 88)  # Punto penal ficticio para visualización
     }
 
-    # Asegurarse de que los valores de zona_saque sean enteros
-    df_filtrado["zona_saque"] = df_filtrado["zona_saque"].apply(lambda x: int(x) if isinstance(x, str) else x)
-
-    # Asignar coordenadas para zona_saque
-    if "zona_saque" in df_filtrado.columns and not df_filtrado["zona_saque"].isnull().all():
-        df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
-    else:
-        st.warning("No hay datos válidos en 'zona_saque'.")
-
-    # Asegurarse de que las coordenadas no estén vacías
+    # Asignar coordenadas
+    df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
     df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
     df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[1])
 
-    # Asignar coordenadas para zona_remate
     df_filtrado["coords_remate"] = df_filtrado["zona_remate"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_remate"])
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
-
-    # Depuración: Verifica si las coordenadas están correctas
-    st.write("Coordenadas zona saque", df_filtrado[["zona_saque", "x_saque", "y_saque"]].head())
-    st.write("Coordenadas zona remate", df_filtrado[["zona_remate", "x_remate", "y_remate"]].head())
 
     # Función para dibujar medio campo
     def dibujar_half_pitch(title, x, y, cmap):
@@ -106,20 +93,18 @@ if not df.empty:
         fig, ax = pitch.draw(figsize=(8, 6))
         ax.invert_yaxis()
 
-        pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
-        pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
+        # Ajustar niveles y transparencia para mejorar la visualización
+        if not x.empty and not y.empty:
+            pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=50, cmap=cmap, alpha=0.6)
+            pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
         st.pyplot(fig)
 
     # Heatmaps
-    if not df_filtrado[["x_saque", "y_saque"]].empty:
+    if not df_filtrado.empty:
         dibujar_half_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    else:
-        st.warning("No hay datos para el Heatmap de Zona de Saque.")
-
-    if not df_filtrado[["x_remate", "y_remate"]].empty:
         dibujar_half_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
     else:
-        st.warning("No hay datos para el Heatmap de Zona de Remate.")
+        st.warning("No hay datos suficientes para generar el heatmap.")
 
     # Descargar CSV
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
