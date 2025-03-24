@@ -1,17 +1,31 @@
 import streamlit as st
-from modules.navigation import show_navigation
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from modules.config import setup_config
 
 # Configuración inicial
-setup_config()
+st.set_page_config(
+    layout="wide",
+    page_icon="⚽",
+    page_title="Set Piece Analytics Pro",
+    initial_sidebar_state="expanded"
+)
+
+# Cargar estilos CSS
+with open("assets/estilos.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Navegación
-page = show_navigation()
+pagina = st.sidebar.radio(
+    "Seleccionar módulo:",
+    ("🏟️ Registro en Vivo", "📊 Panel Analítico"),
+    index=0
+)
 
 # Mostrar página seleccionada
-if page == "registro":
+if "registro" not in st.session_state:
+    st.session_state.registro = []
+
+if pagina == "🏟️ Registro en Vivo":
     registro_page()
 else:
     analitica_page()
