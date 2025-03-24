@@ -11,20 +11,27 @@ st.title("⚽ Registro y Heatmap de Balón Parado - Cavalry FC")
 if "registro" not in st.session_state:
     st.session_state.registro = []
 
-# ========== DATOS ESTÁTICOS ==========
-jugadores_cavalry = [
-    "Marco Carducci", "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
-    "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", "Mihail Gherasimencov", "Charlie Trafford",
-    "Jesse Daley", "Sergio Camargo", "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome",
-    "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey", "Ali Musse", "Tobias Warschewski",
-    "Nicolas Wähling", "Chanan Chanda", "Myer Bevan"
+# ========== DATOS ORDENADOS ==========
+# Jugadores ordenados por apellido (Marco Carducci al final)
+jugadores_base = [
+    "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
+    "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", 
+    "Mihail Gherasimencov", "Charlie Trafford", "Jesse Daley", "Sergio Camargo",
+    "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome",
+    "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
+    "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
+    "Myer Bevan"
 ]
 
-equipos_cpl = [
-    "Atlético Ottawa", "Forge FC", "HFX Wanderers FC", "Pacific FC", "Valour FC",
-    "Vancouver FC", "York United FC"
-]
+jugadores_cavalry = sorted(jugadores_base, key=lambda x: x.split()[-1]) + ["Marco Carducci"]
 
+# Equipos ordenados alfabéticamente
+equipos_cpl = sorted([
+    "Atlético Ottawa", "Forge FC", "HFX Wanderers FC",
+    "Pacific FC", "Valour FC", "Vancouver FC", "York United FC"
+])
+
+# Coordenadas de zonas (sin cambios)
 zonas_coords = {
     1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
     5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
@@ -69,17 +76,15 @@ with st.container(border=True):
     with col2:
         equipo = st.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
-# Paso 4: Detalles de ejecución (dependiendo del tipo de acción)
+# Paso 4: Detalles de ejecución
 with st.container(border=True):
     st.markdown("### 🎯 Detalles de Ejecución")
     
-    # Ejecutor (solo si es Cavalry FC)
     if equipo == "Cavalry FC":
         ejecutor = st.selectbox("Jugador ejecutor", jugadores_cavalry)
     else:
         ejecutor = "Rival"
     
-    # Lógica por tipo de acción
     if tipo_accion == "Penal":
         zona_saque = zona_remate = "Penal"
         st.info("Configuración automática para penales")
@@ -180,18 +185,16 @@ if st.session_state.registro:
             y_valid = y[valid]
             
             if not x_valid.empty:
-                # Scatter plot
-                scatter = pitch.scatter(x_valid, y_valid, ax=ax,
-                                      s=200, color=color,
-                                      edgecolors='white', linewidth=1.5,
-                                      zorder=3, label='Acciones')
+                pitch.scatter(x_valid, y_valid, ax=ax,
+                            s=200, color=color,
+                            edgecolors='white', linewidth=1.5,
+                            zorder=3, label='Acciones')
                 
-                # KDE plot para 2+ puntos
                 if len(x_valid) > 1:
-                    kde = pitch.kdeplot(x_valid, y_valid, ax=ax,
-                                      cmap=f"{color.capitalize()}s",
-                                      levels=50, fill=True, alpha=0.6,
-                                      bw_adjust=0.4, zorder=2)
+                    pitch.kdeplot(x_valid, y_valid, ax=ax,
+                                cmap=f"{color.capitalize()}s",
+                                levels=50, fill=True, alpha=0.6,
+                                bw_adjust=0.4, zorder=2)
                 
                 ax.legend(handles=[scatter], loc='upper left')
                 
