@@ -185,7 +185,7 @@ def generar_heatmaps(df, zonas):
             'levels': 300,       # Máxima suavidad
             'fill': True,
             'alpha': 0.7,
-            'bw_adjust': 0.15,   # Aumento radical del suavizado
+            'bw_adjust': 0.85,   # Aumento radical del suavizado
             'zorder': 2,
             'thresh': 0.05       # Mostrar áreas menos densas
         }
