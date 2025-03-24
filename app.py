@@ -1,5 +1,6 @@
 import streamlit as st
 from modules.registro import registro_page
+from modules.analitica import analitica_page
 
 # Configuración inicial
 st.set_page_config(
@@ -28,4 +29,4 @@ if "registro" not in st.session_state:
 if pagina == "🏟️ Registro en Vivo":
     registro_page()
 else:
-    st.write("Panel Analítico")  # Aquí deberías importar analitica_page()
+    analitica_page()
