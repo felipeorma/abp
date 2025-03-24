@@ -14,7 +14,7 @@ st.title("⚽ Registro de Acciones de Balón Parado - Zonas Personalizadas")
 
 # Mostrar imagen de referencia
 img = Image.open("MedioCampo_enumerado.JPG")
-st.image(img, caption="Referencia de zonas", use_column_width=True)
+st.image(img, caption="Referencia de zonas (portería arriba)", use_column_width=True)
 
 # -------------------------
 # FORMULARIO
@@ -66,20 +66,20 @@ if not df.empty:
     # ZONAS CON COORDENADAS PARA VerticalPitch
     # -------------------------
     zonas = {
-        1: (5, 90, 20, 10),    2: (75, 90, 20, 10),
-        3: (5, 70, 20, 20),    4: (75, 70, 20, 20),
-        5: (37, 95, 6, 5),     6: (57, 95, 6, 5),     7: (47, 95, 6, 5),
-        8: (30, 95, 6, 5),     9: (64, 95, 6, 5),
-        10: (37, 88, 6, 6),    11: (57, 88, 6, 6),
-        12: (30, 88, 6, 6),    13: (64, 88, 6, 6),
-        14: (37, 70, 6, 18),   15: (57, 70, 6, 18),
-        16: (20, 50, 20, 20),  17: (60, 50, 20, 20),
-        "Penal": (50, 89, 1, 1)
+        1: (0, 80, 20, 20),   2: (80, 80, 20, 20),
+        3: (0, 60, 20, 20),   4: (80, 60, 20, 20),
+        5: (40, 96, 6, 4),    6: (60, 96, 6, 4),    7: (50, 96, 6, 4),
+        8: (34, 96, 6, 4),    9: (66, 96, 6, 4),
+        10: (40, 88, 6, 6),   11: (60, 88, 6, 6),
+        12: (34, 88, 6, 6),   13: (66, 88, 6, 6),
+        14: (40, 60, 6, 28),  15: (60, 60, 6, 28),
+        16: (20, 40, 20, 20), 17: (60, 40, 20, 20),
+        "Penal": (52, 89, 1, 1)
     }
 
     def zona_centro(z):
         if z == "Penal":
-            return (50.5, 89.5)
+            return (52.5, 89.5)
         x, y, w, h = zonas[z]
         return (x + w / 2, y + h / 2)
 
