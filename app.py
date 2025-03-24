@@ -40,7 +40,7 @@ def main():
     # Función para graficar heatmap con estilo tipo sofascore
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='#0e1117', line_color='white')
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
 
         fig.patch.set_facecolor('#0e1117')  # fondo total oscuro
