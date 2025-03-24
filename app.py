@@ -71,6 +71,9 @@ if not df.empty:
 
     # Asignar coordenadas al dataframe
     df_filtrado["coords"] = df_filtrado["zona"].map(zona_coords)
+    # Eliminar filas con zonas que no están en el diccionario
+    df_filtrado = df_filtrado.dropna(subset=["coords"])
+    # Extraer coordenadas
     df_filtrado["x"] = df_filtrado["coords"].apply(lambda c: c[0])
     df_filtrado["y"] = df_filtrado["coords"].apply(lambda c: c[1])
 
