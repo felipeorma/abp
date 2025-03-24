@@ -75,8 +75,15 @@ if not df.empty:
         "Penal": (34, 88)  # Punto penal ficticio para visualización
     }
 
+    # Asegurarse de que los valores de zona_saque sean enteros
+    df_filtrado["zona_saque"] = df_filtrado["zona_saque"].apply(lambda x: int(x) if isinstance(x, str) else x)
+
     # Asignar coordenadas
-    df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
+    if "zona_saque" in df_filtrado.columns and not df_filtrado["zona_saque"].isnull().all():
+        df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
+    else:
+        st.warning("No hay datos válidos en 'zona_saque'.")
+
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
     df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
     df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[1])
@@ -107,5 +114,4 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
-
 
