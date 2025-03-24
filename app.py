@@ -65,17 +65,18 @@ if not df.empty:
     st.dataframe(df_filtrado)
 
     # ----------------------------------------
-    # COORDENADAS ADAPTADAS A MEDIA CANCHA (portería arriba)
+    # COORDENADAS AJUSTADAS MÁS CERCA DEL ÁREA (imagen de referencia)
     # ----------------------------------------
     zona_coords = {
-        1: (5, 90),     2: (63, 90),
-        3: (18, 80),    4: (50, 80),
-        5: (30, 95),    6: (38, 95),  7: (34, 95),  8: (22, 95), 9: (46, 95),
-        10: (30, 88),   11: (38, 88), 12: (22, 88), 13: (46, 88),
-        14: (28, 75),   15: (40, 75),
-        16: (20, 65),   17: (48, 65),
-        "Penal": (34, 89)
+        1: (8, 94),     2: (60, 94),
+        3: (18, 88),    4: (50, 88),
+        5: (30, 98),    6: (38, 98),  7: (34, 98),  8: (22, 98), 9: (46, 98),
+        10: (30, 91),   11: (38, 91), 12: (22, 91), 13: (46, 91),
+        14: (28, 84),   15: (40, 84),
+        16: (20, 76),   17: (48, 76),
+        "Penal": (34, 91)
     }
+
     # Asignar coordenadas
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
@@ -99,7 +100,12 @@ if not df.empty:
             half=True
         )
         fig, ax = pitch.draw(figsize=(8, 6))
-        pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
+
+        if len(x) >= 5:
+            pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
+        else:
+            st.warning("Se necesitan al menos 5 puntos para generar el heatmap.")
+
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
         # Agregar etiquetas de zonas
