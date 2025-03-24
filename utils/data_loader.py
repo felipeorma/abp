@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from io import StringIO
 
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/felipeorma/repo/main/master_abp.csv"
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
 
 def load_github_data():
     try:
