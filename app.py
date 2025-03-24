@@ -27,11 +27,11 @@ equipos_cpl = [
 
 # Coordenadas centrales representativas para cada zona (finales)
 zonas_coords = {
-    1:  (120, 0),    2:  (120, 80),   3:  (93, 9),    4:  (93, 71),
-    5:  (114, 30),  6:  (114, 50),  7:  (114, 40),  8:  (111, 15),
-    9:  (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
-   13: (105, 55), 14: (93, 29),  15: (93, 51), 16: (72, 20),
-   17: (72, 60), "Penal": (108, 40)
+    1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
+    5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
+    9: (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
+    13: (105, 55), 14: (93, 29), 15: (93, 51), 16: (72, 20),
+    17: (72, 60), "Penal": (108, 40)
 }
 
 # Formulario de registro
@@ -41,23 +41,56 @@ oponente = st.selectbox("🆚 Rival", equipos_cpl)
 field = st.selectbox("📍 Condición de campo", ["Local", "Visitante"])
 tipo_accion = st.selectbox("⚙️ Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"])
 equipo = st.selectbox("🏳️ Equipo que ejecutó", ["Cavalry FC", "Rival"])
-minuto = st.number_input("⏱️ Minuto", min_value=0, max_value=120, value=0)
-periodo = "1T" if minuto <= 45 else "2T"
 
-zona_saque = st.selectbox("📍 Zona de saque", list(zonas_coords.keys()))
-zona_remate = st.selectbox("🎯 Zona de remate", list(zonas_coords.keys()))
+# Selección de periodo y minuto con opciones extendidas
+periodo = st.selectbox("⏱️ Periodo", ["1T", "2T"])
+if periodo == "1T":
+    minuto_opts = [str(x) for x in range(0, 46)] + ["45+"]
+else:
+    minuto_opts = [str(x) for x in range(45, 91)] + ["90+"]
+    
+minuto_str = st.selectbox("⏱️ Minuto", minuto_opts)
+
+# Convertir minutos extendidos a valores numéricos
+if "45+" in minuto_str:
+    minuto = 46
+elif "90+" in minuto_str:
+    minuto = 91
+else:
+    minuto = int(minuto_str)
+
+# Lógica condicional para zonas y contactos
+if tipo_accion == "Penal":
+    zona_saque = "Penal"
+    st.selectbox("📍 Zona de saque (automático)", ["Penal"], disabled=True)
+    zona_remate = "Penal"
+    st.selectbox("🎯 Zona de remate (automático)", ["Penal"], disabled=True)
+elif tipo_accion == "Córner":
+    zona_saque = st.selectbox("📍 Zona de saque (solo córneres)", [1, 2])
+    zona_remate = st.selectbox("🎯 Zona de remate", [key for key in zonas_coords.keys() if key != "Penal"])
+else:
+    available_zones = [key for key in zonas_coords.keys() if key != "Penal"]
+    zona_saque = st.selectbox("📍 Zona de saque", available_zones)
+    zona_remate = st.selectbox("🎯 Zona de remate", available_zones)
+
 ejecutor = st.selectbox("👟 Ejecutante", jugadores_cavalry)
 gol = st.selectbox("🥅 ¿Terminó en gol?", ["No", "Sí"])
+
+# Mostrar segundo contacto solo si no es penal
+if tipo_accion != "Penal":
+    segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
+else:
+    segundo_contacto = ""
+
 primer_contacto = st.selectbox("🤝 Primer contacto (jugador)", jugadores_cavalry + ["Rival"])
 cuerpo1 = st.selectbox("🦵 Parte del cuerpo (1er contacto)", ["Cabeza", "Pie derecho", "Pie izquierdo", "Tronco", "Otro"])
-segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
 resultado = st.selectbox("🎯 Resultado final de la jugada", ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco", "Gol"])
 perfil = st.selectbox("🦶 Perfil del ejecutante", ["Hábil", "No hábil"])
 estrategia = st.selectbox("📈 ¿Fue jugada estratégica?", ["Sí", "No"])
 tipo_pase = st.selectbox("📨 Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
 
 if st.button("✅ Agregar acción"):
-    st.session_state.registro.append({
+    registro_data = {
         "MatchDay": match_day,
         "Opponent": oponente,
         "Field": field,
@@ -71,13 +104,18 @@ if st.button("✅ Agregar acción"):
         "Goal": gol,
         "Player 1st Contact": primer_contacto,
         "Body Part 1st Contact": cuerpo1,
-        "2nd Contact": segundo_contacto,
+        "2nd Contact": segundo_contacto if tipo_accion != "Penal" else "N/A",
         "Play Outcome": resultado,
         "Taker Profile": perfil,
         "Strategic": estrategia,
         "Direct / Short Pass": tipo_pase
-    })
+    }
+    
+    st.session_state.registro.append(registro_data)
     st.success("Acción registrada correctamente ✅")
+
+# Resto del código para mostrar tabla y heatmaps...
+# (Mantener igual que en la versión original, solo asegurar compatibilidad con nuevos campos)
 
 # Mostrar tabla de acciones registradas
 df = pd.DataFrame(st.session_state.registro)
