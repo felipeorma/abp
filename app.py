@@ -101,6 +101,8 @@ if not df.empty:
         )
         fig, ax = pitch.draw(figsize=(8, 6))
 
+        ax.set_ylim(105, 52.5)  # Mostrar parte superior de la cancha (portería arriba)
+
         if len(x) >= 5:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         else:
