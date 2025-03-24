@@ -69,11 +69,11 @@ with st.container(border=True):
     with col2:
         equipo = st.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
-# Paso 4: Detalles de ejecución (con imagen de referencia)
+# Paso 4: Detalles de ejecución
 with st.container(border=True):
     st.markdown("### 🎯 Detalles de Ejecución")
     
-    # Mostrar imagen de referencia de zonas
+    # Imagen de referencia
     st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", 
              caption="Referencia de Zonas de Balón Parado",
              use_column_width=True)
@@ -95,7 +95,6 @@ with st.container(border=True):
         with col2:
             zona_remate = st.selectbox("Zona de remate", [z for z in zonas_coords if z != "Penal"])
         
-        # Lista de contactos actualizada
         opciones_contacto = jugadores_cavalry + ["Oponente"]
         primer_contacto = st.selectbox("Primer contacto", opciones_contacto)
         cuerpo1 = st.selectbox("Parte del cuerpo", ["Cabeza", "Pie derecho", "Pie izquierdo", "Tronco", "Otro"])
@@ -156,54 +155,76 @@ if st.session_state.registro:
     
     st.dataframe(df, use_container_width=True)
 
-    # Procesamiento de coordenadas
-    df["coords_saque"] = df["Zona Saque"].map(zonas_coords)
-    df["coords_remate"] = df["Zona Remate"].map(zonas_coords)
-    df = df.dropna(subset=["coords_saque", "coords_remate"])
-    df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
-    df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
+    # Filtros de equipo
+    st.markdown("### 🔍 Filtros para Heatmaps")
+    col1, col2 = st.columns(2)
+    with col1:
+        filtro_cavalry = st.checkbox("Cavalry FC", value=True)
+    with col2:
+        filtro_oponente = st.checkbox("Oponente", value=False)
 
-    # Función de graficación mejorada
-    def graficar_heatmap(title, x, y, color, tipo):
-        pitch = VerticalPitch(
-            pitch_type='statsbomb', 
-            pitch_color='grass', 
-            line_color='white',
-            half=(tipo == 'remate')
-        )
-        fig, ax = pitch.draw(figsize=(10, 7))
-        
-        try:
-            x = pd.to_numeric(x, errors='coerce')
-            y = pd.to_numeric(y, errors='coerce')
-            valid = x.notna() & y.notna()
-            x_valid = x[valid]
-            y_valid = y[valid]
+    # Aplicar filtros
+    filtered_df = pd.concat([
+        df[df["Equipo"] == "Cavalry FC"] if filtro_cavalry else pd.DataFrame(),
+        df[df["Equipo"] == "Rival"] if filtro_oponente else pd.DataFrame()
+    ])
+
+    if not filtered_df.empty:
+        # Procesamiento de coordenadas
+        filtered_df["coords_saque"] = filtered_df["Zona Saque"].map(zonas_coords)
+        filtered_df["coords_remate"] = filtered_df["Zona Remate"].map(zonas_coords)
+        filtered_df = filtered_df.dropna(subset=["coords_saque", "coords_remate"])
+        filtered_df[["x_saque", "y_saque"]] = pd.DataFrame(filtered_df["coords_saque"].tolist(), index=filtered_df.index)
+        filtered_df[["x_remate", "y_remate"]] = pd.DataFrame(filtered_df["coords_remate"].tolist(), index=filtered_df.index)
+
+        # Función de graficación con firma
+        def graficar_heatmap(title, x, y, color, tipo):
+            pitch = VerticalPitch(
+                pitch_type='statsbomb', 
+                pitch_color='grass', 
+                line_color='white',
+                half=(tipo == 'remate')
+            )
+            fig, ax = pitch.draw(figsize=(10, 7))
             
-            if not x_valid.empty:
-                pitch.kdeplot(
-                    x_valid, y_valid, ax=ax,
-                    cmap=f'{color.capitalize()}s',
-                    levels=150,
-                    fill=True,
-                    alpha=0.8,
-                    bw_adjust=0.4,
-                    zorder=2
-                )
+            try:
+                x = pd.to_numeric(x, errors='coerce')
+                y = pd.to_numeric(y, errors='coerce')
+                valid = x.notna() & y.notna()
+                x_valid = x[valid]
+                y_valid = y[valid]
                 
-        except Exception as e:
-            st.error(f"Error al generar el gráfico: {str(e)}")
-        
-        st.subheader(title)
-        st.pyplot(fig)
+                if not x_valid.empty:
+                    pitch.kdeplot(
+                        x_valid, y_valid, ax=ax,
+                        cmap=f'{color.capitalize()}s',
+                        levels=150,
+                        fill=True,
+                        alpha=0.8,
+                        bw_adjust=0.4,
+                        zorder=2
+                    )
+                    
+                    # Agregar firma
+                    ax.text(0.95, 0.05, "Felipe Ormazabal\nFootball Scout - Data Analyst",
+                            fontsize=8, color='white', ha='right', va='bottom',
+                            transform=ax.transAxes, alpha=0.7)
+                    
+            except Exception as e:
+                st.error(f"Error al generar el gráfico: {str(e)}")
+            
+            st.subheader(title)
+            st.pyplot(fig)
 
-    # Generar ambos heatmaps
-    graficar_heatmap("🟢 Densidad de Saques", df["x_saque"], df["y_saque"], "green", 'saque')
-    graficar_heatmap("🔴 Densidad de Remates", df["x_remate"], df["y_remate"], "red", 'remate')
+        # Generar heatmaps
+        graficar_heatmap("🟢 Densidad de Saques", filtered_df["x_saque"], filtered_df["y_saque"], "green", 'saque')
+        graficar_heatmap("🔴 Densidad de Remates", filtered_df["x_remate"], filtered_df["y_remate"], "red", 'remate')
 
-    # Descarga de datos
-    csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
-    st.download_button("⬇️ Descargar CSV", csv, "acciones_balon_parado.csv", "text/csv")
+        # Descarga de datos filtrados
+        csv = filtered_df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
+        st.download_button("⬇️ Descargar CSV Filtrado", csv, "acciones_filtradas.csv", "text/csv")
+    else:
+        st.warning("⚠️ No hay datos con los filtros seleccionados")
 
 else:
     st.info("📭 No hay acciones registradas. Comienza registrando una acción arriba.")
