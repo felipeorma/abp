@@ -65,16 +65,16 @@ if not df.empty:
     st.dataframe(df_filtrado)
 
     # ----------------------------------------
-    # COORDENADAS AJUSTADAS A MEDIA CANCHA (alineadas con imagen de referencia)
+    # COORDENADAS EXACTAS BASADAS EN IMAGEN DE REFERENCIA
     # ----------------------------------------
     zona_coords = {
-        1: (20, 103),     2: (52, 103),
-        3: (22, 95),      4: (50, 95),
-        5: (30, 104),     6: (38, 104), 7: (34, 104), 8: (26, 104), 9: (42, 104),
-        10: (30, 98),     11: (38, 98), 12: (26, 98), 13: (42, 98),
-        14: (28, 91),     15: (40, 91),
-        16: (24, 86),     17: (44, 86),
-        "Penal": (34, 94)
+        1: (6, 94), 2: (61, 94),
+        3: (12, 77), 4: (54, 77),
+        5: (28, 101), 6: (40, 101), 7: (34, 101), 8: (20, 101), 9: (48, 101),
+        10: (30, 93), 11: (38, 93), 12: (22, 93), 13: (46, 93),
+        14: (27, 83), 15: (41, 83),
+        16: (22, 67), 17: (44, 67),
+        "Penal": (34, 89)
     }
 
     # Asignar coordenadas
@@ -89,7 +89,7 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP CANCHA COMPLETA CON ZONAS SIEMPRE
+    # FUNCIÓN PARA DIBUJAR HEATMAP EN CAMPO COMPLETO
     # ----------------------------------------
     def dibujar_full_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -106,18 +106,15 @@ if not df.empty:
         if len(x) >= 5:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
 
-        # Agregar etiquetas de zonas
         for zona, (x_z, y_z) in zona_coords.items():
             if isinstance(zona, int):
                 ax.text(x_z, y_z, str(zona), color='white', fontsize=10, ha='center', va='center', weight='bold')
 
         st.pyplot(fig)
 
-    # Heatmaps
     dibujar_full_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
     dibujar_full_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
-    # Descargar CSV
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 
