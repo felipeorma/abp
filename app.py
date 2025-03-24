@@ -34,10 +34,10 @@ with st.expander("➕ Registrar nueva acción"):
     if tipo == "Penal":
         zona_remate = "Penal"
     else:
-        zona_remate = st.selectbox("🎯 Zona de remate", list(range(1, 18)))
+        zona_remate = st.selectbox("🌟 Zona de remate", list(range(1, 18)))
 
     ejecutor = st.text_input("👟 Ejecutante")
-    primer_contacto = st.text_input("🎯 Primer contacto")
+    primer_contacto = st.text_input("🌟 Primer contacto")
     segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
 
     if st.button("✅ Registrar acción"):
@@ -59,7 +59,7 @@ df = pd.DataFrame(st.session_state.registro)
 
 if not df.empty:
     st.subheader("📋 Acciones registradas")
-    filtro_tipo = st.multiselect("🎯 Filtrar por tipo", df["tipo"].unique(), default=df["tipo"].unique())
+    filtro_tipo = st.multiselect("🌟 Filtrar por tipo", df["tipo"].unique(), default=df["tipo"].unique())
     df_filtrado = df[df["tipo"].isin(filtro_tipo)]
 
     st.dataframe(df_filtrado)
@@ -74,7 +74,7 @@ if not df.empty:
         10: (30, 12),  11: (38, 12), 12: (22, 12), 13: (46, 12),
         14: (28, 18),  15: (40, 18),
         16: (20, 24),  17: (48, 24),
-        "Penal": (34, 11)  # Punto penal medio cancha
+        "Penal": (34, 11)
     }
 
     # Asignar coordenadas
@@ -89,14 +89,19 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO
+    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIO CAMPO (superior)
     # ----------------------------------------
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)
+        pitch = VerticalPitch(
+            pitch_type='statsbomb',
+            line_color='white',
+            pitch_color='grass',
+            half=True,
+            direction='vertical',
+            half_side='top'
+        )
         fig, ax = pitch.draw(figsize=(8, 6))
-        ax.invert_yaxis()
-
         pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
         st.pyplot(fig)
@@ -111,3 +116,4 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
+
