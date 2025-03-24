@@ -1,83 +1,48 @@
-import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from PIL import Image
+from mplsoccer import VerticalPitch
 
-# Cargar imagen del campo numerado
-img = Image.open("MedioCampo_enumerado.JPG")
+# Leer el CSV generado desde la app
+df = pd.read_csv("acciones_zonas.csv")
 
-# Inicializar estado
-if "registro" not in st.session_state:
-    st.session_state.registro = []
+# Mapeo manual de cada zona a coordenadas promedio (x, y)
+# ⚠️ Adaptado a cancha de 68x105 (puedes ajustar si usas otro sistema)
+zona_coords = {
+    1: (10, 95),   2: (58, 95),
+    3: (18, 78),   4: (50, 78),
+    5: (30, 100),  6: (38, 100),  7: (34, 100),  8: (22, 100), 9: (46, 100),
+    10: (30, 88), 11: (38, 88), 12: (22, 88), 13: (46, 88),
+    14: (28, 70), 15: (40, 70),
+    16: (20, 55), 17: (48, 55)
+}
 
-st.title("⚽ Acciones de balón parado por zonas numeradas")
+# Crear una nueva columna con las coordenadas
+df["coords"] = df["zona"].map(zona_coords)
+df["x"] = df["coords"].apply(lambda c: c[0])
+df["y"] = df["coords"].apply(lambda c: c[1])
 
-# Mostrar imagen de referencia
-st.image(img, caption="Zonas numeradas para registrar acciones", use_column_width=True)
+# Crear el campo
+pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', linewidth=1)
+fig, ax = pitch.draw(figsize=(8, 6))
 
-# -------------------------
-# Registro de una nueva acción
-# -------------------------
-with st.expander("➕ Registrar nueva acción"):
-    tipo = st.selectbox("Tipo de balón parado", ["Tiro libre", "Córner", "Lateral", "Penal"])
-    minuto = st.number_input("⏱️ Minuto", min_value=0, max_value=120, value=0)
-    zona = st.selectbox("📍 Zona final de la jugada", list(range(1, 18)))
-    ejecutor = st.text_input("👟 Ejecutante")
-    primer_contacto = st.text_input("🎯 Primer contacto")
-    segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
+# Crear heatmap tipo scatter con transparencia
+pitch.kdeplot(
+    x=df["x"],
+    y=df["y"],
+    ax=ax,
+    fill=True,
+    levels=100,
+    cmap="Reds",
+    shade_lowest=False,
+    alpha=0.8
+)
 
-    if st.button("✅ Registrar acción"):
-        st.session_state.registro.append({
-            "tipo": tipo,
-            "minuto": minuto,
-            "zona": zona,
-            "ejecutor": ejecutor,
-            "primer_contacto": primer_contacto,
-            "segundo_contacto": segundo_contacto
-        })
-        st.success("✔️ Acción registrada correctamente")
+# Agregar puntos individuales (opcional)
+pitch.scatter(df["x"], df["y"], ax=ax, color="black", s=30, edgecolors='white', zorder=2)
 
-# -------------------------
-# Mostrar tabla y filtros
-# -------------------------
-df = pd.DataFrame(st.session_state.registro)
-if not df.empty:
-    st.subheader("📋 Acciones registradas")
-    
-    filtro_tipo = st.multiselect("🎯 Filtrar por tipo de jugada", df["tipo"].unique(), default=df["tipo"].unique())
-    df_filtrado = df[df["tipo"].isin(filtro_tipo)]
+# Título
+plt.title("🔥 Heatmap de zonas de finalización - Acciones de balón parado", fontsize=14)
 
-    st.dataframe(df_filtrado)
-
-    # -------------------------
-    # Heatmap por zona
-    # -------------------------
-    st.subheader("🔥 Heatmap de zonas (cantidad de acciones por zona)")
-
-    zona_counts = df_filtrado["zona"].value_counts().sort_index()
-    zonas = list(range(1, 18))
-    valores = [zona_counts.get(z, 0) for z in zonas]
-
-    fig, ax = plt.subplots(figsize=(10, 1))
-    sns.heatmap(
-        [valores],
-        cmap="Reds",
-        annot=True,
-        fmt="d",
-        xticklabels=[f"Zona {z}" for z in zonas],
-        yticklabels=["Acciones"],
-        cbar=False,
-        linewidths=1
-    )
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
-
-    # -------------------------
-    # Descargar CSV
-    # -------------------------
-    csv = df_filtrado.to_csv(index=False).encode("utf-8")
-    st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
-
-else:
-    st.info("Aún no has registrado ninguna acción.")
+# Mostrar
+plt.tight_layout()
+plt.show()
