@@ -95,7 +95,8 @@ if not df.empty:
 
         for zona, (x_z, y_z) in zona_coords.items():
             if isinstance(zona, int):
-                ax.text(x_z, y_z, str(zona), color='white', fontsize=10, ha='center', va='center', weight='bold')
+                ax.text(x_z, y_z, str(zona), fontsize=11, color='white', weight='bold', ha='center', va='center',
+                        bbox=dict(facecolor='black', edgecolor='none', boxstyle='circle,pad=0.2'))
 
         st.pyplot(fig)
 
