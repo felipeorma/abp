@@ -62,15 +62,17 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas calibradas para MITAD DERECHA del campo horizontal
+    # Coordenadas REORIENTADAS PROFESIONALMENTE al campo horizontal de mplsoccer
     zona_coords = {
-        1: (105, 75),   2: (105, 5),
-        3: (95, 65),    4: (95, 15),
-        5: (114, 62),   6: (114, 18), 7: (114, 40), 8: (108, 62), 9: (108, 18),
-        10: (108, 48),  11: (114, 48), 12: (102, 48), 13: (120, 48),
-        14: (100, 40),  15: (120, 40),
-        16: (90, 40),   17: (110, 40),
-        "Penal": (116, 40)
+        1: (10, 18),    2: (10, 62),
+        3: (25, 25),    4: (25, 55),
+        5: (5, 36),     6: (15, 36), 7: (10, 36),
+        8: (5, 26),     9: (15, 26),
+        10: (10, 48),   11: (10, 60),
+        12: (5, 48),    13: (15, 48),
+        14: (28, 40),   15: (38, 40),
+        16: (50, 28),   17: (50, 52),
+        "Penal": (10, 40)
     }
 
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
@@ -108,3 +110,4 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
+
