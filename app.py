@@ -115,4 +115,4 @@ if not df.empty:
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 
 else:
-    st.info("Aún no has registrado ninguna acción.")
+    st.info("Aún no has registrado ninguna acción.") 
