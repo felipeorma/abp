@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-from mplsoccer import Pitch
+from mplsoccer import VerticalPitch
 
 # Inicializar sesión
 if "registro" not in st.session_state:
@@ -86,8 +86,8 @@ if not df.empty:
 
     def graficar(title, x, y, cmap):
         st.subheader(title)
-        pitch = Pitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
-        fig, ax = pitch.draw(figsize=(8, 6))
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
+        fig, ax = pitch.draw(figsize=(6, 10))
 
         # Dibujar zonas
         for zona, (x0, y0, w, h) in zonas.items():
