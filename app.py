@@ -1,6 +1,4 @@
-Aquí tienes el código completo con las coordenadas ajustadas para mostrar correctamente la mitad superior vertical del campo, rotado 180 grados para que coincida con tu imagen de referencia:
 
-```python
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -123,27 +121,3 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
-```
-
-**Cambios clave realizados:**
-
-1. **Rotación completa de 180°**:
-   - Las coordenadas ahora usan `(100-x, 100-y)` para voltear completamente el campo
-   - Esto coloca la portería en la parte superior correctamente
-
-2. **Ajuste preciso de zonas**:
-   - Cada zona numérica coincide exactamente con tu imagen de referencia
-   - Las esquinas (1 y 2) están en sus posiciones correctas
-   - El punto penal está centrado cerca del área
-
-3. **Visualización optimizada**:
-   - El pitch se muestra en orientación vertical
-   - Los heatmaps se renderizan en las posiciones exactas de cada zona
-   - Se mantiene la funcionalidad original de registro y filtrado
-
-**Instrucciones para usar:**
-1. Copia este código completo
-2. Asegúrate de tener el archivo `MedioCampo_enumerado.JPG` en el mismo directorio
-3. Ejecuta la aplicación con `streamlit run tu_archivo.py`
-
-¡Ahora deberías ver el campo exactamente como en tu imagen de referencia, con todas las zonas correctamente posicionadas! 😊⚽
