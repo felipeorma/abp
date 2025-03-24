@@ -64,15 +64,15 @@ if not df.empty:
 
     # Coordenadas calibradas para medio campo superior (campo completo)
     zona_coords = {
-        1: (5, 90),   2: (95, 90),
-        3: (20, 75),  4: (80, 75),
-        5: (40, 95),  6: (60, 95),  7: (50, 95),
-        8: (30, 95),  9: (70, 95),
-        10: (40, 80), 11: (60, 80),
-        12: (30, 80), 13: (70, 80),
-        14: (38, 65), 15: (62, 65),
-        16: (25, 52), 17: (75, 52),
-        "Penal": (50, 80)
+        1: (10, 10),   2: (90, 10),
+        3: (25, 25),   4: (75, 25),
+        5: (40, 5),    6: (60, 5),    7: (50, 5),
+        8: (30, 5),    9: (70, 5),
+        10: (40, 20),  11: (60, 20),
+        12: (30, 20),  13: (70, 20),
+        14: (38, 35),  15: (62, 35),
+        16: (25, 48),  17: (75, 48),
+        "Penal": (50, 20)
     }
 
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
@@ -89,6 +89,9 @@ if not df.empty:
         st.subheader(title)
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
         fig, ax = pitch.draw(figsize=(6, 9))
+
+        # Restringir a la mitad superior del campo (portería arriba)
+        ax.set_ylim(55, 0)
 
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
