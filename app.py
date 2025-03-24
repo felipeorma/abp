@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from mplsoccer import VerticalPitch
+from PIL import Image
 
 # Inicializar sesión
 if "registro" not in st.session_state:
@@ -10,6 +11,10 @@ if "registro" not in st.session_state:
 
 st.set_page_config(layout="centered")
 st.title("⚽ Registro de Acciones de Balón Parado - Zonas Personalizadas")
+
+# Mostrar imagen de referencia
+img = Image.open("MedioCampo_enumerado.JPG")
+st.image(img, caption="Referencia de zonas", use_column_width=True)
 
 # -------------------------
 # FORMULARIO
@@ -86,10 +91,9 @@ if not df.empty:
 
     def graficar(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True, half_side='top')
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=False)
         fig, ax = pitch.draw(figsize=(6, 9))
 
-        # Dibujar zonas
         for zona, (x0, y0, w, h) in zonas.items():
             if zona != "Penal":
                 rect = Rectangle((x0, y0), w, h, linewidth=1, edgecolor='yellow', facecolor='none')
@@ -114,4 +118,3 @@ if not df.empty:
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 else:
     st.info("Aún no has registrado ninguna acción.")
-
