@@ -128,59 +128,52 @@ def generar_mapa_calor(df, tipo='saque'):
     
     coord_col = 'Zona Saque' if tipo == 'saque' else 'Zona Remate'
     
-    # Convertir todas las zonas a enteros excepto "Penal"
+    # Convertir zonas y filtrar válidas
     df_temp = df.copy()
     df_temp[coord_col] = df_temp[coord_col].apply(
         lambda x: int(x) if str(x).isdigit() else x
     )
-    
-    # Obtener coordenadas y eliminar inválidas
     df_coords = df_temp[coord_col].map(zonas_coords).dropna().apply(pd.Series)
+    
     if df_coords.empty:
         st.warning(f"No hay datos válidos para {tipo}s")
         return
     
     df_coords.columns = ['x', 'y']
     
-    # Configurar pitch con parámetros optimizados
+    # Configuración profesional del pitch
     pitch = VerticalPitch(
         pitch_type='statsbomb',
         pitch_color='grass',
-        line_color='#404040',
-        linewidth=1.5,
+        line_color='white',
+        linewidth=1.2,
         half=True,
         goal_type='box'
     )
     
-    fig, ax = plt.subplots(figsize=(10, 7))
+    fig, ax = plt.subplots(figsize=(12, 8))
     pitch.draw(ax=ax)
     
-    # Parámetros mejorados para visualización
-    kdeplot = pitch.kdeplot(
+    # Parámetros clave para heatmaps
+    pitch.kdeplot(
         df_coords['x'], df_coords['y'],
         ax=ax,
-        cmap='viridis' if tipo == 'saque' else 'plasma',
+        cmap='Greens' if tipo == 'saque' else 'Reds',  # Colores específicos
         levels=100,
         fill=True,
-        alpha=0.7,
+        alpha=0.75,
         bw_adjust=0.45,
         zorder=2
     )
     
-    # Añadir puntos de eventos
-    pitch.scatter(
-        df_coords['x'], df_coords['y'],
-        ax=ax,
-        s=50,
-        color='white',
-        edgecolors='black',
-        zorder=3
-    )
-    
-    ax.set_title(f"Densidad de {tipo.capitalize()}s", fontsize=14, pad=15)
-    plt.close()  # Limpiar memoria de figuras
+    # Título profesional
+    ax.set_title(f"Densidad de {tipo.capitalize()}s", 
+                fontsize=16, 
+                pad=20,
+                fontweight='bold')
     
     st.pyplot(fig)
+    plt.close()
 
 def generar_seccion_temporal(df):
     st.header("⏳ Evolución Temporal")
