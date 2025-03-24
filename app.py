@@ -401,7 +401,7 @@ def analytics_page():
         if not filtered_df.empty:
             opponent_analysis = filtered_df.groupby('Rival').agg(
                 Acciones_Contra=('Acción', 'count'),
-                Goles_Recibidos=('Gol', lambda x: sum(x == 'Sí'),
+                Goles_Recibidos=('Gol', lambda x: sum(x == 'Sí')),
                 Zona_Peligrosa=('Zona Remate', lambda x: x.mode()[0])
             ).reset_index()
             
