@@ -89,7 +89,7 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP CANCHA COMPLETA CON ZONAS
+    # FUNCIÓN PARA DIBUJAR HEATMAP CANCHA COMPLETA CON ZONAS SIEMPRE
     # ----------------------------------------
     def dibujar_full_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -101,12 +101,10 @@ if not df.empty:
         )
         fig, ax = pitch.draw(figsize=(8, 6))
 
+        pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
+
         if len(x) >= 5:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
-        else:
-            st.warning("Se necesitan al menos 5 puntos para generar el heatmap.")
-
-        pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
         # Agregar etiquetas de zonas
         for zona, (x_z, y_z) in zona_coords.items():
