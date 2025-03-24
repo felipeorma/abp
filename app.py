@@ -37,11 +37,15 @@ def main():
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función para graficar heatmap
+    # Función para graficar heatmap con etiquetas
     def graficar_heatmap(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(pitch_type='statsbomb', half=False, pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
+
+        # Dibujar los números de zonas para verificación
+        for zona, (x_z, y_z) in zonas_coords.items():
+            pitch.annotate(str(zona), (x_z, y_z), ax=ax, fontsize=10, ha='center', va='center', color='black', bbox=dict(facecolor='white', edgecolor='black', boxstyle='circle'))
 
         if len(x) >= 2:
             try:
