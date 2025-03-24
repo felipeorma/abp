@@ -6,7 +6,6 @@ import plotly.express as px
 from mplsoccer import VerticalPitch
 
 def analitica_page():
-    st.set_page_config(layout="wide")
     st.title("⚽ Panel de Análisis Táctico Profesional")
     
     try:
