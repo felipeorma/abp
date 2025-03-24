@@ -62,15 +62,17 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas afinadas a la imagen de referencia (mitad superior, portería arriba)
+    # Coordenadas calibradas para medio campo con portería arriba (VerticalPitch half-side='top')
     zona_coords = {
-        1: (6, 78), 2: (114, 78),
-        3: (30, 65), 4: (90, 65),
-        5: (52, 98), 6: (68, 98), 7: (60, 98), 8: (44, 98), 9: (76, 98),
-        10: (52, 88), 11: (68, 88), 12: (44, 88), 13: (76, 88),
-        14: (48, 78), 15: (72, 78),
-        16: (40, 68), 17: (80, 68),
-        "Penal": (60, 88)
+        1: (5, 10),   2: (95, 10),
+        3: (20, 25),  4: (80, 25),
+        5: (40, 5),   6: (60, 5),   7: (50, 5),
+        8: (30, 5),   9: (70, 5),
+        10: (40, 20), 11: (60, 20),
+        12: (30, 20), 13: (70, 20),
+        14: (38, 35), 15: (62, 35),
+        16: (25, 48), 17: (75, 48),
+        "Penal": (50, 20)
     }
 
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
@@ -83,10 +85,10 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    def dibujar_pitch(title, x, y, cmap):
+    def dibujar_vertical_pitch(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=False)
-        fig, ax = pitch.draw(figsize=(8, 6))
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True, half_side='top')
+        fig, ax = pitch.draw(figsize=(6, 8))
 
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
@@ -100,8 +102,8 @@ if not df.empty:
 
         st.pyplot(fig)
 
-    dibujar_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
-    dibujar_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
+    dibujar_vertical_pitch("🟢 Heatmap - Zona de Saque", df_filtrado["x_saque"], df_filtrado["y_saque"], "Greens")
+    dibujar_vertical_pitch("🔴 Heatmap - Zona de Remate", df_filtrado["x_remate"], df_filtrado["y_remate"], "Reds")
 
     csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
