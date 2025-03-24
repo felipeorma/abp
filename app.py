@@ -92,6 +92,10 @@ if not df.empty:
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)  # Mitad superior
         fig, ax = pitch.draw(figsize=(8, 6))
         
+        # Graficar las zonas numeradas
+        for zona, (x_coord, y_coord) in zona_coords.items():
+            ax.text(x_coord, y_coord, str(zona), color="black", fontsize=12, ha="center", va="center", bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
+
         # Ajustar niveles y transparencia para mejorar la visualización
         if not x.empty and not y.empty:
             pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=50, cmap=cmap, alpha=0.6)
