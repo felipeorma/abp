@@ -69,9 +69,14 @@ with st.container(border=True):
     with col2:
         equipo = st.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
-# Paso 4: Detalles de ejecución
+# Paso 4: Detalles de ejecución (con imagen de referencia)
 with st.container(border=True):
     st.markdown("### 🎯 Detalles de Ejecución")
+    
+    # Mostrar imagen de referencia de zonas
+    st.image("https://i.imgur.com/7b2W7Qp.png", 
+             caption="Referencia de Zonas de Balón Parado",
+             use_column_width=True)
     
     if equipo == "Cavalry FC":
         ejecutor = st.selectbox("Jugador ejecutor", jugadores_cavalry)
@@ -156,13 +161,13 @@ if st.session_state.registro:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación corregida
+    # Función de graficación mejorada (sin puntos)
     def graficar_heatmap(title, x, y, color, tipo):
         pitch = VerticalPitch(
             pitch_type='statsbomb', 
             pitch_color='grass', 
             line_color='white',
-            half=(tipo == 'remate')  # Media cancha solo para remates
+            half=(tipo == 'remate')
         )
         fig, ax = pitch.draw(figsize=(10, 7))
         
@@ -174,26 +179,14 @@ if st.session_state.registro:
             y_valid = y[valid]
             
             if not x_valid.empty:
-                # Heatmap con parámetros optimizados
                 pitch.kdeplot(
                     x_valid, y_valid, ax=ax,
                     cmap=f'{color.capitalize()}s',
-                    levels=100,
+                    levels=150,
                     fill=True,
-                    alpha=0.7,
-                    bw_adjust=0.4 if tipo == 'saque' else 0.6,
-                    zorder=2
-                )
-                
-                # Puntos superpuestos
-                pitch.scatter(
-                    x_valid, y_valid, ax=ax,
-                    s=100,
-                    color=color,
-                    edgecolors='white',
-                    linewidth=1,
                     alpha=0.8,
-                    zorder=3
+                    bw_adjust=0.4,
+                    zorder=2
                 )
                 
         except Exception as e:
