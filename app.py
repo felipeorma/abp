@@ -96,7 +96,10 @@ if not df.empty:
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
 
         if len(x) >= 2:
-            pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
+            try:
+                pitch.kdeplot(x=x, y=y, ax=ax, fill=True, cmap=cmap, alpha=0.8)
+            except ValueError as e:
+                st.warning("No se pudo generar el heatmap: " + str(e))
 
         for zona, (x_z, y_z) in zona_coords.items():
             if isinstance(zona, int):
