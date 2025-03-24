@@ -147,21 +147,33 @@ if not df.empty:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación mejorada
+    # Función de graficación CORREGIDA
     def graficar_heatmap(title, x, y, color):
         pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
         
-        if not x.empty:
-            try:
-                # Intentar KDE si hay suficientes datos
-                if len(x) > 1:
-                    pitch.kdeplot(x, y, ax=ax, fill=True, cmap=f"{color}s", levels=100, alpha=0.6, bw_adjust=0.4)
-                # Scatter plot para todos los casos
-                pitch.scatter(x, y, ax=ax, s=150, color=color, edgecolors='white', zorder=3)
-            except Exception as e:
-                # Fallback seguro
-                pitch.scatter(x, y, ax=ax, s=150, color=color, edgecolors='white', zorder=3)
+        try:
+            # Convertir a numérico y filtrar NaNs
+            x = pd.to_numeric(x, errors='coerce')
+            y = pd.to_numeric(y, errors='coerce')
+            valid = x.notna() & y.notna()
+            x_valid = x[valid]
+            y_valid = y[valid]
+            
+            if not x_valid.empty:
+                # Scatter plot siempre visible
+                scatter = pitch.scatter(x_valid, y_valid, ax=ax, 
+                                      s=150, color=color, 
+                                      edgecolors='black', zorder=3)
+                
+                # KDE solo si hay suficientes puntos
+                if len(x_valid) > 1:
+                    pitch.kdeplot(x_valid, y_valid, ax=ax, 
+                                 cmap=f"{color}s", levels=50,
+                                 fill=True, alpha=0.5)
+                    
+        except Exception as e:
+            st.error(f"Error al generar el gráfico: {str(e)}")
         
         st.subheader(title)
         st.pyplot(fig)
