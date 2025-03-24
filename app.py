@@ -86,11 +86,14 @@ if not df.empty:
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
-    # Función para dibujar medio campo
+    # Función para dibujar medio campo (mitad superior)
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
         pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True)
         fig, ax = pitch.draw(figsize=(8, 6))
+        
+        # Invertir el eje Y para mostrar la mitad superior
+        ax.set_ylim(60, 120)  # Ajustar el límite superior del campo
         ax.invert_yaxis()
 
         # Ajustar niveles y transparencia para mejorar la visualización
@@ -112,4 +115,3 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
-
