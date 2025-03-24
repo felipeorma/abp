@@ -74,7 +74,7 @@ with st.container(border=True):
     st.markdown("### 🎯 Detalles de Ejecución")
     
     # Mostrar imagen de referencia de zonas
-    st.image("https://i.imgur.com/7b2W7Qp.png", 
+    st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", 
              caption="Referencia de Zonas de Balón Parado",
              use_column_width=True)
     
@@ -95,9 +95,11 @@ with st.container(border=True):
         with col2:
             zona_remate = st.selectbox("Zona de remate", [z for z in zonas_coords if z != "Penal"])
         
-        primer_contacto = st.selectbox("Primer contacto", jugadores_cavalry + ["Rival"])
+        # Lista de contactos actualizada
+        opciones_contacto = jugadores_cavalry + ["Oponente"]
+        primer_contacto = st.selectbox("Primer contacto", opciones_contacto)
         cuerpo1 = st.selectbox("Parte del cuerpo", ["Cabeza", "Pie derecho", "Pie izquierdo", "Tronco", "Otro"])
-        segundo_contacto = st.text_input("Segundo contacto (opcional)")
+        segundo_contacto = st.selectbox("Segundo contacto (opcional)", ["Ninguno"] + opciones_contacto)
 
 # Paso 5: Resultados
 with st.container(border=True):
@@ -129,7 +131,7 @@ if st.button("✅ Registrar Acción", type="primary"):
         "Zona Remate": zona_remate,
         "Primer Contacto": primer_contacto,
         "Parte Cuerpo": cuerpo1,
-        "Segundo Contacto": segundo_contacto,
+        "Segundo Contacto": segundo_contacto if segundo_contacto != "Ninguno" else "",
         "Gol": gol,
         "Resultado": resultado,
         "Perfil": perfil,
@@ -161,7 +163,7 @@ if st.session_state.registro:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación mejorada (sin puntos)
+    # Función de graficación mejorada
     def graficar_heatmap(title, x, y, color, tipo):
         pitch = VerticalPitch(
             pitch_type='statsbomb', 
