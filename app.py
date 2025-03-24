@@ -80,8 +80,9 @@ if not df.empty:
     # ---------------------------
     st.subheader("🔥 Heatmap sobre cancha real (portería arriba)")
 
-    pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
-    fig, ax = pitch.draw(figsize=(8, 6), inverse_y=True)
+    pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', inverse_y=True)
+    fig, ax = pitch.draw(figsize=(8, 6))
+
 
     pitch.kdeplot(
         x=df_filtrado["x"],
