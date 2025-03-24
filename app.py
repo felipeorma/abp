@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
 
-# Configuración inicial DEBE ser lo primero
+# Configuración inicial
 st.set_page_config(layout="centered")
 st.title("⚽ Registro y Heatmap de Balón Parado")
 
@@ -37,16 +37,17 @@ zonas_coords = {
 # Formulario de registro
 st.subheader("📋 Registrar nueva acción")
 
-# Campos básicos
+# Campos principales en columnas
 col1, col2 = st.columns(2)
 with col1:
+    ejecutor = st.selectbox("👟 Ejecutante", jugadores_cavalry)
     match_day = st.selectbox("🗓️ Jornada", ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
     oponente = st.selectbox("🆚 Rival", equipos_cpl)
-    field = st.selectbox("📍 Condición de campo", ["Local", "Visitante"])
-    
+
 with col2:
     tipo_accion = st.selectbox("⚙️ Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"])
     equipo = st.selectbox("🏳️ Equipo que ejecutó", ["Cavalry FC", "Rival"])
+    field = st.selectbox("📍 Condición de campo", ["Local", "Visitante"])
 
 # Tiempo de juego
 periodo = st.selectbox("⏱️ Periodo", ["1T", "2T"])
@@ -86,7 +87,6 @@ else:
     segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
 
 # Campos restantes
-ejecutor = st.selectbox("👟 Ejecutante", jugadores_cavalry)
 gol = st.selectbox("🥅 ¿Terminó en gol?", ["No", "Sí"])
 resultado = st.selectbox("🎯 Resultado final de la jugada", ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco", "Gol"])
 perfil = st.selectbox("🦶 Perfil del ejecutante", ["Hábil", "No hábil"])
@@ -147,24 +147,28 @@ if not df.empty:
     df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
     df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
 
-    # Función de graficación
-    def graficar_heatmap(title, x, y, cmap):
+    # Función de graficación mejorada
+    def graficar_heatmap(title, x, y, color):
         pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
         fig, ax = pitch.draw(figsize=(6, 9))
         
-        if len(x) > 0:
+        if not x.empty:
             try:
-                pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=100, alpha=0.6, bw_adjust=0.4)
-                pitch.scatter(x, y, ax=ax, s=50, color='white', edgecolors='black', zorder=3)
-            except:
-                pitch.scatter(x, y, ax=ax, s=150, color=cmap, edgecolors='white', zorder=3)
+                # Intentar KDE si hay suficientes datos
+                if len(x) > 1:
+                    pitch.kdeplot(x, y, ax=ax, fill=True, cmap=f"{color}s", levels=100, alpha=0.6, bw_adjust=0.4)
+                # Scatter plot para todos los casos
+                pitch.scatter(x, y, ax=ax, s=150, color=color, edgecolors='white', zorder=3)
+            except Exception as e:
+                # Fallback seguro
+                pitch.scatter(x, y, ax=ax, s=150, color=color, edgecolors='white', zorder=3)
         
         st.subheader(title)
         st.pyplot(fig)
 
     # Generación de heatmaps
-    graficar_heatmap("🟢 Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
-    graficar_heatmap("🔴 Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
+    graficar_heatmap("🟢 Zona de Saque", df["x_saque"], df["y_saque"], "green")
+    graficar_heatmap("🔴 Zona de Remate", df["x_remate"], df["y_remate"], "red")
 
     # Descarga de datos
     csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode("utf-8")
