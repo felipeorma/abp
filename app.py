@@ -16,7 +16,7 @@ if "registro" not in st.session_state:
 img = Image.open("MedioCampo_enumerado.JPG")
 
 st.set_page_config(layout="centered")
-st.title("⚽ Registro de acciones de balón parado por zonas")
+st.title("⚽ Registro de Acciones de Balón Parado")
 
 # Mostrar imagen de referencia
 st.image(img, caption="Zonas numeradas del campo (portería arriba)", use_column_width=True)
@@ -27,7 +27,8 @@ st.image(img, caption="Zonas numeradas del campo (portería arriba)", use_column
 with st.expander("➕ Registrar nueva acción"):
     tipo = st.selectbox("Tipo de balón parado", ["Tiro libre", "Córner", "Lateral", "Penal"])
     minuto = st.number_input("⏱️ Minuto", min_value=0, max_value=120, value=0)
-    zona = st.selectbox("📍 Zona final de la jugada (ver imagen)", list(range(1, 18)))
+    zona_saque = st.selectbox("📍 Zona de saque (inicio)", list(range(1, 18)))
+    zona_remate = st.selectbox("🎯 Zona de remate (finalización)", list(range(1, 18)))
     ejecutor = st.text_input("👟 Ejecutante")
     primer_contacto = st.text_input("🎯 Primer contacto")
     segundo_contacto = st.text_input("📌 Segundo contacto (opcional)")
@@ -36,7 +37,8 @@ with st.expander("➕ Registrar nueva acción"):
         st.session_state.registro.append({
             "tipo": tipo,
             "minuto": minuto,
-            "zona": zona,
+            "zona_saque": zona_saque,
+            "zona_remate": zona_remate,
             "ejecutor": ejecutor,
             "primer_contacto": primer_contacto,
             "segundo_contacto": segundo_contacto
@@ -68,45 +70,66 @@ if not df.empty:
         16: (20, 55), 17: (48, 55)
     }
 
-    # Asignar coordenadas
-    df_filtrado["coords"] = df_filtrado["zona"].map(zona_coords)
-    df_filtrado = df_filtrado.dropna(subset=["coords"])  # evitar errores
+    # Asignar coordenadas a ZONA DE SAQUE
+    df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
+    df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
+    df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
+    df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[1])
 
-    df_filtrado["x"] = df_filtrado["coords"].apply(lambda c: c[0])
-    df_filtrado["y"] = df_filtrado["coords"].apply(lambda c: c[1])
+    # Asignar coordenadas a ZONA DE REMATE
+    df_filtrado["coords_remate"] = df_filtrado["zona_remate"].map(zona_coords)
+    df_filtrado = df_filtrado.dropna(subset=["coords_remate"])
+    df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
+    df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ---------------------------
-    # HEATMAP SOBRE CAMPO INVERTIDO
+    # HEATMAP DE ZONA DE SAQUE
     # ---------------------------
-    st.subheader("🔥 Heatmap sobre cancha real (portería arriba)")
+    st.subheader("🟢 Zona de Saque - Heatmap")
 
     pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
-    fig, ax = pitch.draw(figsize=(8, 6))
+    fig1, ax1 = pitch.draw(figsize=(8, 6))
+    ax1.invert_yaxis()
 
-    # Invertir el eje Y para poner la portería arriba
-    ax.invert_yaxis()
-
-    # Heatmap KDE
     pitch.kdeplot(
-        x=df_filtrado["x"],
-        y=df_filtrado["y"],
-        ax=ax,
+        x=df_filtrado["x_saque"],
+        y=df_filtrado["y_saque"],
+        ax=ax1,
+        fill=True,
+        levels=100,
+        cmap="Greens",
+        shade_lowest=False,
+        alpha=0.8
+    )
+    pitch.scatter(df_filtrado["x_saque"], df_filtrado["y_saque"], ax=ax1, color="black", s=30, edgecolors='white')
+    st.pyplot(fig1)
+
+    # ---------------------------
+    # HEATMAP DE ZONA DE REMATE
+    # ---------------------------
+    st.subheader("🔴 Zona de Remate - Heatmap")
+
+    pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
+    fig2, ax2 = pitch.draw(figsize=(8, 6))
+    ax2.invert_yaxis()
+
+    pitch.kdeplot(
+        x=df_filtrado["x_remate"],
+        y=df_filtrado["y_remate"],
+        ax=ax2,
         fill=True,
         levels=100,
         cmap="Reds",
         shade_lowest=False,
         alpha=0.8
     )
-
-    # Puntos individuales
-    pitch.scatter(df_filtrado["x"], df_filtrado["y"], ax=ax, color="black", s=30, edgecolors='white', zorder=2)
-
-    st.pyplot(fig)
+    pitch.scatter(df_filtrado["x_remate"], df_filtrado["y_remate"], ax=ax2, color="black", s=30, edgecolors='white')
+    st.pyplot(fig2)
 
     # ---------------------------
     # DESCARGA CSV
     # ---------------------------
-    csv = df_filtrado.drop(columns=["coords"]).to_csv(index=False).encode("utf-8")
+    csv = df_filtrado.drop(columns=["coords_saque", "coords_remate"]).to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Descargar CSV", csv, "acciones_zonas.csv", "text/csv")
 
 else:
