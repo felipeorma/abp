@@ -5,5 +5,6 @@ def show_navigation():
     return st.sidebar.radio(
         "Seleccionar módulo:",
         ("🏟️ Registro en Vivo", "📊 Panel Analítico"),
-        index=0
+        index=0,
+        key="nav_radio"
     )
