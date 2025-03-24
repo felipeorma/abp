@@ -89,7 +89,7 @@ if not df.empty:
     df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     # ----------------------------------------
-    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIA CANCHA SUPERIOR
+    # FUNCIÓN PARA DIBUJAR HEATMAP MEDIA CANCHA SUPERIOR CON ZONAS
     # ----------------------------------------
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -102,6 +102,12 @@ if not df.empty:
         fig, ax = pitch.draw(figsize=(8, 6))
         pitch.kdeplot(x=x, y=y, ax=ax, fill=True, levels=100, cmap=cmap, alpha=0.8)
         pitch.scatter(x, y, ax=ax, color="black", s=30, edgecolors='white')
+
+        # Agregar etiquetas de zonas
+        for zona, (x_z, y_z) in zona_coords.items():
+            if isinstance(zona, int):
+                ax.text(x_z, y_z, str(zona), color='white', fontsize=10, ha='center', va='center', weight='bold')
+
         st.pyplot(fig)
 
     # Heatmaps
@@ -114,3 +120,4 @@ if not df.empty:
 
 else:
     st.info("Aún no has registrado ninguna acción.")
+
