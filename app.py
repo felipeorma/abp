@@ -62,29 +62,29 @@ if not df.empty:
 
     st.dataframe(df_filtrado)
 
-    # Coordenadas invertidas para mitad superior vertical
+    # Coordenadas rotadas 90 grados (intercambiamos X e Y)
     zona_coords = {
-        1: (5, 60),   2: (63, 60),     # Esquinas superiores
-        3: (18, 40),  4: (50, 40),     # Laterales superiores
-        5: (30, 55),  6: (38, 55),     # Central superior
-        7: (34, 55),  8: (22, 55), 
-        9: (46, 55),  10: (30, 50),    # Delantera
-        11: (38, 50), 12: (22, 50),
-        13: (46, 50), 14: (28, 35),    # Mediocampo
-        15: (40, 35), 16: (20, 25),    # Defensa
-        17: (48, 25), "Penal": (34, 45)  # Punto penal
+        1: (100, 5),   2: (100, 63),     # Esquinas superiores
+        3: (78, 18),   4: (78, 50),      # Laterales superiores
+        5: (95, 30),   6: (95, 38),      # Central superior
+        7: (95, 34),   8: (95, 22),
+        9: (95, 46),   10: (88, 30),     # Delantera
+        11: (88, 38),  12: (88, 22),
+        13: (88, 46),  14: (70, 28),     # Mediocampo
+        15: (70, 40),  16: (55, 20),     # Defensa
+        17: (55, 48),  "Penal": (88, 34) # Punto penal
     }
 
-    # Asignar coordenadas invertidas
+    # Asignar coordenadas rotadas
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_saque"])
     df_filtrado["x_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[0])
-    df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: 100 - c[1])  # Invertir eje Y
+    df_filtrado["y_saque"] = df_filtrado["coords_saque"].apply(lambda c: c[1])
 
     df_filtrado["coords_remate"] = df_filtrado["zona_remate"].map(zona_coords)
     df_filtrado = df_filtrado.dropna(subset=["coords_remate"])
     df_filtrado["x_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[0])
-    df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: 100 - c[1])  # Invertir eje Y
+    df_filtrado["y_remate"] = df_filtrado["coords_remate"].apply(lambda c: c[1])
 
     def dibujar_half_pitch(title, x, y, cmap):
         st.subheader(title)
@@ -92,13 +92,11 @@ if not df.empty:
                             pitch_color='grass', half=True)
         fig, ax = pitch.draw(figsize=(8, 6))
         
-        # Invertir eje Y automáticamente
-        ax.invert_yaxis()
-        
+        # Aplicamos la rotación visual (sin modificar los datos)
         if not x.empty and not y.empty:
-            pitch.kdeplot(x=x, y=y, ax=ax, fill=True, 
+            pitch.kdeplot(x=y, y=x, ax=ax, fill=True,  # Intercambiamos X e Y aquí
                          levels=50, cmap=cmap, alpha=0.6)
-            pitch.scatter(x, y, ax=ax, color="black", 
+            pitch.scatter(y, x, ax=ax, color="black",  # Intercambiamos X e Y aquí
                          s=30, edgecolors='white')
         st.pyplot(fig)
 
