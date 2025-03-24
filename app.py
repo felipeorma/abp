@@ -2,7 +2,7 @@ import streamlit as st
 from modules.navigation import show_navigation
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from config import setup_config
+from modules.config import setup_config
 
 # Configuración inicial
 setup_config()
