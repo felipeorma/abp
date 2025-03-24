@@ -86,12 +86,9 @@ if not df.empty:
     df_filtrado["coords_saque"] = df_filtrado["zona_saque"].map(zona_centro)
     df_filtrado["coords_remate"] = df_filtrado["zona_remate"].map(zona_centro)
 
-    df_filtrado[["x_saque", "y_saque"]] = pd.DataFrame(df_filtrado["coords_saque"].tolist(), index=df_filtrado.index)
-    df_filtrado[["x_remate", "y_remate"]] = pd.DataFrame(df_filtrado["coords_remate"].tolist(), index=df_filtrado.index)
-
-    # Aplicar rotación de 90 grados a las coordenadas del heatmap (swap y, x)
-    df_filtrado["x_saque"], df_filtrado["y_saque"] = df_filtrado["y_saque"], df_filtrado["x_saque"]
-    df_filtrado["x_remate"], df_filtrado["y_remate"] = df_filtrado["y_remate"], df_filtrado["x_remate"]
+    # INVERTIR 90° LAS COORDENADAS PARA HEATMAP
+    df_filtrado["x_saque"], df_filtrado["y_saque"] = zip(*df_filtrado["coords_saque"].map(lambda c: (100 - c[1], c[0])))
+    df_filtrado["x_remate"], df_filtrado["y_remate"] = zip(*df_filtrado["coords_remate"].map(lambda c: (100 - c[1], c[0])))
 
     def graficar(title, x, y, cmap):
         st.subheader(title)
