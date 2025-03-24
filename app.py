@@ -86,7 +86,7 @@ if not df.empty:
 
     def graficar(title, x, y, cmap):
         st.subheader(title)
-        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass')
+        pitch = VerticalPitch(pitch_type='statsbomb', line_color='white', pitch_color='grass', half=True, half_side='top')
         fig, ax = pitch.draw(figsize=(6, 10))
 
         # Dibujar zonas
