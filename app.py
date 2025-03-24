@@ -65,15 +65,19 @@ if not df.empty:
 
     # Función de graficación
     def graficar_heatmap(title, x, y, cmap):
-        if len(x) >= 2:
-            st.subheader(title)
-            pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
-            fig, ax = pitch.draw(figsize=(6, 9))
+        st.subheader(title)
+        pitch = VerticalPitch(pitch_type='statsbomb', pitch_color='grass', line_color='white')
+        fig, ax = pitch.draw(figsize=(6, 9))
+
+        if len(x) == 1:
+            pitch.scatter(x, y, ax=ax, s=150, color=cmap, edgecolors='white', zorder=3)
+        elif len(x) >= 2:
             try:
                 pitch.kdeplot(x, y, ax=ax, fill=True, cmap=cmap, levels=100, alpha=0.6, bw_adjust=0.4)
             except ValueError:
                 st.warning("⚠️ No se pudo generar el heatmap. Verifica que haya suficientes datos.")
-            st.pyplot(fig)
+
+        st.pyplot(fig)
 
     graficar_heatmap("🟢 Heatmap - Zona de Saque", df["x_saque"], df["y_saque"], "Greens")
     graficar_heatmap("🔴 Heatmap - Zona de Remate", df["x_remate"], df["y_remate"], "Reds")
