@@ -65,6 +65,12 @@ def configurar_filtros(df):
             default=df['Equipo'].unique()
         )
         
+        rivals = st.multiselect(
+            "Rivales",
+            options=df['Rival'].unique(),
+            default=df['Rival'].unique()
+        )
+        
         jugadores = st.multiselect(
             "Jugadores",
             options=df['Ejecutor'].unique(),
@@ -90,6 +96,7 @@ def configurar_filtros(df):
         (df['Jornada'].isin(jornadas)) &
         (df['Periodo'].isin(periodos)) &
         (df['Equipo'].isin(equipos)) &
+        (df['Rival'].isin(rivals)) &  # Nuevo filtro
         (df['Ejecutor'].isin(jugadores)) &
         (df['Acción'].isin(acciones)) &
         (df['Minuto'].between(*rango_minutos))
