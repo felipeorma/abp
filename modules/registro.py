@@ -168,52 +168,62 @@ def generar_heatmaps(df, zonas):
         df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
         df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
         
-        # Configuración optimizada del pitch
+        # Configuración óptima del pitch
         pitch = VerticalPitch(
             pitch_type='statsbomb',
-            pitch_color='grass',
-            line_color='white',
+            pitch_color='#1d3649',  # Fondo oscuro para mejor contraste
+            line_color='#dee6ea',
             half=True,
             goal_type='box',
-            linewidth=1.5,
-            pad_top=15
+            linewidth=1.2,
+            pad_top=20
         )
 
+        # Parámetros clave para expansión del heatmap
+        heatmap_params = {
+            'cmap': 'viridis',  # Mejor escala de color
+            'levels': 300,       # Máxima suavidad
+            'fill': True,
+            'alpha': 0.7,
+            'bw_adjust': 0.15,   # Aumento radical del suavizado
+            'zorder': 2,
+            'thresh': 0.05       # Mostrar áreas menos densas
+        }
+
         # Heatmap de Saques
-        fig1, ax1 = plt.subplots(figsize=(12, 8))
+        fig1, ax1 = plt.subplots(figsize=(13, 9))
         pitch.draw(ax=ax1)
         
-        # Ajustes clave para el heatmap:
-        kde1 = pitch.kdeplot(
+        pitch.kdeplot(
             df['x_saque'], df['y_saque'],
             ax=ax1,
-            cmap='Greens',
-            levels=200,  # Más niveles para suavizado
-            fill=True,
-            alpha=0.6,   # Mayor transparencia
-            bw_adjust=0.2,  # Aumentar el ancho de banda
-            zorder=2
+            **heatmap_params
         )
         
-        ax1.set_title('Distribución de Saques', fontsize=16, pad=20, weight='bold')
+        ax1.set_title('Distribución de Saques', 
+                     fontsize=18, 
+                     color='white',
+                     pad=25,
+                     fontweight='bold')
+        ax1.set_facecolor('#1d3649')  # Fondo coordinado
         st.pyplot(fig1)
 
         # Heatmap de Remates
-        fig2, ax2 = plt.subplots(figsize=(12, 8))
+        fig2, ax2 = plt.subplots(figsize=(13, 9))
         pitch.draw(ax=ax2)
         
-        kde2 = pitch.kdeplot(
+        pitch.kdeplot(
             df['x_remate'], df['y_remate'],
             ax=ax2,
-            cmap='Reds',
-            levels=200,
-            fill=True,
-            alpha=0.6,
-            bw_adjust=0.2,  # Mismo ajuste que para saques
-            zorder=2
+            **heatmap_params
         )
         
-        ax2.set_title('Zonas de Remate', fontsize=16, pad=20, weight='bold')
+        ax2.set_title('Zonas de Remate', 
+                     fontsize=18, 
+                     color='white',
+                     pad=25,
+                     fontweight='bold')
+        ax2.set_facecolor('#1d3649')
         st.pyplot(fig2)
 
     except Exception as e:
