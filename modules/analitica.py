@@ -278,7 +278,7 @@ def mostrar_ranking_parte_cuerpo(df):
     ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
     df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
 
-    # Colores personalizados por parte del cuerpo
+    # Colores personalizados
     color_map = {
         'Cabeza': '#00C2A0',
         'Pierna': '#FF5A5F',
@@ -289,7 +289,7 @@ def mostrar_ranking_parte_cuerpo(df):
         df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte Cuerpo'].notna())]
 
         # Agrupamos por jugador y parte del cuerpo
-        df_ranking = df_tipo.groupby(['Ejecutor', 'Parte del cuerpo']).size().reset_index(name='Cantidad')
+        df_ranking = df_tipo.groupby(['Ejecutor', 'Parte Cuerpo']).size().reset_index(name='Cantidad')
 
         # Total por jugador para ordenar
         total_jugadores = df_ranking.groupby('Ejecutor')['Cantidad'].sum().sort_values(ascending=False)
@@ -301,7 +301,7 @@ def mostrar_ranking_parte_cuerpo(df):
             df_ranking,
             x='Cantidad',
             y='Ejecutor',
-            color='Parte del cuerpo',
+            color='Parte Cuerpo',
             orientation='h',
             text='Cantidad',
             title=f"Jugadores con más acciones {tipo.lower()}s por parte del cuerpo",
