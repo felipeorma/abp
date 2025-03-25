@@ -255,9 +255,13 @@ def generar_seccion_efectividad(df):
     
     with col2:
         df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
+    
+        # 🔥 Evita mostrar bloques con Resultado nulo
+        df_sun = df_sun[df_sun['Resultado'].notna()]
+    
         total = df_sun['Cantidad'].sum()
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
-
+    
         fig = px.sunburst(
             df_sun,
             path=['Acción', 'Resultado'],
@@ -266,13 +270,13 @@ def generar_seccion_efectividad(df):
             branchvalues='total',
             custom_data=['Cantidad', 'Porcentaje']
         )
-
+    
         fig.update_traces(
             hovertemplate='<b>%{label}</b><br>' +
                           'Cantidad: %{customdata[0]}<br>' +
                           'Porcentaje: %{customdata[1]:.1f}%<extra></extra>'
         )
-
+    
         st.plotly_chart(fig, use_container_width=True)
 
 
