@@ -105,15 +105,29 @@ def configurar_filtros(df):
         (df['Minuto'].between(*rango_minutos))
     ]
 def mostrar_kpis(df):
-    cols = st.columns(3)  # Reducido a 3 métricas
+    cols = st.columns(4)  # Aumentado a 4 métricas
+    
     with cols[0]:
-        st.metric("Acciones registradas", df.shape[0])
+        st.metric("📈 Acciones registradas", df.shape[0])
+    
+    # Goles a favor (Cavalry FC)
+    goles_favor = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Cavalry FC')].shape[0]
     with cols[1]:
-        goles = df[df['Gol'] == 'Sí'].shape[0]
-        st.metric("Goles convertidos", goles)
+        st.metric("✅ Goles a favor", goles_favor, 
+                 help="Goles convertidos por Cavalry FC",
+                 delta_color="off")
+    
+    # Goles en contra (Rival)
+    goles_contra = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Rival')].shape[0]
     with cols[2]:
-        eficacia = (goles/df.shape[0]*100) if df.shape[0] > 0 else 0
-        st.metric("Efectividad (%)", f"{eficacia:.1f}%")
+        st.metric("❌ Goles en contra", goles_contra, 
+                 help="Goles concedidos al rival",
+                 delta_color="off")
+    
+    # Efectividad basada en goles a favor
+    with cols[3]:
+        eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
+        st.metric("🎯 Efectividad", f"{eficacia:.1f}%")
 
 def generar_seccion_espacial(df):
     st.header("🌍 Mapeo Táctico")
