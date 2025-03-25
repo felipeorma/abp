@@ -113,6 +113,7 @@ def configurar_filtros(df):
             "Minutos del partido",
             min_min, max_min,
             (min_min, max_min)
+        )  # This parenthesis was missing
     
     return df[
         (df['Fecha'].isin(fechas_a_filtrar)) &
