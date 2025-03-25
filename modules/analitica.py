@@ -254,27 +254,21 @@ def generar_seccion_efectividad(df):
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
-        # Agrupamos por Acción y Resultado
+        # Agrupar por Acción y Resultado
         df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
+        df_sun = df_sun[df_sun['Resultado'].notna()]  # quitar nulos
     
-        # Quitamos nulos en Resultado
-        df_sun = df_sun[df_sun['Resultado'].notna()]
-    
-        # Total general
         total = df_sun['Cantidad'].sum()
-    
-        # Porcentaje por Acción + Resultado
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
     
-        # Ahora agregamos los totales por Acción para el primer nivel del sunburst
+        # Agregar totales por Acción para el primer nivel
         df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
-        df_accion['Resultado'] = None
+        df_accion['Resultado'] = 'Total'  # Usamos string válido, no None
         df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
     
-        # Unimos los dos DataFrames
+        # Unir ambos dataframes
         df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
     
-        # Creamos el gráfico
         fig = px.sunburst(
             df_sunburst,
             path=['Acción', 'Resultado'],
