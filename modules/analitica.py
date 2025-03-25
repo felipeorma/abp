@@ -122,29 +122,30 @@ def configurar_filtros(df):
     ]
 
 def mostrar_kpis(df):
-    cols = st.columns(4)
+    cols = st.columns(5)  # Cambiamos de 4 a 5 columnas para meter la nueva métrica
     
     with cols[0]:
         st.metric("📈 Acciones registradas", df.shape[0])
     
-    # Goles a favor (Cavalry FC)
     goles_favor = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Cavalry FC')].shape[0]
     with cols[1]:
         st.metric("✅ Goles a favor", goles_favor, 
-                 help="Goles convertidos por Cavalry FC",
-                 delta_color="off")
+                 help="Goles convertidos por Cavalry FC")
     
-    # Goles en contra (Rival)
     goles_contra = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Rival')].shape[0]
     with cols[2]:
         st.metric("❌ Goles en contra", goles_contra, 
-                 help="Goles concedidos al rival",
-                 delta_color="off")
+                 help="Goles concedidos al rival")
     
-    # Efectividad basada en goles a favor
+    eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
     with cols[3]:
-        eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
-        st.metric("🎯 Efectividad", f"{eficacia:.1f}%")
+        st.metric("🎯 Efectividad ofensiva", f"{eficacia:.1f}%",
+                 help="Porcentaje de acciones que terminaron en gol a favor")
+    
+    eficacia_def = 100 - (goles_contra / df.shape[0] * 100) if df.shape[0] > 0 else 0
+    with cols[4]:
+        st.metric("🛡️ Efectividad defensiva", f"{eficacia_def:.1f}%",
+                 help="Porcentaje de acciones que NO terminaron en gol en contra")
 
 def generar_seccion_espacial(df):
     st.header("🌍 Mapeo Táctico")
