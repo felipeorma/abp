@@ -1,22 +1,21 @@
-Jornada,Fecha,Equipo,Rival,Acción,Gol,Resultado
-Jornada 1,01/04/2023,Forge FC,Saskatoon FC,Tiro,No,Fuera
-Jornada 1,01/04/2023,Cavalry FC,Quebec City FC,Tiro,No,Sin Gol
-Jornada 1,01/04/2023,Pacific FC,FC Edmonton,Atajada,No,Bloqueado
-Jornada 1,02/04/2023,York United,Vancouver Whitecaps,Remate,Sí,Gol
-Jornada 1,02/04/2023,Valour FC,CF Montreal,Atajada,No,Bloqueado
-Jornada 1,02/04/2023,HFX Wanderers,Toronto FC,Atajada,Sí,Gol
-Jornada 1,02/04/2023,Atlético Ottawa,Vancouver FC,Falta,No,Fuera
-Jornada 2,08/04/2023,Forge FC,Quebec City FC,Cabeceo,Sí,Gol
-Jornada 2,08/04/2023,Saskatoon FC,FC Edmonton,Cabeceo,Sí,Gol
-Jornada 2,08/04/2023,Cavalry FC,Vancouver Whitecaps,Tiro,No,Atajado
-Jornada 2,09/04/2023,Pacific FC,CF Montreal,Remate,Sí,Gol
-Jornada 2,09/04/2023,York United,Toronto FC,Cabeceo,Sí,Gol
-Jornada 2,09/04/2023,Valour FC,Vancouver FC,Remate,Sí,Gol
-Jornada 2,09/04/2023,HFX Wanderers,Atlético Ottawa,Penal,No,Bloqueado
-Jornada 3,15/04/2023,Forge FC,FC Edmonton,Tiro,No,Bloqueado
-Jornada 3,15/04/2023,Quebec City FC,Vancouver Whitecaps,Tiro,No,Atajado
-Jornada 3,15/04/2023,Saskatoon FC,CF Montreal,Atajada,Sí,Gol
-Jornada 3,16/04/2023,Cavalry FC,Toronto FC,Falta,Sí,Gol
-Jornada 3,16/04/2023,Pacific FC,Vancouver FC,Penal,No,Atajado
-Jornada 3,16/04/2023,York United,Atlético Ottawa,Falta,Sí,Gol
-Jornada 3,16/04/2023,Valour FC,HFX Wanderers,Cabeceo,Sí,Gol
+Jornada,Fecha,Rival,Condición,Periodo,Minuto,Acción,Equipo,Ejecutor,Zona Saque,Zona Remate,Primer Contacto,Parte Cuerpo,Segundo Contacto,Gol,Resultado,Perfil,Estrategia,Tipo Ejecución,x_saque,y_saque,x_remate,y_remate
+Jornada 3,05/04/2024 20:10,HFX Wanderers FC,Local,1T,14,Lateral,Atlético Ottawa,Jugador 10,5,14,Jugador 16,Pie derecho,Jugador 8,No,Disparo al arco,Hábil,Sí,Centro,92,68,90,55
+Jornada 4,05/11/2024 19:29,Vancouver FC,Visitante,1T,7,Penal,York United FC,Jugador 17,13,4,Jugador 9,Tronco,,No,Disparo al arco,No hábil,Sí,Disparo directo,70,61,108,55
+Jornada 3,05/04/2024 21:10,Cavalry FC,Local,1T,46,Lateral,Vancouver FC,Jugador 4,2,4,Jugador 1,Pie izquierdo,Jugador 16,Sí,Gol,Hábil,No,Disparo directo,93,12,77,76
+Jornada 3,05/04/2024 20:04,Cavalry FC,Local,2T,19,Penal,Vancouver FC,Jugador 8,17,1,Jugador 7,Tronco,Jugador 14,Sí,Gol,No hábil,No,Centro,88,49,89,24
+Jornada 4,05/11/2024 20:02,Pacific FC,Visitante,2T,76,Lateral,HFX Wanderers FC,Jugador 13,13,4,Jugador 3,Tronco,Jugador 8,No,Disparo desviado,Hábil,No,Pase corto,108,28,81,69
+Jornada 4,05/11/2024 18:47,Pacific FC,Visitante,2T,86,Córner,Valour FC,Jugador 11,12,3,Jugador 12,Pie izquierdo,Jugador 3,Sí,Gol,No hábil,Sí,Pase corto,75,73,81,41
+Jornada 3,05/04/2024 21:10,Atlético Ottawa,Visitante,2T,58,Córner,HFX Wanderers FC,Jugador 11,7,9,Jugador 9,Pie derecho,Jugador 15,No,Posesión rival,No hábil,No,Disparo directo,71,68,118,37
+Jornada 2,04/27/2024 19:55,Forge FC,Visitante,1T,18,Penal,Vancouver FC,Jugador 6,17,6,Jugador 15,Cabeza,,No,Posesión rival,Hábil,No,Pase corto,76,71,120,18
+Jornada 3,05/04/2024 19:42,York United FC,Visitante,1T,2,Tiro libre,Pacific FC,Jugador 16,2,16,Jugador 20,Cabeza,Jugador 11,No,Disparo desviado,No hábil,Sí,Pase corto,119,8,93,3
+Jornada 2,04/27/2024 19:31,Valour FC,Local,1T,82,Tiro libre,Forge FC,Jugador 5,8,6,Jugador 5,Pie derecho,,Sí,Gol,No hábil,No,Centro,120,62,115,37
+Jornada 2,04/27/2024 20:18,Valour FC,Local,2T,8,Penal,Forge FC,Jugador 16,15,8,Jugador 6,Pie izquierdo,Jugador 20,Sí,Gol,No hábil,No,Disparo directo,109,6,75,3
+Jornada 2,04/27/2024 19:20,Forge FC,Visitante,1T,81,Penal,Pacific FC,Jugador 2,3,13,Jugador 16,Pie izquierdo,,Sí,Gol,Hábil,Sí,Disparo directo,72,70,96,7
+Jornada 4,05/11/2024 19:04,Vancouver FC,Visitante,2T,88,Lateral,York United FC,Jugador 4,5,11,Jugador 18,Pie izquierdo,,Sí,Gol,Hábil,No,Disparo directo,78,6,89,71
+Jornada 2,04/27/2024 20:20,Atlético Ottawa,Local,1T,3,Penal,Pacific FC,Jugador 7,13,1,Jugador 11,Pie izquierdo,,No,Despeje,Hábil,Sí,Disparo directo,86,33,81,9
+Jornada 4,05/11/2024 18:05,Valour FC,Local,1T,57,Córner,Pacific FC,Jugador 1,6,14,Jugador 2,Tronco,Jugador 11,Sí,Gol,Hábil,Sí,Disparo directo,115,59,83,2
+Jornada 3,05/04/2024 19:27,York United FC,Local,1T,26,Tiro libre,Vancouver FC,Jugador 15,15,7,Jugador 11,Cabeza,Jugador 5,Sí,Gol,Hábil,Sí,Pase corto,73,45,87,69
+Jornada 1,04/20/2024 18:29,Cavalry FC,Local,1T,39,Tiro libre,Pacific FC,Jugador 17,10,16,Jugador 18,Tronco,,Sí,Gol,Hábil,No,Centro,120,24,120,65
+Jornada 1,04/20/2024 21:24,Forge FC,Local,1T,68,Lateral,Cavalry FC,Jugador 12,5,13,Jugador 16,Tronco,,No,Disparo al arco,Hábil,Sí,Centro,80,20,101,35
+Jornada 2,04/27/2024 21:07,York United FC,Local,2T,44,Lateral,Vancouver FC,Jugador 16,11,1,Jugador 16,Tronco,Jugador 10,No,Despeje,No hábil,No,Pase corto,105,34,97,48
+Jornada 4,05/11/2024 20:19,Vancouver FC,Visitante,1T,9,Lateral,York United FC,Jugador 15,17,6,Jugador 14,Pie izquierdo,Jugador 2,Sí,Gol,No hábil,No,Disparo directo,70,32,85,67
