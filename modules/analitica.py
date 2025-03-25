@@ -245,30 +245,40 @@ def generar_seccion_efectividad(df):
             Acciones=('Ejecutor', 'count'),
             Goles=('Gol', lambda x: (x == 'Sí').sum())
         ).reset_index()
+
         fig = px.scatter(
             df_efectividad, 
             x='Acciones', y='Goles',
             size='Goles', color='Ejecutor',
             title="Relación Acciones-Goles por Jugador"
         )
+
+        # ✔️ Mejora visual: fondo + bordes en puntos
+        fig.update_traces(marker=dict(line=dict(width=1, color='black')))
+        fig.update_layout(
+            plot_bgcolor='#F9F9F9',
+            paper_bgcolor='#F9F9F9'
+        )
+
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
         # Agrupar por Acción y Resultado
         df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
         df_sun = df_sun[df_sun['Resultado'].notna()]  # quitar nulos
-    
+
         total = df_sun['Cantidad'].sum()
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
-    
-        # Agregar totales por Acción para el primer nivel
+
+        # Agregar totales por Acción para nodos raíz
         df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
-        df_accion['Resultado'] = 'Total'  # Usamos string válido, no None
+        df_accion['Resultado'] = 'Total'
         df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
-    
-        # Unir ambos dataframes
+
+        # Unir y asegurar porcentaje
         df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
-    
+        df_sunburst['Porcentaje'] = df_sunburst['Porcentaje'].fillna(0)
+
         fig = px.sunburst(
             df_sunburst,
             path=['Acción', 'Resultado'],
@@ -277,13 +287,13 @@ def generar_seccion_efectividad(df):
             branchvalues='total',
             custom_data=['Cantidad', 'Porcentaje']
         )
-    
+
         fig.update_traces(
             hovertemplate='<b>%{label}</b><br>' +
                           'Cantidad: %{customdata[0]}<br>' +
                           'Porcentaje: %{customdata[1]:.1f}%<extra></extra>'
         )
-    
+
         st.plotly_chart(fig, use_container_width=True)
 
 
