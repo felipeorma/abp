@@ -316,3 +316,15 @@ def mostrar_ranking_parte_cuerpo(df):
         )
         fig.update_layout(barmode='stack')
         st.plotly_chart(fig, use_container_width=True)
+
+def configurar_descarga(df):
+    st.divider()
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        "📤 Exportar Dataset Filtrado",
+        data=csv,
+        file_name="analisis_tactico.csv",
+        mime="text/csv",
+        help="Descarga los datos actualmente filtrados en formato CSV"
+    )
+
