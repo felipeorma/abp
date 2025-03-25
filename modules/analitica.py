@@ -22,6 +22,7 @@ def analitica_page():
     generar_seccion_temporal(df_filtrado)
     generar_seccion_efectividad(df_filtrado)
     configurar_descarga(df_filtrado)
+    mostrar_ranking_contactos(df_filtrado)
 
 def cargar_datos():
     # Cargar datos desde GitHub
@@ -269,3 +270,26 @@ def configurar_descarga(df):
         mime="text/csv",
         help="Descarga los datos actualmente filtrados en formato CSV"
     )
+
+def mostrar_ranking_contactos(df):
+    st.header("🏅 Ranking por Primer Contacto")
+
+    # Mismo preprocesamiento
+    ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
+    df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
+
+    df_ranking = df.groupby(['Ejecutor', 'Tipo Acción', 'Primer Contacto']) \
+                   .size().reset_index(name='Recuento')
+
+    for tipo in ['Ofensiva', 'Defensiva']:
+        st.subheader(f"{tipo}s ⚽")
+        fig = px.bar(
+            df_ranking[df_ranking['Tipo Acción'] == tipo],
+            x='Recuento',
+            y='Ejecutor',
+            color='Primer Contacto',
+            orientation='h',
+            title=f"Jugadores con más acciones {tipo.lower()}s por tipo de contacto",
+            labels={'Recuento': 'Cantidad', 'Ejecutor': 'Jugador'}
+        )
+        st.plotly_chart(fig, use_container_width=True)
