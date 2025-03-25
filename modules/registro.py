@@ -50,43 +50,56 @@ def mostrar_formulario(jugadores, equipos, zonas):
     datos = {}
     st.subheader("📋 Registrar nueva acción")
 
-    # Contexto del partido
+    # 🔄 Inicializar controladores en session_state
+    if "accion_key" not in st.session_state:
+        st.session_state.accion_key = "Tiro libre"
+    if "gol_key" not in st.session_state:
+        st.session_state.gol_key = "No"
+    if "resultado_key" not in st.session_state:
+        st.session_state.resultado_key = "Despeje"
+    if "zona_saque_key" not in st.session_state:
+        st.session_state.zona_saque_key = 5
+
+    st.markdown("### 🗓️ Contexto del Partido")
     with st.container(border=True):
-        st.markdown("### 🗓️ Contexto del Partido")
         col1, col2, col3 = st.columns(3)
         datos["Jornada"] = col1.selectbox("Jornada", ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
         datos["Rival"] = col2.selectbox("Rival", equipos)
         datos["Condición"] = col3.selectbox("Condición", ["Local", "Visitante"])
         datos["Fecha"] = st.date_input("Fecha", value=datetime.date.today())
 
-    # Tiempo de juego
     with st.container(border=True):
         st.markdown("### ⏱️ Tiempo de Juego")
         col1, col2 = st.columns(2)
         periodo = col1.selectbox("Periodo", ["1T", "2T"])
-
-        if periodo == "1T":
-            minutos = [str(x) for x in range(0, 46)] + ["45+"]
-        else:
-            minutos = [str(x) for x in range(45, 91)] + ["90+"]
-
+        minutos = [str(x) for x in range(0, 46)] + ["45+"] if periodo == "1T" else [str(x) for x in range(45, 91)] + ["90+"]
         minuto_str = col2.selectbox("Minuto", minutos)
         datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
         datos["Periodo"] = periodo
 
-    # Tipo de acción
     with st.container(border=True):
         st.markdown("### ⚽ Acción")
         col1, col2 = st.columns(2)
-        datos["Acción"] = col1.selectbox("Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
+
+        def reset_zona_saque():
+            # Forzamos a que zona de saque sea válida (1 o 2) si cambia a córner
+            if st.session_state.accion_key == "Córner":
+                st.session_state.zona_saque_key = 1
+
+        datos["Acción"] = col1.selectbox(
+            "Tipo de acción",
+            ["Tiro libre", "Córner", "Lateral", "Penal"],
+            key="accion_key",
+            on_change=reset_zona_saque
+        )
+
         datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
-    # Detalles de ejecución
     with st.container(border=True):
         st.markdown("### 🎯 Detalles de Ejecución")
         st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", use_column_width=True)
 
-        if datos["Acción"] == "Penal":
+        if st.session_state.accion_key == "Penal":
             datos["Zona Saque"] = "Penal"
             datos["Zona Remate"] = "Penal"
             datos["Primer Contacto"] = "N/A"
@@ -96,14 +109,11 @@ def mostrar_formulario(jugadores, equipos, zonas):
         else:
             col1, col2 = st.columns(2)
 
-            # Zona de saque condicionada si es córner
-            if datos["Acción"] == "Córner":
-                zona_opciones_saque = [1, 2]
-            else:
-                zona_opciones_saque = [z for z in zonas if z != "Penal"]
+            zonas_saque = [1, 2] if st.session_state.accion_key == "Córner" else [z for z in zonas if z != "Penal"]
+            zonas_remate = [z for z in zonas if z != "Penal"]
 
-            datos["Zona Saque"] = col1.selectbox("Zona de saque", zona_opciones_saque)
-            datos["Zona Remate"] = col2.selectbox("Zona de remate", [z for z in zonas if z != "Penal"])
+            datos["Zona Saque"] = col1.selectbox("Zona de saque", zonas_saque, key="zona_saque_key")
+            datos["Zona Remate"] = col2.selectbox("Zona de remate", zonas_remate)
 
             opciones_contacto = jugadores + ["Oponente"]
             datos["Primer Contacto"] = st.selectbox("Primer contacto", opciones_contacto)
@@ -111,21 +121,25 @@ def mostrar_formulario(jugadores, equipos, zonas):
             segundo_contacto = st.selectbox("Segundo contacto (opcional)", ["Ninguno"] + opciones_contacto)
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
-    # Resultados
     with st.container(border=True):
         st.markdown("### 📊 Resultados")
         col1, col2 = st.columns(2)
 
-        datos["Gol"] = col1.selectbox("¿Gol?", ["No", "Sí"], key="gol_key")
+        def forzar_resultado_gol():
+            if st.session_state.gol_key == "Sí":
+                st.session_state.resultado_key = "Gol"
 
-        # Forzar Resultado = Gol si Gol = Sí
-        if st.session_state.get("gol_key") == "Sí":
-            datos["Resultado"] = "Gol"
-            col1.text_input("Resultado final", value="Gol", disabled=True)
+        datos["Gol"] = col1.selectbox(
+            "¿Gol?", ["No", "Sí"], key="gol_key", on_change=forzar_resultado_gol
+        )
+
+        if st.session_state.gol_key == "Sí":
+            datos["Resultado"] = col1.text_input("Resultado final", value="Gol", disabled=True)
         else:
             datos["Resultado"] = col1.selectbox(
                 "Resultado final",
-                ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+                ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"],
+                key="resultado_key"
             )
 
         datos["Perfil"] = col2.selectbox("Perfil ejecutor", ["Hábil", "No hábil"])
@@ -133,6 +147,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Tipo Ejecución"] = col2.selectbox("Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
 
     return datos if st.form_submit_button("✅ Registrar Acción") else None
+
 
 
 def procesar_registro(datos):
