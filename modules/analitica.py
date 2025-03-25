@@ -274,22 +274,52 @@ def configurar_descarga(df):
 def mostrar_ranking_contactos(df):
     st.header("🏅 Ranking por Primer Contacto")
 
-    # Mismo preprocesamiento
+    # Clasificación de acciones ofensivas
     ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
     df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
 
+    # Agrupamos
     df_ranking = df.groupby(['Ejecutor', 'Tipo Acción', 'Primer Contacto']) \
                    .size().reset_index(name='Recuento')
 
-    for tipo in ['Ofensiva', 'Defensiva']:
-        st.subheader(f"{tipo}s ⚽")
-        fig = px.bar(
-            df_ranking[df_ranking['Tipo Acción'] == tipo],
-            x='Recuento',
-            y='Ejecutor',
-            color='Primer Contacto',
-            orientation='h',
-            title=f"Jugadores con más acciones {tipo.lower()}s por tipo de contacto",
-            labels={'Recuento': 'Cantidad', 'Ejecutor': 'Jugador'}
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    # Recuento total por jugador para ordenar
+    orden_off = (
+        df_ranking[df_ranking['Tipo Acción'] == 'Ofensiva']
+        .groupby('Ejecutor')['Recuento'].sum()
+        .sort_values(ascending=False)
+        .index
+    )
+    orden_def = (
+        df_ranking[df_ranking['Tipo Acción'] == 'Defensiva']
+        .groupby('Ejecutor')['Recuento'].sum()
+        .sort_values(ascending=False)
+        .index
+    )
+
+    # Visualizamos ofensivas
+    st.subheader("⚔️ Acciones Ofensivas")
+    fig_off = px.bar(
+        df_ranking[df_ranking['Tipo Acción'] == 'Ofensiva'],
+        x='Recuento',
+        y='Ejecutor',
+        color='Primer Contacto',
+        orientation='h',
+        category_orders={'Ejecutor': orden_off.tolist()},
+        title="Ranking ofensivo por tipo de primer contacto",
+        labels={'Recuento': 'Cantidad', 'Ejecutor': 'Jugador'}
+    )
+    st.plotly_chart(fig_off, use_container_width=True)
+
+    # Visualizamos defensivas
+    st.subheader("🛡️ Acciones Defensivas")
+    fig_def = px.bar(
+        df_ranking[df_ranking['Tipo Acción'] == 'Defensiva'],
+        x='Recuento',
+        y='Ejecutor',
+        color='Primer Contacto',
+        orientation='h',
+        category_orders={'Ejecutor': orden_def.tolist()},
+        title="Ranking defensivo por tipo de primer contacto",
+        labels={'Recuento': 'Cantidad', 'Ejecutor': 'Jugador'}
+    )
+    st.plotly_chart(fig_def, use_container_width=True)
