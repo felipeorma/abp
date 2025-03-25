@@ -12,7 +12,7 @@ from io import BytesIO
 # Configuración inicial del logo
 def setup_logo():
     # Usar versión PNG del logo directamente
-    logo_url = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.svg.png"
+    logo_url = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.png"
     
     try:
         response = requests.get(logo_url, headers={'User-Agent': 'Mozilla/5.0'})
