@@ -1,111 +1,111 @@
 Jornada,Fecha,Rival,Condición,Periodo,Minuto,Acción,Equipo,Ejecutor,Zona Saque,Zona Remate,Primer Contacto,Parte Cuerpo,Segundo Contacto,Gol,Resultado,Perfil,Estrategia,Tipo Ejecución,x_saque,y_saque,x_remate,y_remate
-Rueda 1,2023-04-30 20:36:21,Forge FC,Local,1T,12,Córner,Cavalry FC,Fraser Aird,2,7,Shamit Shome,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,114,40
-Rueda 3,2023-07-09 08:14:04,Pacific FC,Visitante,2T,63,Tiro libre,Rival,Rival,10,13,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Disparo directo,105,35,105,55
-Rueda 2,2023-05-05 02:47:20,Valour FC,Local,1T,28,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-06-26 01:35:43,York United FC,Visitante,2T,78,Lateral,Cavalry FC,Charlie Trafford,16,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,20,105,25
-Rueda 1,2023-05-08 22:26:26,HFX Wanderers FC,Local,1T,45+,Córner,Cavalry FC,Ali Musse,1,5,Myer Bevan,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,30
-Rueda 3,2023-05-28 01:44:44,Vancouver FC,Visitante,2T,67,Tiro libre,Rival,Rival,14,9,Oponente,Pie izquierdo,Oponente,No,Despeje,No hábil,No,Centro,93,29,111,65
-Rueda 2,2023-09-02 01:17:31,Atlético Ottawa,Local,1T,22,Lateral,Cavalry FC,Tom Field,17,11,Joseph Holliday,Cabeza,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,45
-Rueda 4,2023-05-02 19:40:00,Pacific FC,Visitante,2T,83,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 3,2023-09-28 10:28:10,Valour FC,Local,1T,38,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Pie izquierdo,,No,Posesión rival,Hábil,No,Centro,120,0,111,15
-Rueda 1,2023-08-29 16:13:41,York United FC,Visitante,2T,57,Tiro libre,Rival,Rival,9,6,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,111,65,114,50
-Rueda 4,2023-10-12 20:25:06,Forge FC,Local,1T,18,Lateral,Cavalry FC,Diego Gutiérrez,15,10,Niko Myroniuk,Pie derecho,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,35
-Rueda 2,2023-07-17 03:57:43,HFX Wanderers FC,Visitante,2T,72,Córner,Cavalry FC,Myer Bevan,2,4,Chanan Chanda,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,80,93,71
-Rueda 3,2023-10-26 01:32:37,Pacific FC,Local,1T,33,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 1,2023-06-22 14:12:51,Vancouver FC,Visitante,2T,64,Tiro libre,Rival,Rival,12,14,Oponente,Pie izquierdo,,No,Posesión rival,No hábil,No,Centro,105,25,93,29
-Rueda 4,2023-10-12 19:09:25,York United FC,Local,1T,7,Córner,Cavalry FC,Jesse Daley,1,7,Tobias Warschewski,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,114,40
-Rueda 2,2023-05-20 14:35:33,Valour FC,Visitante,2T,88+,Lateral,Rival,Rival,16,17,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Pase corto,72,20,72,60
-Rueda 3,2023-10-24 14:55:29,Atlético Ottawa,Local,1T,27,Tiro libre,Cavalry FC,Neven Fewster,13,5,James McGlinchey,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,55,114,30
-Rueda 1,2023-07-12 17:06:55,Forge FC,Visitante,2T,59,Córner,Cavalry FC,Ali Musse,2,9,Eryk Kobza,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,111,65
-Rueda 4,2023-10-01 23:56:49,Pacific FC,Local,1T,41,Lateral,Cavalry FC,Bradley Kamdem,14,11,Michael Harms,Tronco,,No,Posesión rival,No hábil,No,Pase corto,93,29,105,45
-Rueda 2,2023-09-30 09:39:39,York United FC,Visitante,2T,76,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo al arco,No hábil,No,Disparo directo,108,40,108,40
-Rueda 3,2023-08-17 21:47:57,HFX Wanderers FC,Local,1T,15,Córner,Cavalry FC,Fraser Aird,1,6,Mihail Gherasimencov,Pie derecho,,No,Despeje,Hábil,Sí,Centro,120,0,114,50
-Rueda 1,2023-05-11 12:31:25,Valour FC,Visitante,2T,68,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,114,40,105,25
-Rueda 4,2023-05-15 02:11:53,Vancouver FC,Local,1T,23,Lateral,Cavalry FC,Charlie Trafford,17,13,Josh Belbin,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,72,60,105,55
-Rueda 2,2023-08-26 06:22:24,Forge FC,Visitante,1T,37,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 3,2023-08-02 17:58:25,Pacific FC,Local,2T,51,Córner,Cavalry FC,Sergio Camargo,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
-Rueda 1,2023-10-21 22:25:43,York United FC,Visitante,1T,9,Lateral,Rival,Rival,15,10,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Pase corto,93,51,105,35
-Rueda 4,2023-10-19 13:30:08,Valour FC,Local,2T,63,Tiro libre,Cavalry FC,Tom Field,11,14,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,45,93,29
-Rueda 2,2023-04-29 21:13:56,HFX Wanderers FC,Visitante,1T,28,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,Sí,Gol,No hábil,Sí,Centro,120,0,114,30
-Rueda 3,2023-08-15 21:07:11,Atlético Ottawa,Local,2T,74,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 1,2023-05-30 21:44:50,Vancouver FC,Visitante,1T,44+,Lateral,Rival,Rival,16,17,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,72,20,72,60
-Rueda 4,2023-07-21 06:36:55,Forge FC,Local,2T,57,Córner,Cavalry FC,Ali Musse,2,7,Tobias Warschewski,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,114,40
-Rueda 2,2023-05-31 22:04:31,Pacific FC,Visitante,1T,19,Tiro libre,Rival,Rival,9,6,Oponente,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,111,65,114,50
-Rueda 3,2023-07-22 03:57:13,York United FC,Local,1T,32,Lateral,Cavalry FC,Diego Gutiérrez,14,11,Niko Myroniuk,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,29,105,45
-Rueda 1,2023-10-04 20:01:11,Valour FC,Visitante,2T,66,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-06-15 02:12:56,HFX Wanderers FC,Local,1T,5,Córner,Cavalry FC,Fraser Aird,1,4,Joseph Holliday,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,93,71
-Rueda 2,2023-04-08 21:29:53,Atlético Ottawa,Visitante,2T,79,Tiro libre,Rival,Rival,12,15,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,25,93,51
-Rueda 3,2023-06-12 01:07:35,Vancouver FC,Local,1T,24,Lateral,Cavalry FC,Charlie Trafford,17,13,James McGlinchey,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,55
-Rueda 1,2023-04-22 11:38:55,Pacific FC,Visitante,2T,58,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-05-10 14:45:35,York United FC,Local,1T,11,Córner,Cavalry FC,Sergio Camargo,2,9,Eryk Kobza,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,111,65
-Rueda 2,2023-08-02 08:49:39,Forge FC,Visitante,1T,36,Tiro libre,Rival,Rival,10,14,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,105,35,93,29
-Rueda 3,2023-06-16 00:39:41,Valour FC,Local,2T,62,Lateral,Cavalry FC,Bradley Kamdem,15,10,Michael Harms,Tronco,,No,Despeje,No hábil,No,Pase corto,93,51,105,35
-Rueda 1,2023-06-08 15:12:38,HFX Wanderers FC,Visitante,2T,71,Córner,Cavalry FC,Myer Bevan,1,6,Chanan Chanda,Pie izquierdo,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,50
-Rueda 4,2023-04-24 14:32:59,Pacific FC,Local,1T,29,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 2,2023-04-25 21:10:25,Vancouver FC,Visitante,1T,43+,Lateral,Rival,Rival,16,12,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,72,20,105,25
-Rueda 3,2023-09-02 17:55:50,York United FC,Local,2T,55,Tiro libre,Cavalry FC,Tom Field,13,5,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,55,114,30
-Rueda 1,2023-07-08 04:54:11,Atlético Ottawa,Visitante,2T,81,Córner,Cavalry FC,Ali Musse,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
-Rueda 4,2023-09-12 02:30:25,Forge FC,Local,1T,14,Lateral,Cavalry FC,Diego Gutiérrez,14,11,Niko Myroniuk,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,93,29,105,45
-Rueda 2,2023-08-14 17:58:27,Valour FC,Visitante,1T,27,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo desviado,No hábil,No,Disparo directo,108,40,108,40
-Rueda 3,2023-08-18 11:11:41,HFX Wanderers FC,Local,1T,8,Córner,Cavalry FC,Fraser Aird,1,7,Tobias Warschewski,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,40
-Rueda 1,2023-05-16 14:03:39,Pacific FC,Local,2T,53,Tiro libre,Cavalry FC,Neven Fewster,9,6,James McGlinchey,Pie derecho,,No,Disparo al arco,Hábil,Sí,Disparo directo,111,65,114,50
-Rueda 4,2023-05-04 13:45:31,York United FC,Visitante,2T,77,Lateral,Rival,Rival,17,13,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,72,60,105,55
-Rueda 2,2023-04-04 07:52:04,Vancouver FC,Local,1T,21,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 3,2023-10-25 22:13:27,Forge FC,Visitante,1T,39,Córner,Cavalry FC,Sergio Camargo,2,4,Caniggia Elva,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,80,93,71
-Rueda 1,2023-09-01 06:13:34,Valour FC,Local,2T,65,Tiro libre,Cavalry FC,Charlie Trafford,10,14,Josh Belbin,Tronco,,No,Posesión rival,No hábil,No,Centro,105,35,93,29
-Rueda 4,2023-06-01 12:46:00,HFX Wanderers FC,Visitante,1T,34,Lateral,Rival,Rival,15,10,Oponente,Pie derecho,,No,Disparo al arco,No hábil,No,Pase corto,93,51,105,35
-Rueda 2,2023-05-06 02:31:22,Pacific FC,Local,1T,16,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,Sí,Gol,No hábil,Sí,Centro,120,0,114,30
-Rueda 3,2023-08-27 01:59:49,York United FC,Visitante,2T,72,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 1,2023-08-15 11:25:37,Atlético Ottawa,Local,1T,47+,Tiro libre,Cavalry FC,Tom Field,12,7,Oponente,Cabeza,,No,Despeje,Hábil,Sí,Centro,105,25,114,40
-Rueda 4,2023-05-03 17:52:36,Valour FC,Visitante,2T,89+,Lateral,Rival,Rival,16,17,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,72,20,72,60
-Rueda 2,2023-06-17 16:15:37,Forge FC,Local,1T,25,Córner,Cavalry FC,Ali Musse,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
-Rueda 3,2023-06-16 10:05:06,Vancouver FC,Visitante,1T,41,Tiro libre,Rival,Rival,11,13,Oponente,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,105,45,105,55
-Rueda 1,2023-05-12 23:11:03,HFX Wanderers FC,Local,2T,59,Lateral,Cavalry FC,Diego Gutiérrez,14,9,Niko Myroniuk,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,29,111,65
-Rueda 4,2023-06-07 04:21:12,Pacific FC,Visitante,1T,32,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 2,2023-05-07 03:30:13,York United FC,Local,1T,18,Córner,Cavalry FC,Fraser Aird,1,6,Mihail Gherasimencov,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,50
-Rueda 3,2023-10-24 04:59:48,Valour FC,Visitante,2T,74,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,114,40,105,25
-Rueda 1,2023-06-28 16:54:22,Forge FC,Local,1T,6,Lateral,Cavalry FC,Bradley Kamdem,17,11,Michael Harms,Tronco,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,45
-Rueda 4,2023-08-10 17:03:14,Atlético Ottawa,Visitante,1T,44+,Córner,Cavalry FC,Sergio Camargo,2,5,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,114,30
-Rueda 2,2023-07-18 21:17:01,Vancouver FC,Local,2T,63,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 3,2023-08-29 14:40:38,Pacific FC,Visitante,1T,29,Tiro libre,Rival,Rival,9,14,Oponente,Pie izquierdo,,No,Posesión rival,No hábil,No,Centro,111,65,93,29
-Rueda 1,2023-06-19 16:40:47,York United FC,Local,2T,55,Lateral,Cavalry FC,Charlie Trafford,15,10,Jay Herdman,Tronco,,No,Despeje,No hábil,No,Pase corto,93,51,105,35
-Rueda 4,2023-05-27 18:02:34,HFX Wanderers FC,Visitante,2T,82,Córner,Cavalry FC,Myer Bevan,1,7,Chanan Chanda,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,40
-Rueda 2,2023-06-25 09:04:45,Forge FC,Local,1T,37,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 3,2023-10-05 04:31:01,Valour FC,Visitante,1T,23,Tiro libre,Rival,Rival,13,6,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,55,114,50
-Rueda 1,2023-04-21 16:42:26,Atlético Ottawa,Local,2T,68,Lateral,Cavalry FC,Tom Field,16,12,Josh Belbin,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,72,20,105,25
-Rueda 4,2023-10-06 13:45:18,Pacific FC,Visitante,2T,86+,Córner,Cavalry FC,Ali Musse,2,9,Tobias Warschewski,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,111,65
-Rueda 2,2023-09-20 03:48:42,York United FC,Local,1T,14,Tiro libre,Cavalry FC,Neven Fewster,10,15,James McGlinchey,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,35,93,51
-Rueda 3,2023-08-03 21:52:48,HFX Wanderers FC,Visitante,1T,48+,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 1,2023-04-29 05:47:38,Vancouver FC,Local,1T,31,Lateral,Rival,Rival,14,11,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,93,29,105,45
-Rueda 4,2023-04-12 14:41:50,Forge FC,Visitante,2T,73,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,111,15
-Rueda 2,2023-09-15 18:00:07,Valour FC,Local,1T,19,Tiro libre,Cavalry FC,Diego Gutiérrez,7,13,Niko Myroniuk,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,114,40,105,55
-Rueda 3,2023-10-09 13:33:54,Pacific FC,Visitante,2T,66,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo al arco,No hábil,No,Disparo directo,108,40,108,40
-Rueda 1,2023-10-16 19:16:57,York United FC,Local,1T,4,Córner,Cavalry FC,Fraser Aird,2,4,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,93,71
-Rueda 4,2023-09-12 15:33:22,HFX Wanderers FC,Local,1T,26,Lateral,Cavalry FC,Charlie Trafford,17,10,Michael Harms,Tronco,,No,Despeje,No hábil,No,Pase corto,72,60,105,35
-Rueda 2,2023-09-01 18:05:51,Atlético Ottawa,Visitante,1T,52,Tiro libre,Rival,Rival,12,14,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,105,25,93,29
-Rueda 3,2023-05-02 03:11:15,Forge FC,Local,2T,61,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,30
-Rueda 1,2023-05-26 22:09:05,Valour FC,Visitante,2T,79,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-08-08 20:45:41,Pacific FC,Local,1T,33,Lateral,Cavalry FC,Bradley Kamdem,15,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,25
-Rueda 2,2023-04-19 18:03:36,York United FC,Visitante,1T,46+,Tiro libre,Rival,Rival,9,6,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,111,65,114,50
-Rueda 3,2023-08-13 03:02:24,Vancouver FC,Local,1T,17,Córner,Cavalry FC,Ali Musse,2,7,Shamit Shome,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,114,40
-Rueda 1,2023-10-24 16:27:10,HFX Wanderers FC,Visitante,2T,64,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-10-10 16:33:54,Valour FC,Local,1T,9,Lateral,Cavalry FC,Tom Field,16,13,Josh Belbin,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Pase corto,72,20,105,55
-Rueda 2,2023-04-07 22:31:21,Forge FC,Visitante,1T,41,Tiro libre,Rival,Rival,11,15,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,45,93,51
-Rueda 3,2023-04-01 00:54:52,York United FC,Local,2T,58,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,111,15
-Rueda 1,2023-09-12 02:32:03,Pacific FC,Visitante,2T,87+,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-05-27 11:37:14,Atlético Ottawa,Local,1T,22,Lateral,Cavalry FC,Diego Gutiérrez,14,9,Niko Myroniuk,Tronco,,No,Posesión rival,No hábil,No,Pase corto,93,29,111,65
-Rueda 2,2023-06-16 13:24:12,HFX Wanderers FC,Visitante,1T,35,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Disparo desviado,No hábil,No,Centro,114,40,105,25
-Rueda 3,2023-10-28 06:21:08,Vancouver FC,Local,2T,54,Córner,Cavalry FC,Fraser Aird,2,5,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,114,30
-Rueda 1,2023-07-01 16:41:44,Forge FC,Local,1T,13,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 4,2023-06-17 14:30:37,York United FC,Visitante,2T,75,Lateral,Rival,Rival,17,10,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,72,60,105,35
-Rueda 2,2023-06-10 00:51:31,Valour FC,Local,1T,24,Córner,Cavalry FC,Myer Bevan,1,6,Chanan Chanda,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,50
-Rueda 3,2023-08-24 15:41:26,Pacific FC,Visitante,2T,69,Tiro libre,Rival,Rival,10,14,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,105,35,93,29
-Rueda 1,2023-05-25 10:30:47,Atlético Ottawa,Visitante,1T,51,Lateral,Cavalry FC,Charlie Trafford,15,11,Michael Harms,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,45
-Rueda 4,2023-07-17 04:46:05,HFX Wanderers FC,Local,2T,63,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
-Rueda 2,2023-08-31 06:30:03,York United FC,Visitante,1T,42+,Córner,Cavalry FC,Ali Musse,2,7,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,40
-Rueda 3,2023-05-17 06:17:43,Forge FC,Local,1T,28,Tiro libre,Cavalry FC,Tom Field,12,13,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Centro,105,25,105,55
-Rueda 1,2023-09-14 00:32:24,Vancouver FC,Visitante,2T,77,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo desviado,No hábil,No,Disparo directo,108,40,108,40
-Rueda 4,2023-05-13 15:37:11,Valour FC,Local,1T,11,Lateral,Cavalry FC,Bradley Kamdem,16,9,Niko Myroniuk,Pie derecho,,No,Posesión rival,No hábil,No,Pase corto,72,20,111,65
-Rueda 2,2023-07-29 00:16:02,Pacific FC,Visitante,1T,36,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,0,111,15
-Rueda 3,2023-09-27 22:50:33,York United FC,Local,2T,59,Tiro libre,Cavalry FC,Neven Fewster,9,6,James McGlinchey,Pie izquierdo,,No,Despeje,Hábil,Sí,Disparo directo,111,65,114,50
-Rueda 1,2023-08-08 00:03:29,HFX Wanderers FC,Local,1T,7,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 1,4/30/2023 20:36,Forge FC,Local,1T,12,Córner,Cavalry FC,Fraser Aird,2,7,Shamit Shome,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,114,40
+Rueda 3,7/9/2023 8:14,Pacific FC,Visitante,2T,63,Tiro libre,Rival,Rival,10,13,Oponente,Pie derecho,,SI,Disparo desviado,No hábil,No,Disparo directo,105,35,105,55
+Rueda 2,5/5/2023 2:47,Valour FC,Local,1T,28,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,6/26/2023 1:35,York United FC,Visitante,2T,78,Lateral,Cavalry FC,Charlie Trafford,16,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,20,105,25
+Rueda 1,5/8/2023 22:26,HFX Wanderers FC,Local,1T,45+,Córner,Cavalry FC,Ali Musse,1,5,Myer Bevan,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,30
+Rueda 3,5/28/2023 1:44,Vancouver FC,Visitante,2T,67,Tiro libre,Rival,Rival,14,9,Oponente,Pie izquierdo,Oponente,No,Despeje,No hábil,No,Centro,93,29,111,65
+Rueda 2,9/2/2023 1:17,Atlético Ottawa,Local,1T,22,Lateral,Cavalry FC,Tom Field,17,11,Joseph Holliday,Cabeza,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,45
+Rueda 4,5/2/2023 19:40,Pacific FC,Visitante,2T,83,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 3,9/28/2023 10:28,Valour FC,Local,1T,38,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Pie izquierdo,,No,Posesión rival,Hábil,No,Centro,120,0,111,15
+Rueda 1,8/29/2023 16:13,York United FC,Visitante,2T,57,Tiro libre,Rival,Rival,9,6,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,111,65,114,50
+Rueda 4,10/12/2023 20:25,Forge FC,Local,1T,18,Lateral,Cavalry FC,Diego Gutiérrez,15,10,Niko Myroniuk,Pie derecho,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,35
+Rueda 2,7/17/2023 3:57,HFX Wanderers FC,Visitante,2T,72,Córner,Cavalry FC,Myer Bevan,2,4,Chanan Chanda,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,80,93,71
+Rueda 3,10/26/2023 1:32,Pacific FC,Local,1T,33,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 1,6/22/2023 14:12,Vancouver FC,Visitante,2T,64,Tiro libre,Rival,Rival,12,14,Oponente,Pie izquierdo,,No,Posesión rival,No hábil,No,Centro,105,25,93,29
+Rueda 4,10/12/2023 19:09,York United FC,Local,1T,7,Córner,Cavalry FC,Jesse Daley,1,7,Tobias Warschewski,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,114,40
+Rueda 2,5/20/2023 14:35,Valour FC,Visitante,2T,88+,Lateral,Rival,Rival,16,17,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Pase corto,72,20,72,60
+Rueda 3,10/24/2023 14:55,Atlético Ottawa,Local,1T,27,Tiro libre,Cavalry FC,Neven Fewster,13,5,James McGlinchey,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,55,114,30
+Rueda 1,7/12/2023 17:06,Forge FC,Visitante,2T,59,Córner,Cavalry FC,Ali Musse,2,9,Eryk Kobza,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,111,65
+Rueda 4,10/1/2023 23:56,Pacific FC,Local,1T,41,Lateral,Cavalry FC,Bradley Kamdem,14,11,Michael Harms,Tronco,,No,Posesión rival,No hábil,No,Pase corto,93,29,105,45
+Rueda 2,9/30/2023 9:39,York United FC,Visitante,2T,76,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo al arco,No hábil,No,Disparo directo,108,40,108,40
+Rueda 3,8/17/2023 21:47,HFX Wanderers FC,Local,1T,15,Córner,Cavalry FC,Fraser Aird,1,6,Mihail Gherasimencov,Pie derecho,,No,Despeje,Hábil,Sí,Centro,120,0,114,50
+Rueda 1,5/11/2023 12:31,Valour FC,Visitante,2T,68,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,114,40,105,25
+Rueda 4,5/15/2023 2:11,Vancouver FC,Local,1T,23,Lateral,Cavalry FC,Charlie Trafford,17,13,Josh Belbin,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,72,60,105,55
+Rueda 2,8/26/2023 6:22,Forge FC,Visitante,1T,37,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 3,8/2/2023 17:58,Pacific FC,Local,2T,51,Córner,Cavalry FC,Sergio Camargo,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
+Rueda 1,10/21/2023 22:25,York United FC,Visitante,1T,9,Lateral,Rival,Rival,15,10,Oponente,Pie derecho,,No,Disparo desviado,No hábil,No,Pase corto,93,51,105,35
+Rueda 4,10/19/2023 13:30,Valour FC,Local,2T,63,Tiro libre,Cavalry FC,Tom Field,11,14,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,45,93,29
+Rueda 2,4/29/2023 21:13,HFX Wanderers FC,Visitante,1T,28,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,Sí,Gol,No hábil,Sí,Centro,120,0,114,30
+Rueda 3,8/15/2023 21:07,Atlético Ottawa,Local,2T,74,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 1,5/30/2023 21:44,Vancouver FC,Visitante,1T,44+,Lateral,Rival,Rival,16,17,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,72,20,72,60
+Rueda 4,7/21/2023 6:36,Forge FC,Local,2T,57,Córner,Cavalry FC,Ali Musse,2,7,Tobias Warschewski,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,114,40
+Rueda 2,5/31/2023 22:04,Pacific FC,Visitante,1T,19,Tiro libre,Rival,Rival,9,6,Oponente,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,111,65,114,50
+Rueda 3,7/22/2023 3:57,York United FC,Local,1T,32,Lateral,Cavalry FC,Diego Gutiérrez,14,11,Niko Myroniuk,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,29,105,45
+Rueda 1,10/4/2023 20:01,Valour FC,Visitante,2T,66,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,6/15/2023 2:12,HFX Wanderers FC,Local,1T,5,Córner,Cavalry FC,Fraser Aird,1,4,Joseph Holliday,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,93,71
+Rueda 2,4/8/2023 21:29,Atlético Ottawa,Visitante,2T,79,Tiro libre,Rival,Rival,12,15,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,25,93,51
+Rueda 3,6/12/2023 1:07,Vancouver FC,Local,1T,24,Lateral,Cavalry FC,Charlie Trafford,17,13,James McGlinchey,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,55
+Rueda 1,4/22/2023 11:38,Pacific FC,Visitante,2T,58,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,5/10/2023 14:45,York United FC,Local,1T,11,Córner,Cavalry FC,Sergio Camargo,2,9,Eryk Kobza,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,111,65
+Rueda 2,8/2/2023 8:49,Forge FC,Visitante,1T,36,Tiro libre,Rival,Rival,10,14,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,105,35,93,29
+Rueda 3,6/16/2023 0:39,Valour FC,Local,2T,62,Lateral,Cavalry FC,Bradley Kamdem,15,10,Michael Harms,Tronco,,No,Despeje,No hábil,No,Pase corto,93,51,105,35
+Rueda 1,6/8/2023 15:12,HFX Wanderers FC,Visitante,2T,71,Córner,Cavalry FC,Myer Bevan,1,6,Chanan Chanda,Pie izquierdo,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,50
+Rueda 4,4/24/2023 14:32,Pacific FC,Local,1T,29,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 2,4/25/2023 21:10,Vancouver FC,Visitante,1T,43+,Lateral,Rival,Rival,16,12,Oponente,Cabeza,,No,Posesión rival,No hábil,No,Centro,72,20,105,25
+Rueda 3,9/2/2023 17:55,York United FC,Local,2T,55,Tiro libre,Cavalry FC,Tom Field,13,5,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,55,114,30
+Rueda 1,7/8/2023 4:54,Atlético Ottawa,Visitante,2T,81,Córner,Cavalry FC,Ali Musse,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
+Rueda 4,9/12/2023 2:30,Forge FC,Local,1T,14,Lateral,Cavalry FC,Diego Gutiérrez,14,11,Niko Myroniuk,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,93,29,105,45
+Rueda 2,8/14/2023 17:58,Valour FC,Visitante,1T,27,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo desviado,No hábil,No,Disparo directo,108,40,108,40
+Rueda 3,8/18/2023 11:11,HFX Wanderers FC,Local,1T,8,Córner,Cavalry FC,Fraser Aird,1,7,Tobias Warschewski,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,40
+Rueda 1,5/16/2023 14:03,Pacific FC,Local,2T,53,Tiro libre,Cavalry FC,Neven Fewster,9,6,James McGlinchey,Pie derecho,,No,Disparo al arco,Hábil,Sí,Disparo directo,111,65,114,50
+Rueda 4,5/4/2023 13:45,York United FC,Visitante,2T,77,Lateral,Rival,Rival,17,13,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,72,60,105,55
+Rueda 2,4/4/2023 7:52,Vancouver FC,Local,1T,21,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 3,10/25/2023 22:13,Forge FC,Visitante,1T,39,Córner,Cavalry FC,Sergio Camargo,2,4,Caniggia Elva,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,80,93,71
+Rueda 1,9/1/2023 6:13,Valour FC,Local,2T,65,Tiro libre,Cavalry FC,Charlie Trafford,10,14,Josh Belbin,Tronco,,No,Posesión rival,No hábil,No,Centro,105,35,93,29
+Rueda 4,6/1/2023 12:46,HFX Wanderers FC,Visitante,1T,34,Lateral,Rival,Rival,15,10,Oponente,Pie derecho,,No,Disparo al arco,No hábil,No,Pase corto,93,51,105,35
+Rueda 2,5/6/2023 2:31,Pacific FC,Local,1T,16,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,Sí,Gol,No hábil,Sí,Centro,120,0,114,30
+Rueda 3,8/27/2023 1:59,York United FC,Visitante,2T,72,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 1,8/15/2023 11:25,Atlético Ottawa,Local,1T,47+,Tiro libre,Cavalry FC,Tom Field,12,7,Oponente,Cabeza,,No,Despeje,Hábil,Sí,Centro,105,25,114,40
+Rueda 4,5/3/2023 17:52,Valour FC,Visitante,2T,89+,Lateral,Rival,Rival,16,17,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,72,20,72,60
+Rueda 2,6/17/2023 16:15,Forge FC,Local,1T,25,Córner,Cavalry FC,Ali Musse,2,8,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,111,15
+Rueda 3,6/16/2023 10:05,Vancouver FC,Visitante,1T,41,Tiro libre,Rival,Rival,11,13,Oponente,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,105,45,105,55
+Rueda 1,5/12/2023 23:11,HFX Wanderers FC,Local,2T,59,Lateral,Cavalry FC,Diego Gutiérrez,14,9,Niko Myroniuk,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,29,111,65
+Rueda 4,6/7/2023 4:21,Pacific FC,Visitante,1T,32,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 2,5/7/2023 3:30,York United FC,Local,1T,18,Córner,Cavalry FC,Fraser Aird,1,6,Mihail Gherasimencov,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,50
+Rueda 3,10/24/2023 4:59,Valour FC,Visitante,2T,74,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,114,40,105,25
+Rueda 1,6/28/2023 16:54,Forge FC,Local,1T,6,Lateral,Cavalry FC,Bradley Kamdem,17,11,Michael Harms,Tronco,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,45
+Rueda 4,8/10/2023 17:03,Atlético Ottawa,Visitante,1T,44+,Córner,Cavalry FC,Sergio Camargo,2,5,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,114,30
+Rueda 2,7/18/2023 21:17,Vancouver FC,Local,2T,63,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 3,8/29/2023 14:40,Pacific FC,Visitante,1T,29,Tiro libre,Rival,Rival,9,14,Oponente,Pie izquierdo,,No,Posesión rival,No hábil,No,Centro,111,65,93,29
+Rueda 1,6/19/2023 16:40,York United FC,Local,2T,55,Lateral,Cavalry FC,Charlie Trafford,15,10,Jay Herdman,Tronco,,No,Despeje,No hábil,No,Pase corto,93,51,105,35
+Rueda 4,5/27/2023 18:02,HFX Wanderers FC,Visitante,2T,82,Córner,Cavalry FC,Myer Bevan,1,7,Chanan Chanda,Cabeza,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,40
+Rueda 2,6/25/2023 9:04,Forge FC,Local,1T,37,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 3,10/5/2023 4:31,Valour FC,Visitante,1T,23,Tiro libre,Rival,Rival,13,6,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,55,114,50
+Rueda 1,4/21/2023 16:42,Atlético Ottawa,Local,2T,68,Lateral,Cavalry FC,Tom Field,16,12,Josh Belbin,Pie izquierdo,,Sí,Gol,No hábil,Sí,Pase corto,72,20,105,25
+Rueda 4,10/6/2023 13:45,Pacific FC,Visitante,2T,86+,Córner,Cavalry FC,Ali Musse,2,9,Tobias Warschewski,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,111,65
+Rueda 2,9/20/2023 3:48,York United FC,Local,1T,14,Tiro libre,Cavalry FC,Neven Fewster,10,15,James McGlinchey,Tronco,,No,Disparo al arco,Hábil,Sí,Disparo directo,105,35,93,51
+Rueda 3,8/3/2023 21:52,HFX Wanderers FC,Visitante,1T,48+,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 1,4/29/2023 5:47,Vancouver FC,Local,1T,31,Lateral,Rival,Rival,14,11,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,93,29,105,45
+Rueda 4,4/12/2023 14:41,Forge FC,Visitante,2T,73,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,No,Posesión rival,Hábil,Sí,Centro,120,0,111,15
+Rueda 2,9/15/2023 18:00,Valour FC,Local,1T,19,Tiro libre,Cavalry FC,Diego Gutiérrez,7,13,Niko Myroniuk,Pie izquierdo,,No,Disparo desviado,No hábil,No,Centro,114,40,105,55
+Rueda 3,10/9/2023 13:33,Pacific FC,Visitante,2T,66,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo al arco,No hábil,No,Disparo directo,108,40,108,40
+Rueda 1,10/16/2023 19:16,York United FC,Local,1T,4,Córner,Cavalry FC,Fraser Aird,2,4,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,93,71
+Rueda 4,9/12/2023 15:33,HFX Wanderers FC,Local,1T,26,Lateral,Cavalry FC,Charlie Trafford,17,10,Michael Harms,Tronco,,No,Despeje,No hábil,No,Pase corto,72,60,105,35
+Rueda 2,9/1/2023 18:05,Atlético Ottawa,Visitante,1T,52,Tiro libre,Rival,Rival,12,14,Oponente,Pie derecho,,No,Posesión rival,No hábil,No,Centro,105,25,93,29
+Rueda 3,5/2/2023 3:11,Forge FC,Local,2T,61,Córner,Cavalry FC,Myer Bevan,1,5,Chanan Chanda,Pie izquierdo,,No,Disparo desviado,Hábil,Sí,Centro,120,0,114,30
+Rueda 1,5/26/2023 22:09,Valour FC,Visitante,2T,79,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,8/8/2023 20:45,Pacific FC,Local,1T,33,Lateral,Cavalry FC,Bradley Kamdem,15,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,25
+Rueda 2,4/19/2023 18:03,York United FC,Visitante,1T,46+,Tiro libre,Rival,Rival,9,6,Oponente,Cabeza,,No,Despeje,No hábil,No,Centro,111,65,114,50
+Rueda 3,8/13/2023 3:02,Vancouver FC,Local,1T,17,Córner,Cavalry FC,Ali Musse,2,7,Shamit Shome,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,114,40
+Rueda 1,10/24/2023 16:27,HFX Wanderers FC,Visitante,2T,64,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,10/10/2023 16:33,Valour FC,Local,1T,9,Lateral,Cavalry FC,Tom Field,16,13,Josh Belbin,Pie izquierdo,,No,Disparo al arco,Hábil,Sí,Pase corto,72,20,105,55
+Rueda 2,4/7/2023 22:31,Forge FC,Visitante,1T,41,Tiro libre,Rival,Rival,11,15,Oponente,Pie derecho,,No,Despeje,No hábil,No,Centro,105,45,93,51
+Rueda 3,4/1/2023 0:54,York United FC,Local,2T,58,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,111,15
+Rueda 1,9/12/2023 2:32,Pacific FC,Visitante,2T,87+,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,5/27/2023 11:37,Atlético Ottawa,Local,1T,22,Lateral,Cavalry FC,Diego Gutiérrez,14,9,Niko Myroniuk,Tronco,,No,Posesión rival,No hábil,No,Pase corto,93,29,111,65
+Rueda 2,6/16/2023 13:24,HFX Wanderers FC,Visitante,1T,35,Tiro libre,Rival,Rival,7,12,Oponente,Cabeza,,No,Disparo desviado,No hábil,No,Centro,114,40,105,25
+Rueda 3,10/28/2023 6:21,Vancouver FC,Local,2T,54,Córner,Cavalry FC,Fraser Aird,2,5,Joseph Holliday,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,80,114,30
+Rueda 1,7/1/2023 16:41,Forge FC,Local,1T,13,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 4,6/17/2023 14:30,York United FC,Visitante,2T,75,Lateral,Rival,Rival,17,10,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,72,60,105,35
+Rueda 2,6/10/2023 0:51,Valour FC,Local,1T,24,Córner,Cavalry FC,Myer Bevan,1,6,Chanan Chanda,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,50
+Rueda 3,8/24/2023 15:41,Pacific FC,Visitante,2T,69,Tiro libre,Rival,Rival,10,14,Oponente,Pie izquierdo,,No,Despeje,No hábil,No,Centro,105,35,93,29
+Rueda 1,5/25/2023 10:30,Atlético Ottawa,Visitante,1T,51,Lateral,Cavalry FC,Charlie Trafford,15,11,Michael Harms,Tronco,,Sí,Gol,No hábil,Sí,Pase corto,93,51,105,45
+Rueda 4,7/17/2023 4:46,HFX Wanderers FC,Local,2T,63,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
+Rueda 2,8/31/2023 6:30,York United FC,Visitante,1T,42+,Córner,Cavalry FC,Ali Musse,2,7,Shamit Shome,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,40
+Rueda 3,5/17/2023 6:17,Forge FC,Local,1T,28,Tiro libre,Cavalry FC,Tom Field,12,13,Jay Herdman,Tronco,,No,Disparo al arco,Hábil,Sí,Centro,105,25,105,55
+Rueda 1,9/14/2023 0:32,Vancouver FC,Visitante,2T,77,Penal,Rival,Rival,Penal,Penal,,,,No,Disparo desviado,No hábil,No,Disparo directo,108,40,108,40
+Rueda 4,5/13/2023 15:37,Valour FC,Local,1T,11,Lateral,Cavalry FC,Bradley Kamdem,16,9,Niko Myroniuk,Pie derecho,,No,Posesión rival,No hábil,No,Pase corto,72,20,111,65
+Rueda 2,7/29/2023 0:16,Pacific FC,Visitante,1T,36,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Cabeza,,Sí,Gol,Hábil,Sí,Centro,120,0,111,15
+Rueda 3,9/27/2023 22:50,York United FC,Local,2T,59,Tiro libre,Cavalry FC,Neven Fewster,9,6,James McGlinchey,Pie izquierdo,,No,Despeje,Hábil,Sí,Disparo directo,111,65,114,50
+Rueda 1,8/8/2023 0:03,HFX Wanderers FC,Local,1T,7,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
