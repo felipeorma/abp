@@ -50,7 +50,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
     datos = {}
     st.subheader("📋 Registrar nueva acción")
 
-    # 🔄 Inicializar controladores en session_state
+    # 🔄 Inicializar session_state
     if "accion_key" not in st.session_state:
         st.session_state.accion_key = "Tiro libre"
     if "gol_key" not in st.session_state:
@@ -60,14 +60,16 @@ def mostrar_formulario(jugadores, equipos, zonas):
     if "zona_saque_key" not in st.session_state:
         st.session_state.zona_saque_key = 5
 
-    st.markdown("### 🗓️ Contexto del Partido")
+    # 🗓️ Contexto del Partido
     with st.container(border=True):
+        st.markdown("### 🗓️ Contexto del Partido")
         col1, col2, col3 = st.columns(3)
         datos["Jornada"] = col1.selectbox("Jornada", ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
         datos["Rival"] = col2.selectbox("Rival", equipos)
         datos["Condición"] = col3.selectbox("Condición", ["Local", "Visitante"])
         datos["Fecha"] = st.date_input("Fecha", value=datetime.date.today())
 
+    # ⏱️ Tiempo de Juego
     with st.container(border=True):
         st.markdown("### ⏱️ Tiempo de Juego")
         col1, col2 = st.columns(2)
@@ -77,12 +79,12 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
         datos["Periodo"] = periodo
 
+    # ⚽ Tipo de Acción
     with st.container(border=True):
         st.markdown("### ⚽ Acción")
         col1, col2 = st.columns(2)
 
         def reset_zona_saque():
-            # Forzamos a que zona de saque sea válida (1 o 2) si cambia a córner
             if st.session_state.accion_key == "Córner":
                 st.session_state.zona_saque_key = 1
 
@@ -92,9 +94,9 @@ def mostrar_formulario(jugadores, equipos, zonas):
             key="accion_key",
             on_change=reset_zona_saque
         )
-
         datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
+    # 🎯 Detalles de Ejecución
     with st.container(border=True):
         st.markdown("### 🎯 Detalles de Ejecución")
         st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", use_column_width=True)
@@ -121,6 +123,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
             segundo_contacto = st.selectbox("Segundo contacto (opcional)", ["Ninguno"] + opciones_contacto)
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
+    # 📊 Resultados
     with st.container(border=True):
         st.markdown("### 📊 Resultados")
         col1, col2 = st.columns(2)
@@ -146,12 +149,11 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Estrategia"] = col2.selectbox("Estrategia", ["Sí", "No"])
         datos["Tipo Ejecución"] = col2.selectbox("Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
 
-    # ✅ Botón de registrar fuera del container
+    # ✅ Botón de registro final
     if st.button("✅ Registrar Acción"):
         return datos
     else:
         return None
-
 
 
 def procesar_registro(datos):
