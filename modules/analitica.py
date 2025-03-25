@@ -49,73 +49,78 @@ def configurar_filtros(df):
     with st.sidebar:
         st.header("🔍 Filtros Avanzados")
         
-        # Selector de partidos por fecha
-        fechas_unicas = df.sort_values('Fecha', ascending=False)['Fecha_Str'].unique()
-        partidos_seleccionados = st.multiselect(
-            "Partidos",
-            options=fechas_unicas,
-            default=fechas_unicas,
-            format_func=lambda x: f"{x} vs {df[df['Fecha_Str'] == x]['Rival'].iloc[0]}",
-            help="Selecciona los partidos a analizar"
+        # Selector compacto de fechas
+        fechas_ordenadas = df.sort_values('Fecha', ascending=False)['Fecha'].unique()
+        fechas_formateadas = [f"{fecha.strftime('%d/%m')} vs {df[df['Fecha'] == fecha]['Rival'].iloc[0]}" 
+                             for fecha in fechas_ordenadas]
+        
+        # Agregar opción "Todos los partidos" al inicio
+        opciones_fechas = ["Todos los partidos"] + fechas_formateadas
+        
+        fechas_seleccionadas = st.multiselect(
+            "Partidos por fecha",
+            options=opciones_fechas,
+            default=["Todos los partidos"],
+            help="Selecciona uno o múltiples partidos"
         )
         
-        # Resto de los filtros
-        col1, col2 = st.columns(2)
+        # Mapear selección a fechas reales
+        if "Todos los partidos" in fechas_seleccionadas:
+            fechas_a_filtrar = fechas_ordenadas
+        else:
+            fechas_a_filtrar = [fechas_ordenadas[i] 
+                               for i, f in enumerate(fechas_formateadas) 
+                               if f in fechas_seleccionadas]
+
+        # Resto de los filtros en columnas compactas
+        col1, col2, col3 = st.columns(3)
         with col1:
             jornadas = st.multiselect(
-                "Jornadas",
+                "Jornada",
                 options=df['Jornada'].unique(),
                 default=df['Jornada'].unique()
             )
         with col2:
             condicion = st.multiselect(
-                "Local/Visitante",
+                "Condición",
                 options=df['Condición'].unique(),
                 default=df['Condición'].unique()
             )
-        
-        col3, col4 = st.columns(2)
         with col3:
             equipos = st.multiselect(
-                "Equipos", 
+                "Equipo", 
                 options=df['Equipo'].unique(),
                 default=df['Equipo'].unique()
             )
+
+        col4, col5 = st.columns(2)
         with col4:
-            rivals = st.multiselect(
-                "Rivales",
-                options=df['Rival'].unique(),
-                default=df['Rival'].unique()
+            acciones = st.multiselect(
+                "Acciones",
+                options=df['Acción'].unique(),
+                default=df['Acción'].unique()
+            )
+        with col5:
+            jugadores = st.multiselect(
+                "Jugadores",
+                options=df['Ejecutor'].unique(),
+                default=df['Ejecutor'].unique()
             )
 
-        jugadores = st.multiselect(
-            "Jugadores",
-            options=df['Ejecutor'].unique(),
-            default=df['Ejecutor'].unique()
-        )
-        
-        acciones = st.multiselect(
-            "Tipos de acción",
-            options=df['Acción'].unique(),
-            default=df['Acción'].unique()
-        )
-        
-        min_minuto = int(df['Minuto'].min())
-        max_minuto = int(df['Minuto'].max())
+        # Slider compacto
+        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
         rango_minutos = st.slider(
-            "Rango de minutos (partido)",
-            min_minuto, max_minuto,
-            (min_minuto, max_minuto)
-        )
-
+            "Minutos del partido",
+            min_min, max_min,
+            (min_min, max_min)
+    
     return df[
-        (df['Fecha_Str'].isin(partidos_seleccionados)) &
+        (df['Fecha'].isin(fechas_a_filtrar)) &
         (df['Jornada'].isin(jornadas)) &
         (df['Condición'].isin(condicion)) &
         (df['Equipo'].isin(equipos)) &
-        (df['Rival'].isin(rivals)) &
-        (df['Ejecutor'].isin(jugadores)) &
         (df['Acción'].isin(acciones)) &
+        (df['Ejecutor'].isin(jugadores)) &
         (df['Minuto'].between(*rango_minutos))
     ]
 
