@@ -272,34 +272,32 @@ def configurar_descarga(df):
     )
 
 def mostrar_ranking_contactos(df):
-    st.header("🏅 Ranking por Primer Contacto")
+    st.header("🏅 Ranking de Primer Contacto por Tipo")
 
-    # Clasificamos acciones ofensivas
+    # Clasificación de acciones ofensivas
     ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
     df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
 
     for tipo in ['Ofensiva', 'Defensiva']:
         df_tipo = df[df['Tipo Acción'] == tipo]
 
-        # Agrupar por jugador y tipo de primer contacto
-        df_ranking = df_tipo.groupby(['Ejecutor', 'Primer Contacto']).size().reset_index(name='Recuento')
+        # Agrupar por tipo de contacto y jugador
+        df_ranking = df_tipo.groupby(['Primer Contacto', 'Ejecutor']) \
+                            .size().reset_index(name='Recuento')
 
-        # Sumar total por jugador para ordenar
-        total_por_jugador = df_ranking.groupby('Ejecutor')['Recuento'].sum().sort_values(ascending=False)
-        df_ranking['Ejecutor'] = pd.Categorical(df_ranking['Ejecutor'], categories=total_por_jugador.index, ordered=True)
+        # Filtrar por contactos válidos
+        df_ranking = df_ranking[df_ranking['Primer Contacto'].notna()]
 
         st.subheader(f"{'⚔️' if tipo == 'Ofensiva' else '🛡️'} Acciones {tipo}s")
 
         fig = px.bar(
             df_ranking,
-            x='Recuento',
-            y='Ejecutor',
-            color='Primer Contacto',
-            orientation='h',
-            title=f"Jugadores con más acciones {tipo.lower()}s por tipo de contacto",
-            labels={'Recuento': 'Cantidad', 'Ejecutor': 'Jugador'},
-            category_orders={'Ejecutor': total_por_jugador.index.tolist()}
+            x='Primer Contacto',
+            y='Recuento',
+            color='Ejecutor',
+            title=f"Total de acciones {tipo.lower()}s por tipo de contacto y jugador",
+            labels={'Primer Contacto': 'Tipo de contacto', 'Recuento': 'Cantidad'},
+            text='Recuento'
         )
-
+        fig.update_layout(barmode='stack')
         st.plotly_chart(fig, use_container_width=True)
-
