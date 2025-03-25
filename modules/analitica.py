@@ -47,89 +47,78 @@ def configurar_filtros(df):
     with st.sidebar:
         st.header("🔍 Filtros Avanzados")
         
-        # 1. Selector compacto de fechas
-        # -------------------------------
-        # Creamos un diccionario para mapear fechas formateadas a fechas reales
-        fechas_unicas = df['Fecha'].unique()
-        fechas_ordenadas = sorted(fechas_unicas, reverse=True)  # Más reciente primero
-        
-        # Formateamos las fechas para mostrar (DD/MM vs Rival)
-        opciones_fechas = {
-            f"{fecha.strftime('%d/%m')} vs {df[df['Fecha'] == fecha]['Rival'].iloc[0]}": fecha
-            for fecha in fechas_ordenadas
+        # Diccionario de abreviaciones para equipos
+        ABREVIACIONES = {
+            "York United FC": "YOR",
+            "Vancouver FC": "VAN",
+            "Pacific FC": "PAC",
+            "Atlético Ottawa": "OTT",
+            "Forge FC": "FOR",
+            "HFX Wanderers FC": "HFX",
+            "Valour FC": "VAL"
         }
         
-        # Añadimos la opción "Todos los partidos"
-        opciones_fechas = {"Todos los partidos": None} | opciones_fechas
+        # Procesar fechas y partidos
+        df = df.sort_values('Fecha', ascending=False)
+        df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')  # Formato: 15 Mar
+        df['Rival_abr'] = df['Rival'].map(ABREVIACIONES).fillna(df['Rival'])
+        df['Partido'] = df.apply(lambda x: f"{x['Fecha_str']} vs {x['Rival_abr']}", axis=1)
         
-        # Widget de selección
-        fechas_seleccionadas = st.multiselect(
+        # Selector compacto de partidos
+        partidos_seleccionados = st.multiselect(
             "Seleccionar partidos:",
-            options=list(opciones_fechas.keys()),
-            default=["Todos los partidos"],
-            help="Filtra por partidos específicos"
+            options=df['Partido'].unique(),
+            default=df['Partido'].unique(),
+            format_func=lambda x: x,
+            help="Selecciona uno o múltiples partidos (ordenados del más reciente)"
         )
         
-        # 2. Filtros principales en columnas compactas
-        # -------------------------------------------
+        # Filtros principales en columnas compactas
         col1, col2 = st.columns(2)
         with col1:
             jornadas = st.multiselect(
                 "Jornada:",
-                options=sorted(df['Jornada'].unique()),
+                options=df['Jornada'].unique(),
                 default=df['Jornada'].unique()
             )
-            
         with col2:
             condicion = st.multiselect(
                 "Condición:",
-                options=df['Condición'].unique()),
+                options=df['Condición'].unique(),
                 default=df['Condición'].unique()
             )
-        
-        # 3. Filtros secundarios
-        # ----------------------
-        equipos = st.multiselect(
-            "Equipo ejecutor:",
-            options=df['Equipo'].unique()),
-            default=df['Equipo'].unique()
-        )
-        
-        acciones = st.multiselect(
-            "Tipo de acción:",
-            options=df['Acción'].unique()),
-            default=df['Acción'].unique()
-        )
-        
-        # 4. Filtro de minutos
-        # --------------------
-        min_minuto = int(df['Minuto'].min())
-        max_minuto = int(df['Minuto'].max())
+
+        # Filtros secundarios
+        col3, col4 = st.columns(2)
+        with col3:
+            acciones = st.multiselect(
+                "Acciones:",
+                options=df['Acción'].unique(),
+                default=df['Acción'].unique()
+            )
+        with col4:
+            jugadores = st.multiselect(
+                "Jugadores:",
+                options=df['Ejecutor'].unique(),
+                default=df['Ejecutor'].unique()
+            )
+
+        # Slider compacto
+        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
         rango_minutos = st.slider(
-            "Minutos del partido:",
-            min_minuto, max_minuto,
-            (min_minuto, max_minuto)
-        )
-    
+            "Minutos:",
+            min_min, max_min,
+            (min_min, max_min)
+        
     # Aplicar filtros
-    # ---------------
-    df_filtrado = df.copy()
-    
-    # Filtro de fechas (maneja caso "Todos los partidos")
-    if "Todos los partidos" not in fechas_seleccionadas:
-        fechas_a_filtrar = [opciones_fechas[f] for f in fechas_seleccionadas]
-        df_filtrado = df_filtrado[df_filtrado['Fecha'].isin(fechas_a_filtrar)]
-    
-    # Aplicar resto de filtros
-    df_filtrado = df_filtrado[
-        (df_filtrado['Jornada'].isin(jornadas)) &
-        (df_filtrado['Condición'].isin(condicion)) &
-        (df_filtrado['Equipo'].isin(equipos)) &
-        (df_filtrado['Acción'].isin(acciones)) &
-        (df_filtrado['Minuto'].between(*rango_minutos))
+    return df[
+        (df['Partido'].isin(partidos_seleccionados)) &
+        (df['Jornada'].isin(jornadas)) &
+        (df['Condición'].isin(condicion)) &
+        (df['Acción'].isin(acciones)) &
+        (df['Ejecutor'].isin(jugadores)) &
+        (df['Minuto'].between(*rango_minutos))
     ]
-    
-    return df_filtrado
 
 def mostrar_kpis(df):
     cols = st.columns(4)
