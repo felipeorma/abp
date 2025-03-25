@@ -1,405 +1,381 @@
 # modules/analitica.py
 import pandas as pd
-import streamlit as st# modules/analitica.py
-import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
 from datetime import datetime
-import requests
-from io import BytesIO
 
-# Configuración del logo SVG compatible
-def setup_logo():
-    logo_url = "https://raw.githubusercontent.com/felipeorma/abp/main/Cavalry_FC_logo.svg"
-    st.sidebar.markdown(
-        f'<div style="text-align: center;"><img src="{logo_url}" width="200"></div>',
-        unsafe_allow_html=True
-    )
-
-# Carga de datos desde GitHub con validación robusta
 def cargar_datos():
+    """Carga y prepara los datos desde el repositorio GitHub"""
     try:
-        # URL del CSV en GitHub
         url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
-        
-        # Cargar datos con timeout y codificación correcta
         df = pd.read_csv(url, encoding='utf-8')
         
-        # Corregir nombre de columna con problemas de codificación
-        df = df.rename(columns={'Tipo EjecuciÃ³n': 'Tipo Ejecución'})
+        # Corrección de nombres de columnas
+        df = df.rename(columns={
+            'Tipo EjecuciÃ³n': 'Tipo Ejecución',
+            'CondiciÃ³n': 'Condición'
+        })
         
-        # Columnas obligatorias para el análisis (actualizadas)
+        # Validación de estructura
         columnas_requeridas = [
             'Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha',
-            'Gol', 'Primer Contacto', 'Segundo Contacto', 'Tipo Ejecución', 
-            'Zona Saque', 'Zona Remate', 'Ejecutor', 'Resultado'
+            'Gol', 'Primer Contacto', 'Segundo Contacto', 'Tipo Ejecución',
+            'Zona Saque', 'Zona Remate', 'Ejecutor', 'Resultado', 'Condición'
         ]
         
-        # Verificar estructura completa
         faltantes = [col for col in columnas_requeridas if col not in df.columns]
         if faltantes:
-            st.error(f"🚨 Estructura incompleta. Faltan: {', '.join(faltantes)}")
+            st.error(f"🚨 Columnas faltantes: {', '.join(faltantes)}")
             return pd.DataFrame()
 
-        # Conversión de tipos de datos
+        # Limpieza y normalización
         df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
         df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce')
+        df['Gol'] = df['Gol'].replace({'Si': 'Sí', 'Yes': 'Sí'}).str.strip().fillna('No')
+        df['Equipo'] = df['Equipo'].str.strip()
         
-        # Normalización de valores
-        df['Gol'] = df['Gol'].apply(lambda x: 'Sí' if str(x).lower() in ['sí', 'si', '1', 'true'] else 'No')
-        
-        # Limpieza de datos
-        df = df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor', 'Fecha'])
-        
-        return df
+        return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor', 'Fecha'])
 
     except Exception as e:
-        st.error(f"⛔ Error cargando datos: {str(e)}")
+        st.error(f"⛔ Error al cargar datos: {str(e)}")
         return pd.DataFrame()
 
-# Configuración de filtros interactivos
 def configurar_filtros(df):
+    """Configura los filtros interactivos en la barra lateral"""
     with st.sidebar:
-        st.header("🔍 Filtros Avanzados")
+        st.header("⚙️ Parámetros de Análisis")
         
-        # Filtro de jornadas
-        jornadas = sorted(df['Jornada'].unique())
-        jornadas_sel = st.multiselect(
-            "Jornada",
-            options=jornadas,
-            default=jornadas
+        # Filtro de equipo principal
+        equipo_analisis = st.radio(
+            "Equipo a analizar",
+            options=['Cavalry FC', 'Rival'],
+            index=0,
+            help="Seleccione si desea analizar al Cavalry FC o al equipo rival"
         )
         
-        # Filtro de fechas dinámico
-        fechas_disponibles = df[df['Jornada'].isin(jornadas_sel)]['Fecha'].unique()
-        fechas_formateadas = [
-            f"{fecha.strftime('%d/%m')} vs {df[df['Fecha'] == fecha]['Rival'].iloc[0]}" 
-            for fecha in sorted(fechas_disponibles, reverse=True)
+        # Filtro de jornadas con ordenamiento descendente
+        jornadas = sorted(df['Jornada'].unique(), reverse=True)
+        jornadas_sel = st.multiselect(
+            "Jornadas",
+            options=jornadas,
+            default=jornadas[:3],
+            help="Seleccione una o más jornadas para analizar"
+        )
+        
+        # Filtro avanzado de partidos
+        partidos_disponibles = df[df['Jornada'].isin(jornadas_sel)]
+        partidos = partidos_disponibles.drop_duplicates('Fecha').sort_values('Fecha', ascending=False)
+        partidos_opciones = [
+            f"J{jornada} - {fecha.strftime('%d/%m')} vs {rival}"
+            for jornada, fecha, rival in zip(partidos['Jornada'], partidos['Fecha'], partidos['Rival'])
         ]
         
-        fechas_sel = st.multiselect(
-            "Partidos",
-            options=fechas_formateadas,
-            default=fechas_formateadas
+        partidos_sel = st.multiselect(
+            "Partidos específicos",
+            options=partidos_opciones,
+            default=partidos_opciones[:1],
+            help="Seleccione partidos individuales para un análisis detallado"
         )
         
-        # Mapeo de fechas seleccionadas
-        fechas_a_filtrar = [
-            fecha for i, fecha in enumerate(sorted(fechas_disponibles, reverse=True))
-            if fechas_formateadas[i] in fechas_sel
-        ] if fechas_sel else fechas_disponibles
-
-        # Filtros adicionales
-        col1, col2 = st.columns(2)
-        with col1:
-            condicion = st.multiselect(
-                "Condición",
-                options=df['Condición'].unique(),
-                default=df['Condición'].unique()
-            )
-        with col2:
-            equipos = st.multiselect(
-                "Equipo",
-                options=df['Equipo'].unique(),
-                default=df['Equipo'].unique()
-            )
-            
+        # Obtener fechas seleccionadas
+        fechas_sel = []
+        for opcion in partidos_sel:
+            jornada = int(opcion.split(' - ')[0][1:])
+            fecha_str = opcion.split(' vs ')[0].split(' - ')[1]
+            fecha = datetime.strptime(fecha_str, '%d/%m').replace(year=datetime.now().year)
+            fechas_sel.extend(partidos[(partidos['Jornada'] == jornada) & 
+                                      (partidos['Fecha'].dt.strftime('%d/%m') == fecha_str)]['Fecha'].tolist())
+        
+        # Filtros de acciones y jugadores
         acciones = st.multiselect(
-            "Acciones",
-            options=df['Acción'].unique(),
-            default=df['Acción'].unique()
+            "Tipos de acción",
+            options=sorted(df['Acción'].unique()),
+            default=['Remate', 'Pase', 'Centro'],
+            help="Filtre por tipos específicos de acciones"
         )
         
         jugadores = st.multiselect(
             "Jugadores",
-            options=df['Ejecutor'].unique(),
-            default=df['Ejecutor'].unique()
+            options=sorted(df['Ejecutor'].unique()),
+            default=sorted(df['Ejecutor'].unique())[:5],
+            help="Seleccione jugadores específicos para analizar"
         )
 
-        # Filtro temporal adaptativo
+        # Filtro de rango de minutos
         min_min = int(df['Minuto'].min())
         max_min = int(df['Minuto'].max())
         rango_minutos = st.slider(
             "Rango de minutos",
             min_min, max_min,
-            (min_min, max_min)
+            (min_min, max_min),
+            help="Seleccione el rango de minutos del partido a analizar"
         )
 
-    # Aplicar todos los filtros
-    return df[
+    # Aplicar filtros
+    df_filtrado = df[
+        (df['Equipo'] == equipo_analisis) &
         (df['Jornada'].isin(jornadas_sel)) &
-        (df['Fecha'].isin(fechas_a_filtrar)) &
-        (df['Condición'].isin(condicion)) &
-        (df['Equipo'].isin(equipos)) &
+        (df['Fecha'].isin(fechas_sel)) &
         (df['Acción'].isin(acciones)) &
         (df['Ejecutor'].isin(jugadores)) &
         (df['Minuto'].between(*rango_minutos))
     ]
-
-# Visualización de KPIs mejorados
-def mostrar_kpis_mejorados(df):
-    cols = st.columns(5)
     
-    # Logo pequeño
+    # Ajustar para análisis del rival
+    if equipo_analisis == 'Rival':
+        df_filtrado = df_filtrado.copy()
+        df_filtrado['Equipo'] = 'Cavalry FC'  # Para consistencia en visualizaciones
+    
+    return df_filtrado, equipo_analisis
+
+def mostrar_metricas_clave(df, equipo_analisis):
+    """Muestra las métricas principales en la parte superior del dashboard"""
+    cols = st.columns(4)
+    
+    # Cálculo de métricas
+    goles = df[df['Gol'] == 'Sí'].shape[0]
+    acciones = df.shape[0]
+    efectividad = (goles / acciones * 100) if acciones > 0 else 0
+    jugadores_destacados = df['Ejecutor'].value_counts().head(3).index.tolist()
+    
     with cols[0]:
-        st.markdown(
-            '<div style="text-align: center;"><img src="https://raw.githubusercontent.com/felipeorma/abp/main/Cavalry_FC_logo.svg" width="60"></div>',
-            unsafe_allow_html=True
-        )
+        st.metric(f"⚽ Goles {equipo_analisis}", goles)
     
-    # Goles a favor (Cavalry FC)
-    goles_favor = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Cavalry FC')].shape[0]
     with cols[1]:
-        st.metric("✅ Goles a favor", goles_favor, 
-                help="Goles convertidos por Cavalry FC")
+        st.metric("📊 Acciones totales", acciones)
     
-    # Goles en contra (Rival)
-    goles_contra = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Rival')].shape[0]
     with cols[2]:
-        st.metric("❌ Goles en contra", goles_contra, 
-                help="Goles concedidos al rival")
+        st.metric("🎯 Efectividad", f"{efectividad:.1f}%")
     
-    # Efectividad ofensiva
-    acciones_ofensivas = df[df['Equipo'] == 'Cavalry FC'].shape[0]
     with cols[3]:
-        eficacia_of = (goles_favor / acciones_ofensivas * 100) if acciones_ofensivas > 0 else 0
-        st.metric("🎯 Efectividad Ofensiva", f"{eficacia_of:.1f}%")
-    
-    # Efectividad defensiva
-    acciones_defensivas = df[df['Equipo'] == 'Rival'].shape[0]
-    with cols[4]:
-        eficacia_def = (100 - (goles_contra / acciones_defensivas * 100)) if acciones_defensivas > 0 else 0
-        st.metric("🛡️ Efectividad Defensiva", f"{eficacia_def:.1f}%")
-
-# Sección de mapas de calor
-def generar_seccion_espacial(df):
-    st.header("🌍 Mapeo Táctico")
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        generar_mapa_calor(df, tipo='saque')
-    with col2:
-        generar_mapa_calor(df, tipo='remate')
+        st.metric(
+            "👥 Jugadores destacados", 
+            ", ".join(jugadores_destacados) if jugadores_destacados else "N/A"
+        )
 
 def generar_mapa_calor(df, tipo='saque'):
+    """Genera mapas de calor para saques o remates"""
+    # Sistema de coordenadas optimizado
     zonas_coords = {
-        1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
-        5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
-        9: (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
-        13: (105, 55), 14: (93, 29), 15: (93, 51), 16: (72, 20),
-        17: (72, 60), "Penal": (108, 40)
+        1: (105, 40), 2: (105, 20), 3: (105, 60), 
+        4: (85, 30), 5: (85, 50), 6: (70, 40),
+        7: (50, 30), 8: (30, 40), "Penal": (88, 40)
     }
     
     coord_col = 'Zona Saque' if tipo == 'saque' else 'Zona Remate'
-    df_coords = df[coord_col].map(zonas_coords).dropna().apply(pd.Series)
+    df_coords = df[coord_col].map(zonas_coords).dropna()
     
     if df_coords.empty:
-        st.warning(f"No hay datos válidos para {tipo}s")
+        st.warning(f"No hay datos de {tipo}s con los filtros actuales")
         return
     
-    df_coords.columns = ['x', 'y']
+    xs, ys = zip(*df_coords)
     
+    # Configuración del campo
     pitch = VerticalPitch(
-        pitch_type='statsbomb',
-        pitch_color='grass',
-        line_color='white',
-        linewidth=1.2,
+        pitch_type='uefa',
         half=True,
-        goal_type='box'
+        goal_type='box',
+        pitch_color='#22312b',
+        line_color='#c7d5cc',
+        linewidth=1.5
     )
     
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(10, 7))
     pitch.draw(ax=ax)
+    
+    # Heatmap con contornos
     pitch.kdeplot(
-        df_coords['x'], df_coords['y'],
+        xs, ys,
         ax=ax,
-        cmap='Greens' if tipo == 'saque' else 'Reds',
-        levels=100,
+        cmap='viridis',
+        levels=30,
         fill=True,
-        alpha=0.75,
-        bw_adjust=0.65
+        alpha=0.6,
+        bw_method=0.3
     )
-    ax.set_title(f"Densidad de {tipo.capitalize()}s", fontsize=16, pad=20)
+    
+    # Puntos individuales
+    pitch.scatter(
+        xs, ys,
+        ax=ax,
+        s=50,
+        color='red',
+        edgecolors='white',
+        linewidth=0.5
+    )
+    
+    ax.set_title(f"Distribución de {tipo}s", fontsize=14, pad=15)
     st.pyplot(fig)
     plt.close()
 
-# Sección temporal
-def generar_seccion_temporal(df):
-    st.header("⏳ Evolución Temporal")
-    col1, col2 = st.columns(2)
+def visualizar_distribucion_temporal(df):
+    """Muestra la distribución temporal de las acciones"""
+    st.header("⏳ Distribución Temporal")
     
-    with col1:
+    tabs = st.tabs(["Por minuto", "Por jornada"])
+    
+    with tabs[0]:
         fig = px.histogram(
-            df, x='Jornada', color='Periodo',
-            title="Acciones por Jornada",
-            labels={'count': 'Acciones'}
+            df,
+            x='Minuto',
+            color='Acción',
+            nbins=30,
+            title="Acciones por minuto de juego",
+            labels={'count': 'Acciones'},
+            category_orders={'Acción': df['Acción'].value_counts().index.tolist()}
         )
-        st.plotly_chart(fig, use_container_width=True)
-        
-    with col2:
-        fig = px.box(
-            df, x='Acción', y='Minuto',
-            color='Equipo', 
-            title="Distribución temporal por acción",
-            points="all"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-# Sección de efectividad mejorada
-def generar_seccion_efectividad_mejorada(df):
-    st.header("🎯 Efectividad Operativa")
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        df_efectividad = df[df['Equipo'] == 'Cavalry FC'].groupby('Ejecutor').agg(
-            Acciones=('Ejecutor', 'count'),
-            Goles=('Gol', lambda x: (x == 'Sí').sum()),
-            Efectividad=('Gol', lambda x: (x == 'Sí').mean() * 100)
-        ).reset_index()
-        
-        fig = px.scatter(
-            df_efectividad, 
-            x='Acciones', y='Efectividad',
-            size='Goles', color='Ejecutor',
-            title="Efectividad por Jugador",
-            hover_data=['Ejecutor', 'Acciones', 'Goles']
-        )
+        fig.update_layout(barmode='stack', xaxis_title='Minuto', yaxis_title='Acciones')
         st.plotly_chart(fig, use_container_width=True)
     
-    with col2:
-        fig = px.sunburst(
-            df, path=['Equipo', 'Acción', 'Resultado'],
-            title="Flujo de Acciones y Resultados",
-            color_discrete_sequence=px.colors.qualitative.Pastel
+    with tabs[1]:
+        fig = px.bar(
+            df.groupby(['Jornada', 'Acción']).size().reset_index(name='Count'),
+            x='Jornada',
+            y='Count',
+            color='Acción',
+            title="Acciones por jornada",
+            labels={'Count': 'Acciones'}
         )
+        fig.update_layout(xaxis_title='Jornada', yaxis_title='Acciones')
         st.plotly_chart(fig, use_container_width=True)
 
-# Sección de análisis de contactos (actualizada)
-def generar_seccion_contactos(df):
-    st.header("👣 Análisis de Contactos")
-    col1, col2 = st.columns(2)
+def analizar_efectividad_jugadores(df):
+    """Analiza y visualiza la efectividad de los jugadores"""
+    st.header("🎯 Efectividad por Jugador")
     
-    with col1:
-        # Combinar ambos contactos para análisis ofensivo
-        contactos_of = pd.concat([
-            df[df['Equipo'] == 'Cavalry FC']['Primer Contacto'],
-            df[df['Equipo'] == 'Cavalry FC']['Segundo Contacto']
-        ]).value_counts().reset_index()
-        contactos_of.columns = ['Contacto', 'Cantidad']
-        
-        fig = px.pie(
-            contactos_of, 
-            names='Contacto', 
-            values='Cantidad',
-            title="Contactos Ofensivos",
-            color_discrete_sequence=['#FF0000', '#000000']
+    df_efectividad = df.groupby('Ejecutor').agg(
+        Acciones=('Acción', 'count'),
+        Goles=('Gol', lambda x: (x == 'Sí').sum()),
+        Efectividad=('Gol', lambda x: (x == 'Sí').mean() * 100)
+    ).sort_values('Goles', ascending=False).reset_index()
+    
+    cols = st.columns([3, 2])
+    
+    with cols[0]:
+        fig = px.bar(
+            df_efectividad.head(10),
+            x='Ejecutor',
+            y=['Goles', 'Acciones'],
+            title="Top 10 Jugadores",
+            labels={'value': 'Cantidad', 'variable': 'Métrica'},
+            barmode='group',
+            color_discrete_sequence=['#4ECDC4', '#FF6B6B']
         )
+        fig.update_layout(xaxis={'categoryorder': 'total descending'})
         st.plotly_chart(fig, use_container_width=True)
-        
-    with col2:
-        # Combinar ambos contactos para análisis defensivo
-        contactos_def = pd.concat([
-            df[df['Equipo'] == 'Rival']['Primer Contacto'],
-            df[df['Equipo'] == 'Rival']['Segundo Contacto']
-        ]).value_counts().reset_index()
-        contactos_def.columns = ['Contacto', 'Cantidad']
-        
-        fig = px.pie(
-            contactos_def, 
-            names='Contacto', 
-            values='Cantidad',
-            title="Contactos Defensivos",
-            color_discrete_sequence=['#000000', '#FF0000']
+    
+    with cols[1]:
+        st.dataframe(
+            df_efectividad.style
+                .background_gradient(cmap='Blues', subset=['Acciones'])
+                .background_gradient(cmap='Greens', subset=['Goles'])
+                .format({'Efectividad': '{:.1f}%'}),
+            height=500
         )
-        st.plotly_chart(fig, use_container_width=True)
 
-# Sección de tipos de acción (actualizada)
-def generar_seccion_tipos_accion(df):
+def visualizar_tipos_ejecucion(df):
+    """Muestra la distribución de tipos de ejecución"""
     st.header("📊 Tipos de Ejecución")
     
-    df_acciones = df[df['Equipo'] == 'Cavalry FC']['Tipo Ejecución'].value_counts().reset_index()
-    df_acciones.columns = ['Tipo', 'Cantidad']
+    df_tipos = df['Tipo Ejecución'].value_counts().reset_index(name='Count')
     
     fig = px.bar(
-        df_acciones,
-        x='Tipo',
-        y='Cantidad',
-        color='Tipo',
-        title="Distribución de Tipos de Ejecución Ofensiva",
-        labels={'Cantidad': 'Número de acciones'},
-        color_discrete_sequence=px.colors.qualitative.Pastel
+        df_tipos,
+        x='Count',
+        y='Tipo Ejecución',
+        orientation='h',
+        title="Distribución por tipo de ejecución",
+        labels={'Count': 'Acciones'},
+        color='Count',
+        color_continuous_scale='Teal'
     )
+    fig.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(fig, use_container_width=True)
 
-# Sección de mejores jugadores
-def generar_seccion_mejores_jugadores(df):
-    st.header("🏆 Mejores Jugadores")
-    col1, col2 = st.columns(2)
+def analizar_contactos(df):
+    """Analiza y visualiza los contactos del balón"""
+    st.header("👣 Análisis de Contactos")
     
-    with col1:
-        df_def = df[df['Acción'].isin(['Intercepción', 'Despeje', 'Entrada'])]
-        top_def = df_def['Ejecutor'].value_counts().head(5).reset_index()
-        top_def.columns = ['Jugador', 'Acciones']
-        fig = px.bar(
-            top_def,
-            x='Jugador',
-            y='Acciones',
-            title="Top 5 Defensores",
-            labels={'Acciones': 'Acciones defensivas'},
-            color='Acciones',
-            color_continuous_scale='reds'
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    contactos = pd.concat([
+        df['Primer Contacto'].rename('Contacto'),
+        df['Segundo Contacto'].rename('Contacto')
+    ]).dropna()
     
-    with col2:
-        df_ataq = df[df['Acción'].isin(['Remate', 'Tiro'])]
-        top_ataq = df_ataq['Ejecutor'].value_counts().head(5).reset_index()
-        top_ataq.columns = ['Jugador', 'Acciones']
-        fig = px.bar(
-            top_ataq,
-            x='Jugador',
-            y='Acciones',
-            title="Top 5 Rematadores",
-            labels={'Acciones': 'Remates'},
-            color='Acciones',
-            color_continuous_scale='reds'
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    if not contactos.empty:
+        cols = st.columns(2)
+        
+        with cols[0]:
+            fig = px.pie(
+                contactos.value_counts().reset_index(name='Count'),
+                names='Contacto',
+                values='Count',
+                title="Distribución de contactos",
+                hole=0.4
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with cols[1]:
+            st.dataframe(
+                contactos.value_counts().reset_index(name='Conteo'),
+                height=300
+            )
+    else:
+        st.warning("No hay datos de contactos con los filtros actuales")
 
-# Configuración de descarga
 def configurar_descarga(df):
+    """Configura el botón de descarga de datos"""
     st.divider()
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button(
-        "📤 Exportar Dataset Filtrado",
+        "💾 Descargar datos filtrados",
         data=csv,
-        file_name="analisis_tactico_cavalry.csv",
-        mime="text/csv"
+        file_name="analisis_tactico.csv",
+        mime="text/csv",
+        help="Descargue los datos actualmente filtrados en formato CSV"
     )
 
-# Función principal de la página
-def analitica_page():
-    setup_logo()
-    st.title("⚽ Panel de Análisis Táctico - Cavalry FC")
+def main():
+    """Función principal que orquesta el dashboard"""
+    st.set_page_config(layout="wide", page_title="Análisis Táctico")
+    st.title("📊 Panel de Análisis Táctico")
     
-    df = cargar_datos()
-    if df.empty:
-        st.warning("⚠️ No hay datos disponibles. Verifica la conexión o el archivo CSV.")
-        return
+    # Carga de datos
+    with st.spinner("Cargando datos..."):
+        df = cargar_datos()
+        if df.empty:
+            st.error("No se pudieron cargar los datos. Verifique la conexión o el formato del archivo.")
+            return
     
-    df_filtrado = configurar_filtros(df)
+    # Configuración de filtros
+    df_filtrado, equipo_analisis = configurar_filtros(df)
     
     if df_filtrado.empty:
-        st.warning("🔍 No hay datos con los filtros seleccionados")
+        st.warning("No hay datos con los filtros seleccionados. Ajuste los parámetros e intente nuevamente.")
         return
     
-    mostrar_kpis_mejorados(df_filtrado)
-    generar_seccion_espacial(df_filtrado)
-    generar_seccion_temporal(df_filtrado)
-    generar_seccion_efectividad_mejorada(df_filtrado)
-    generar_seccion_contactos(df_filtrado)
-    generar_seccion_tipos_accion(df_filtrado)
-    generar_seccion_mejores_jugadores(df_filtrado)
+    # Visualización del dashboard
+    st.subheader(f"Análisis para {equipo_analisis}")
+    mostrar_metricas_clave(df_filtrado, equipo_analisis)
+    
+    with st.expander("🗺️ Mapas Tácticos", expanded=True):
+        generar_seccion_espacial(df_filtrado)
+    
+    with st.expander("⏳ Análisis Temporal"):
+        visualizar_distribucion_temporal(df_filtrado)
+    
+    with st.expander("🎯 Efectividad"):
+        analizar_efectividad_jugadores(df_filtrado)
+    
+    with st.expander("📊 Tipos de Ejecución"):
+        visualizar_tipos_ejecucion(df_filtrado)
+    
+    with st.expander("👣 Contactos"):
+        analizar_contactos(df_filtrado)
+    
     configurar_descarga(df_filtrado)
+
+if __name__ == "__main__":
+    main()
