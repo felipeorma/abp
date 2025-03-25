@@ -107,7 +107,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
 
             opciones_contacto = jugadores + ["Oponente"]
             datos["Primer Contacto"] = st.selectbox("Primer contacto", opciones_contacto)
-            datos["Parte Cuerpo"] = st.selectbox("Parte del cuerpo", ["Cabeza", "Pie derecho", "Pie izquierdo", "Tronco", "Otro"])
+            datos["Parte Cuerpo"] = st.selectbox("Parte del cuerpo", ["Cabeza","Otro", "Pie"])
             segundo_contacto = st.selectbox("Segundo contacto (opcional)", ["Ninguno"] + opciones_contacto)
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
