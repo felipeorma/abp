@@ -1,164 +1,210 @@
-import streamlit as st
+# modules/analitica.py
 import pandas as pd
-import altair as alt
-import plotly.graph_objects as go
+import streamlit as st
+import matplotlib.pyplot as plt
+import plotly.express as px
+from mplsoccer import VerticalPitch
+from datetime import datetime
 
-# Cargar datos desde CSV
-df = pd.read_csv('master_abp.csv')
+# =============================================
+# FUNCIONES BASE
+# =============================================
 
-# Unificar valores de la columna 'Gol' para evitar inconsistencias ("SI" y "Sí" tratados igual)
-df['Gol'] = df['Gol'].replace({'SI': 'Sí'})
+def cargar_datos():
+    try:
+        url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
+        df = pd.read_csv(url)
+        
+        # Renombrar columnas
+        df = df.rename(columns={
+            'Tipo Ejecución': 'Tipo_Acción',
+            'Primer Contacto': 'Contacto',
+            'Parte Cuerpo': 'Parte_Cuerpo'
+        })
 
-# Preparar opciones únicas de fechas (ordenadas) para el filtro de fecha
-# Se utiliza multiselect en forma de dropdown por claridad y compacidad
-df['Fecha_dt'] = pd.to_datetime(df['Fecha'], format="%m/%d/%Y %H:%M")
-unique_dates_sorted = df.sort_values('Fecha_dt')['Fecha'].unique().tolist()
+        # Validar estructura
+        required_columns = [
+            'Jornada', 'Fecha', 'Rival', 'Periodo', 'Minuto', 'Acción', 
+            'Equipo', 'Ejecutor', 'Zona Saque', 'Zona Remate', 'Gol',
+            'x_saque', 'y_saque', 'x_remate', 'y_remate', 'Tipo_Acción'
+        ]
+        
+        if not all(col in df.columns for col in required_columns):
+            st.error("Error en estructura del CSV")
+            return pd.DataFrame()
 
-# Colocar los filtros en la interfaz
-filter_col1, filter_col2 = st.columns([4, 1])
-with filter_col1:
-    # Filtro de fechas como selectbox con multiselección
-    selected_dates = st.multiselect("Fecha(s)", options=unique_dates_sorted, default=unique_dates_sorted)
-with filter_col2:
-    # Filtro de equipo como selección única (Cavalry FC o Rival)
-    selected_team = st.selectbox("Equipo", ["Cavalry FC", "Rival"])
+        # Conversiones
+        df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
+        df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce')
+        df['Gol'] = df['Gol'].replace({'Sí': True, 'No': False})
+        
+        return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Fecha'])
 
-# Filtrar el DataFrame según las fechas seleccionadas
-df_date = df[df['Fecha'].isin(selected_dates)]
+    except Exception as e:
+        st.error(f"Error crítico: {str(e)}")
+        return pd.DataFrame()
 
-# Calcular KPI: goles a favor y encajados (dinámico según equipo seleccionado)
-# Goles a favor Cavalry = eventos de Cavalry FC con Gol "Sí"
-gf_cav = len(df_date[(df_date['Equipo'] == 'Cavalry FC') & (df_date['Gol'] == 'Sí')])
-# Goles a favor Rival = eventos del rival con Gol "Sí"
-gf_opp = len(df_date[(df_date['Equipo'] == 'Rival') & (df_date['Gol'] == 'Sí')])
-# Total de ABP ejecutados por Cavalry y por Rival en las fechas seleccionadas
-total_cav = len(df_date[df_date['Equipo'] == 'Cavalry FC'])
-total_opp = len(df_date[df_date['Equipo'] == 'Rival'])
+# =============================================
+# COMPONENTES DE INTERFAZ
+# =============================================
 
-# Determinar KPIs según equipo seleccionado (dinámica de goles encajados invertida según el caso)
-if selected_team == "Cavalry FC":
-    goles_favor = gf_cav
-    goles_encajados = gf_opp  # Goles encajados de Cavalry = goles del Rival
-    # Efectividad ofensiva: % de ABP de Cavalry que terminan en gol
-    efectividad_ofensiva = (goles_favor / total_cav * 100) if total_cav > 0 else 0
-    # Efectividad defensiva: % de ABP del rival en que NO encajan gol (100% si no encaja ninguno)
-    efectividad_defensiva = ((1 - (gf_opp / total_opp)) * 100) if total_opp > 0 else 0
-else:  # selected_team == "Rival"
-    goles_favor = gf_opp  # Goles a favor del Rival = goles encajados por Cavalry
-    goles_encajados = gf_cav  # Goles encajados del Rival = goles a favor de Cavalry
-    efectividad_ofensiva = (goles_favor / total_opp * 100) if total_opp > 0 else 0
-    efectividad_defensiva = ((1 - (gf_cav / total_cav)) * 100) if total_cav > 0 else 0
+def configurar_filtros(df):
+    with st.sidebar:
+        st.header("⚙️ Filtros Tácticos")
+        
+        # 1. Selector de fechas (multiselect)
+        fechas_disponibles = df['Fecha'].dt.strftime('%d/%m/%Y').sort_values(ascending=False).unique()
+        fechas_sel = st.multiselect(
+            "Fechas de partidos",
+            options=fechas_disponibles,
+            default=fechas_disponibles
+        )
+        
+        # 2. Selector de equipo (radio buttons)
+        equipo_sel = st.radio(
+            "Equipo a analizar",
+            options=['Cavalry FC', 'Rival'],
+            index=0
+        )
+        
+        # 3. Filtros adicionales
+        acciones_sel = st.multiselect(
+            "Tipo de acción",
+            options=df['Acción'].unique(),
+            default=df['Acción'].unique()
+        )
+        
+        # 4. Rango de minutos
+        min_min = int(df['Minuto'].min())
+        max_min = int(df['Minuto'].max())
+        rango_min = st.slider("Rango de minutos", min_min, max_min, (min_min, max_min))
 
-# Mostrar los KPIs principales
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Goles a favor", int(goles_favor))
-col2.metric("Goles encajados", int(goles_encajados))
-col3.metric("Efectividad ofensiva (%)", f"{efectividad_ofensiva:.1f}%")
-col4.metric("Efectividad defensiva (%)", f"{efectividad_defensiva:.1f}%")
-
-# Filtrar datos por equipo seleccionado para gráficos de detalle
-filtered_team_df = df_date[df_date['Equipo'] == selected_team]
-
-# Crear función para generar figura de cancha de fútbol con Plotly (fondo y líneas)
-def create_field_figure(width=600, height=400):
-    fig = go.Figure()
-    # Configurar fondo verde (cancha) y ejes ocultos
-    fig.update_layout(
-        plot_bgcolor="#0B6623", paper_bgcolor="#0B6623",
-        xaxis=dict(range=[0, 120], showgrid=False, zeroline=False, visible=False),
-        yaxis=dict(range=[0, 80], showgrid=False, zeroline=False, visible=False),
-        width=width, height=height, margin=dict(l=0, r=0, t=0, b=0)
-    )
-    # Dibujar líneas del campo (blancas) como shapes
-    field_shapes = [
-        # Perímetro del campo
-        dict(type='rect', x0=0, y0=0, x1=120, y1=80, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Línea central
-        dict(type='line', x0=60, x1=60, y0=0, y1=80, line=dict(color='white', width=2), layer='below'),
-        # Círculo central
-        dict(type='circle', x0=50, y0=30, x1=70, y1=50, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Área penal derecha
-        dict(type='rect', x0=102, y0=18, x1=120, y1=62, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Área penal izquierda
-        dict(type='rect', x0=0, y0=18, x1=18, y1=62, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Área chica derecha
-        dict(type='rect', x0=114, y0=30, x1=120, y1=50, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Área chica izquierda
-        dict(type='rect', x0=0, y0=30, x1=6, y1=50, line=dict(color='white', width=2), layer='below', fillcolor='rgba(0,0,0,0)'),
-        # Punto penal derecha
-        dict(type='circle', x0=107, y0=39, x1=109, y1=41, line=dict(color='white', width=2), layer='below', fillcolor='white'),
-        # Punto penal izquierda
-        dict(type='circle', x0=11, y0=39, x1=13, y1=41, line=dict(color='white', width=2), layer='below', fillcolor='white'),
-        # Portería derecha
-        dict(type='line', x0=120, x1=120, y0=36, y1=44, line=dict(color='white', width=4), layer='below'),
-        # Portería izquierda
-        dict(type='line', x0=0, x1=0, y0=36, y1=44, line=dict(color='white', width=4), layer='below')
+    # Aplicar filtros (excepto equipo)
+    df_filtrado = df[
+        (df['Fecha'].dt.strftime('%d/%m/%Y').isin(fechas_sel)) &
+        (df['Acción'].isin(acciones_sel)) &
+        (df['Minuto'].between(*rango_min))
     ]
-    fig.update_layout(shapes=field_shapes)
-    return fig
-
-# Generar mapas de calor (saque y remate) si hay datos disponibles
-if filtered_team_df.empty:
-    st.warning("No hay datos para los filtros seleccionados.")
-else:
-    # Filtrar datos para heatmap de saques excluyendo zona "Penal"
-    df_heat_saque = filtered_team_df[filtered_team_df['Zona Saque'] != 'Penal']
-    df_heat_remate = filtered_team_df  # incluye todos, incluso penales
     
-    st.subheader("Mapas de calor de zonas de saque y remate")
-    colA, colB = st.columns(2)
-    with colA:
-        st.caption("Mapa de calor – Zona de Saque (excluyendo penales)")
-        fig_saque = create_field_figure(width=500, height=333)
-        # Agregar heatmap de saques (si hay datos luego de excluir penales)
-        if not df_heat_saque.empty:
-            fig_saque.add_trace(go.Histogram2d(
-                x=df_heat_saque['x_saque'], y=df_heat_saque['y_saque'],
-                xbins=dict(start=0, end=120, size=5),  # bins de ~5 unidades
-                ybins=dict(start=0, end=80, size=5),
-                colorscale='YlOrRd', reversescale=False, showscale=False, opacity=0.7
-            ))
-        st.plotly_chart(fig_saque, use_container_width=True)
-    with colB:
-        st.caption("Mapa de calor – Zona de Remate")
-        fig_remate = create_field_figure(width=500, height=333)
-        if not df_heat_remate.empty:
-            fig_remate.add_trace(go.Histogram2d(
-                x=df_heat_remate['x_remate'], y=df_heat_remate['y_remate'],
-                xbins=dict(start=0, end=120, size=5),
-                ybins=dict(start=0, end=80, size=5),
-                colorscale='YlOrRd', reversescale=False, showscale=False, opacity=0.7
-            ))
-        st.plotly_chart(fig_remate, use_container_width=True)
+    return df_filtrado, equipo_sel
 
-    # Análisis de contactos por parte del cuerpo (primer contacto principalmente)
-    st.subheader("Análisis de contactos por parte del cuerpo")
-    # Excluir entradas sin parte de cuerpo (NaN significa que no hubo contacto claro)
-    part_df = filtered_team_df[filtered_team_df['Parte Cuerpo'].notna()]
-    if part_df.empty:
-        st.write("No se registró ningún contacto con el balón en estas acciones.")
-    else:
-        # Grafica de barras de la frecuencia de cada parte del cuerpo usada en el primer contacto
-        part_counts_chart = alt.Chart(part_df).mark_bar(color='#327B9E').encode(
-            x=alt.X('Parte Cuerpo:N', sort='-y', title='Parte del Cuerpo'),
-            y=alt.Y('count():Q', title='Cantidad de contactos')
-        )
-        st.altair_chart(part_counts_chart, use_container_width=True)
+# =============================================
+# MÓDULOS DE ANÁLISIS
+# =============================================
 
-    # Ranking de jugadores (por ABP ejecutados)
-    st.subheader("Ranking de jugadores (ABP ejecutados)")
-    # Contar cuántas acciones ejecutó cada jugador (columna 'Ejecutor')
-    ranking_df = filtered_team_df['Ejecutor'].value_counts().reset_index()
-    ranking_df.columns = ['Jugador', 'Conteo']
-    if ranking_df.empty:
-        st.write("No hay datos de jugadores para mostrar.")
+def calcular_kpis(df, equipo_sel):
+    contrincante = 'Rival' if equipo_sel == 'Cavalry FC' else 'Cavalry FC'
+    
+    # Datos del equipo seleccionado
+    df_equipo = df[df['Equipo'] == equipo_sel]
+    goles_favor = df_equipo['Gol'].sum()
+    acciones_ofensivas = len(df_equipo)
+    
+    # Datos del contrincante
+    df_rival = df[df['Equipo'] == contrincante]
+    goles_contra = df_rival['Gol'].sum()
+    acciones_defensivas = len(df_rival)
+    
+    # Cálculo de efectividades
+    ef_ofensiva = (goles_favor / acciones_ofensivas * 100) if acciones_ofensivas > 0 else 0
+    ef_defensiva = (1 - (goles_contra / acciones_defensivas)) * 100 if acciones_defensivas > 0 else 0
+    
+    return ef_ofensiva, ef_defensiva, goles_favor, goles_contra
+
+def generar_mapa_calor(df, equipo, tipo):
+    # Filtrar datos
+    df_filtrado = df[df['Equipo'] == equipo]
+    
+    if tipo == 'saque':
+        coord_x = 'x_saque'
+        coord_y = 'y_saque'
+        # Excluir penales solo para saques
+        df_filtrado = df_filtrado[df_filtrado['Zona Saque'] != 'Penal']
     else:
-        # Tomar top 5 jugadores con más ejecuciones
-        top_players = ranking_df.head(5)
-        # Definir color de barras (rojo para Cavalry, gris para Rival)
-        bar_color = '#D62728' if selected_team == 'Cavalry FC' else '#7F7F7F'
-        ranking_chart = alt.Chart(top_players).mark_bar(color=bar_color).encode(
-            y=alt.Y('Jugador:N', sort='-x', title=None),
-            x=alt.X('Conteo:Q', title='Cantidad de ABP ejecutados')
+        coord_x = 'x_remate'
+        coord_y = 'y_remate'
+    
+    # Configurar pitch
+    pitch = VerticalPitch(pitch_type='statsbomb', half=True, goal_type='box')
+    fig, ax = plt.subplots(figsize=(10, 7))
+    pitch.draw(ax=ax)
+    
+    # Generar heatmap
+    if not df_filtrado.empty:
+        pitch.kdeplot(
+            df_filtrado[coord_x], 
+            df_filtrado[coord_y],
+            ax=ax,
+            cmap='Reds' if tipo == 'remate' else 'Blues',
+            levels=50,
+            fill=True,
+            alpha=0.6
         )
-        st.altair_chart(ranking_chart, use_container_width=True)
+    ax.set_title(f"Mapa de {tipo.capitalize()}s - {equipo}", fontsize=14)
+    st.pyplot(fig)
+    plt.close()
+
+def generar_graficos_contactos(df, equipo):
+    df_equipo = df[df['Equipo'] == equipo]
+    if not df_equipo.empty and 'Parte_Cuerpo' in df_equipo:
+        fig = px.pie(
+            df_equipo,
+            names='Parte_Cuerpo',
+            title=f"Contactos Corporales - {equipo}",
+            hole=0.4,
+            color_discrete_sequence=px.colors.sequential.RdBu
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+# =============================================
+# VISTA PRINCIPAL
+# =============================================
+
+def analitica_page():
+    st.title("🔥 Panel Táctico Cavalry FC")
+    
+    # Cargar datos
+    df = cargar_datos()
+    if df.empty:
+        st.warning("Base de datos no disponible")
+        return
+    
+    # Configurar filtros
+    df_filtrado, equipo_sel = configurar_filtros(df)
+    contrincante = 'Rival' if equipo_sel == 'Cavalry FC' else 'Cavalry FC'
+    
+    # Calcular KPIs
+    ef_of, ef_def, goles_favor, goles_contra = calcular_kpis(df_filtrado, equipo_sel)
+    
+    # Mostrar KPIs
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric(f"Goles {equipo_sel}", goles_favor)
+    with col2:
+        st.metric(f"Efectividad Ofensiva", f"{ef_of:.1f}%")
+    with col3:
+        st.metric(f"Efectividad Defensiva", f"{ef_def:.1f}%")
+    
+    # Sección de mapas de calor
+    st.header("🗺️ Análisis Espacial")
+    col_map1, col_map2 = st.columns(2)
+    with col_map1:
+        generar_mapa_calor(df_filtrado, equipo_sel, 'saque')
+    with col_map2:
+        generar_mapa_calor(df_filtrado, equipo_sel, 'remate')
+    
+    # Sección de contactos
+    st.header("👥 Análisis de Contactos")
+    generar_graficos_contactos(df_filtrado, equipo_sel)
+    
+    # Sección adicional (gráficos previos)
+    st.header("📊 Métricas Complementarias")
+    df_equipo = df_filtrado[df_filtrado['Equipo'] == equipo_sel]
+    if not df_equipo.empty:
+        fig = px.histogram(
+            df_equipo,
+            x='Acción',
+            color='Tipo_Acción',
+            title="Distribución de Acciones"
+        )
+        st.plotly_chart(fig, use_container_width=True)
