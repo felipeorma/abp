@@ -254,22 +254,21 @@ def generar_seccion_efectividad(df):
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
+        df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
+        total = df_sun['Cantidad'].sum()
+        df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
+        df_sun['Label'] = df_sun.apply(
+            lambda x: f"{x['Resultado']} ({x['Porcentaje']:.1f}%)", axis=1
+        )
+
         fig = px.sunburst(
-            df, path=['Acción', 'Resultado'],
-            title="Composición de Resultados por Acción"
+            df_sun,
+            path=['Acción', 'Label'],
+            values='Cantidad',
+            title="Composición de Resultados por Acción",
+            branchvalues='total'
         )
         st.plotly_chart(fig, use_container_width=True)
-
-def configurar_descarga(df):
-    st.divider()
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        "📤 Exportar Dataset Filtrado",
-        data=csv,
-        file_name="analisis_tactico.csv",
-        mime="text/csv",
-        help="Descarga los datos actualmente filtrados en formato CSV"
-    )
 
 def mostrar_ranking_parte_cuerpo(df):
     st.header("🏅 Ranking por Parte del Cuerpo")
