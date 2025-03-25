@@ -133,7 +133,8 @@ def mostrar_kpis(df):
         st.metric("✅ Goles a favor", goles_favor, 
                  help="Goles convertidos por Cavalry FC")
     
-    goles_contra = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Rival')].shape[0]
+    goles_contra = df[(df['Gol'] == 'Sí') & (df['Equipo'] != 'Cavalry FC')].shape[0]
+
     with cols[2]:
         st.metric("❌ Goles en contra", goles_contra, 
                  help="Goles concedidos al rival")
