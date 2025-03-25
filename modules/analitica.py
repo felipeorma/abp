@@ -5,9 +5,20 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
 from datetime import datetime
+import requests
+from PIL import Image
+from io import BytesIO
+
+# Configuración inicial del logo
+def setup_logo():
+    logo_url = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.svg.png"
+    response = requests.get(logo_url)
+    logo = Image.open(BytesIO(response.content))
+    st.sidebar.image(logo, width=200)
 
 def analitica_page():
-    st.title("⚽ Panel de Análisis Táctico Profesional")
+    setup_logo()
+    st.title("⚽ Panel de Análisis Táctico Profesional - Cavalry FC")
     
     try:
         df = cargar_datos()
@@ -19,10 +30,13 @@ def analitica_page():
         return
 
     df_filtrado = configurar_filtros(df)
-    mostrar_kpis(df_filtrado)
+    mostrar_kpis_mejorados(df_filtrado)
     generar_seccion_espacial(df_filtrado)
     generar_seccion_temporal(df_filtrado)
-    generar_seccion_efectividad(df_filtrado)
+    generar_seccion_efectividad_mejorada(df_filtrado)
+    generar_seccion_contactos(df_filtrado)
+    generar_seccion_tipos_accion(df_filtrado)
+    generar_seccion_mejores_jugadores(df_filtrado)
     configurar_descarga(df_filtrado)
 
 def cargar_datos():
@@ -36,21 +50,26 @@ def cargar_datos():
     df['Fecha_Str'] = df['Fecha'].dt.strftime('%Y-%m-%d')  # Nuevo campo formateado
     
     # Validar estructura del CSV
-    columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
+    columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha', 'Gol', 'Contacto', 'Tipo Acción']
     if not all(col in df.columns for col in columnas_requeridas):
-        st.error("Estructura inválida del CSV")
+        st.error("Estructura inválida del CSV: faltan columnas clave")
         return pd.DataFrame()
     
     # Limpieza de datos
     df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce')
-    return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
+    df = df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
+    
+    # Asegurar que 'Gol' esté en formato correcto
+    df['Gol'] = df['Gol'].apply(lambda x: 'Sí' if str(x).lower() in ['sí', 'si', '1', 'true'] else 'No')
+    
+    return df
 
 def configurar_filtros(df):
     with st.sidebar:
         st.header("🔍 Filtros Avanzados")
         
         # 1. FILTRO DE JORNADA (PRIMERO)
-        todas_jornadas = df['Jornada'].unique()
+        todas_jornadas = sorted(df['Jornada'].unique())
         jornadas_seleccionadas = st.multiselect(
             "Jornada",
             options=todas_jornadas,
@@ -143,13 +162,13 @@ def configurar_filtros(df):
         (df['Minuto'].between(*rango_minutos))
     ]
 
-
-
-def mostrar_kpis(df):
-    cols = st.columns(4)
+def mostrar_kpis_mejorados(df):
+    cols = st.columns(5)
     
+    # Logo pequeño
     with cols[0]:
-        st.metric("📈 Acciones registradas", df.shape[0])
+        logo_url = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.svg.png"
+        st.image(logo_url, width=80)
     
     # Goles a favor (Cavalry FC)
     goles_favor = df[(df['Gol'] == 'Sí') & (df['Equipo'] == 'Cavalry FC')].shape[0]
@@ -165,10 +184,17 @@ def mostrar_kpis(df):
                  help="Goles concedidos al rival",
                  delta_color="off")
     
-    # Efectividad basada en goles a favor
+    # Efectividad ofensiva
+    acciones_ofensivas = df[df['Equipo'] == 'Cavalry FC'].shape[0]
     with cols[3]:
-        eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
-        st.metric("🎯 Efectividad", f"{eficacia:.1f}%")
+        eficacia_of = (goles_favor / acciones_ofensivas * 100) if acciones_ofensivas > 0 else 0
+        st.metric("🎯 Efectividad Ofensiva", f"{eficacia_of:.1f}%")
+    
+    # Efectividad defensiva
+    acciones_defensivas = df[df['Equipo'] == 'Rival'].shape[0]
+    with cols[4]:
+        eficacia_def = (100 - (goles_contra / acciones_defensivas * 100)) if acciones_defensivas > 0 else 0
+        st.metric("🛡️ Efectividad Defensiva", f"{eficacia_def:.1f}%")
 
 def generar_seccion_espacial(df):
     st.header("🌍 Mapeo Táctico")
@@ -258,7 +284,7 @@ def generar_seccion_temporal(df):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-def generar_seccion_efectividad(df):
+def generar_seccion_efectividad_mejorada(df):
     st.header("🎯 Efectividad Operativa")
     col1, col2 = st.columns(2)
     
@@ -271,14 +297,115 @@ def generar_seccion_efectividad(df):
             df_efectividad, 
             x='Acciones', y='Goles',
             size='Goles', color='Ejecutor',
-            title="Relación Acciones-Goles por Jugador"
+            title="Relación Acciones-Goles por Jugador",
+            hover_data=['Ejecutor', 'Acciones', 'Goles']
         )
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
         fig = px.sunburst(
             df, path=['Acción', 'Resultado'],
-            title="Composición de Resultados por Acción"
+            title="Composición de Resultados por Acción",
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+def generar_seccion_contactos(df):
+    st.header("👣 Análisis de Contactos")
+    
+    # Filtrar solo acciones ofensivas del Cavalry
+    df_ofensivo = df[df['Equipo'] == 'Cavalry FC']
+    
+    # Calcular métricas
+    primer_contacto_of = df_ofensivo[df_ofensivo['Contacto'] == 'Primer contacto'].shape[0]
+    segundo_contacto_of = df_ofensivo[df_ofensivo['Contacto'] == 'Segundo contacto'].shape[0]
+    total_ofensivo = df_ofensivo.shape[0]
+    
+    # Filtrar acciones defensivas del Cavalry (contra el rival)
+    df_defensivo = df[df['Equipo'] == 'Rival']
+    primer_contacto_def = df_defensivo[df_defensivo['Contacto'] == 'Primer contacto'].shape[0]
+    segundo_contacto_def = df_defensivo[df_defensivo['Contacto'] == 'Segundo contacto'].shape[0]
+    total_defensivo = df_defensivo.shape[0]
+    
+    # Mostrar en columnas
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Ofensivo (Cavalry FC)")
+        fig = px.pie(
+            names=['Primer contacto', 'Segundo contacto'],
+            values=[primer_contacto_of, segundo_contacto_of],
+            title="Distribución de contactos ofensivos",
+            color_discrete_sequence=['#FF0000', '#000000']  # Rojo y negro del Cavalry
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+    with col2:
+        st.subheader("Defensivo (vs Rival)")
+        fig = px.pie(
+            names=['Primer contacto', 'Segundo contacto'],
+            values=[primer_contacto_def, segundo_contacto_def],
+            title="Distribución de contactos defensivos",
+            color_discrete_sequence=['#000000', '#FF0000']
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+def generar_seccion_tipos_accion(df):
+    st.header("📊 Tipos de Acción")
+    
+    # Filtrar solo acciones del Cavalry
+    df_cavalry = df[df['Equipo'] == 'Cavalry FC']
+    
+    # Calcular tipos de acción
+    tipos_accion = df_cavalry['Tipo Acción'].value_counts().reset_index()
+    tipos_accion.columns = ['Tipo', 'Cantidad']
+    
+    # Mostrar gráfico
+    fig = px.bar(
+        tipos_accion,
+        x='Tipo',
+        y='Cantidad',
+        color='Tipo',
+        title="Distribución de tipos de acción ofensiva",
+        labels={'Cantidad': 'Número de acciones', 'Tipo': 'Tipo de acción'},
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+def generar_seccion_mejores_jugadores(df):
+    st.header("🏆 Mejores Jugadores")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Mejores Defensores")
+        df_defensores = df[df['Acción'].isin(['Intercepción', 'Despeje', 'Entrada'])]
+        mejores_def = df_defensores['Ejecutor'].value_counts().head(5).reset_index()
+        mejores_def.columns = ['Jugador', 'Acciones defensivas']
+        
+        fig = px.bar(
+            mejores_def,
+            x='Jugador',
+            y='Acciones defensivas',
+            color='Acciones defensivas',
+            title="Top 5 defensores por acciones defensivas",
+            color_continuous_scale='reds'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("Mejores Rematadores")
+        df_rematadores = df[df['Acción'].isin(['Remate', 'Tiro'])]
+        mejores_rem = df_rematadores['Ejecutor'].value_counts().head(5).reset_index()
+        mejores_rem.columns = ['Jugador', 'Remates']
+        
+        fig = px.bar(
+            mejores_rem,
+            x='Jugador',
+            y='Remates',
+            color='Remates',
+            title="Top 5 rematadores por cantidad de remates",
+            color_continuous_scale='reds'
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -288,7 +415,7 @@ def configurar_descarga(df):
     st.download_button(
         "📤 Exportar Dataset Filtrado",
         data=csv,
-        file_name="analisis_tactico.csv",
+        file_name="analisis_tactico_cavalry.csv",
         mime="text/csv",
         help="Descarga los datos actualmente filtrados en formato CSV"
     )
