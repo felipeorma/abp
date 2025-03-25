@@ -298,15 +298,16 @@ def mostrar_ranking_parte_cuerpo(df):
         st.subheader(f"{'⚔️' if tipo == 'Ofensiva' else '🛡️'} Acciones {tipo}s")
 
         fig = px.bar(
-            df_ranking,
-            x='Cantidad',
-            y='Ejecutor',
-            color='Parte Cuerpo',
-            orientation='h',
-            text='Cantidad',
-            title=f"Jugadores con más acciones {tipo.lower()}s por parte del cuerpo",
-            labels={'Cantidad': 'Acciones', 'Ejecutor': 'Jugador'},
-            color_discrete_map=color_map
+    df_ranking,
+    x='Cantidad',
+    y='Ejecutor',
+    color='Parte Cuerpo',
+    orientation='h',
+    text='Cantidad',
+    title=f"Jugadores con más acciones {tipo.lower()}s por parte del cuerpo",
+    labels={'Cantidad': 'Acciones', 'Ejecutor': 'Jugador'},
+    color_discrete_map=color_map,
+    category_orders={'Ejecutor': total_jugadores.index.tolist()}
         )
         fig.update_layout(barmode='stack')
         st.plotly_chart(fig, use_container_width=True)
