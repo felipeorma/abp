@@ -22,7 +22,7 @@ def analitica_page():
     generar_seccion_temporal(df_filtrado)
     generar_seccion_efectividad(df_filtrado)
     configurar_descarga(df_filtrado)
-    mostrar_ranking_contactos(df_filtrado)
+    mostrar_resumen_contactos(df)
 
 def cargar_datos():
     # Cargar datos desde GitHub
@@ -271,33 +271,36 @@ def configurar_descarga(df):
         help="Descarga los datos actualmente filtrados en formato CSV"
     )
 
-def mostrar_ranking_contactos(df):
-    st.header("🏅 Ranking de Primer Contacto por Tipo")
+def mostrar_resumen_contactos(df):
+    st.header("💥 Primer Contacto por Tipo de Acción")
 
-    # Clasificación de acciones ofensivas
+    # Clasificamos ofensiva/defensiva
     ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
     df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
 
-    for tipo in ['Ofensiva', 'Defensiva']:
-        df_tipo = df[df['Tipo Acción'] == tipo]
+    # Agrupamos solo por tipo de contacto y tipo de acción
+    df_resumen = df.groupby(['Primer Contacto', 'Tipo Acción']).size().reset_index(name='Cantidad')
+    df_resumen = df_resumen[df_resumen['Primer Contacto'].notna()]
 
-        # Agrupar por tipo de contacto y jugador
-        df_ranking = df_tipo.groupby(['Primer Contacto', 'Ejecutor']) \
-                            .size().reset_index(name='Recuento')
+    # Ordenamos por total
+    orden_contacto = (
+        df_resumen.groupby('Primer Contacto')['Cantidad'].sum()
+        .sort_values(ascending=False)
+        .index
+    )
+    df_resumen['Primer Contacto'] = pd.Categorical(df_resumen['Primer Contacto'], categories=orden_contacto, ordered=True)
 
-        # Filtrar por contactos válidos
-        df_ranking = df_ranking[df_ranking['Primer Contacto'].notna()]
+    # Gráfico de barras apiladas
+    fig = px.bar(
+        df_resumen,
+        x='Cantidad',
+        y='Primer Contacto',
+        color='Tipo Acción',
+        orientation='h',
+        text='Cantidad',
+        title="Totales por tipo de primer contacto",
+        labels={'Cantidad': 'Acciones', 'Primer Contacto': 'Tipo de contacto'}
+    )
+    fig.update_layout(barmode='stack')
+    st.plotly_chart(fig, use_container_width=True)
 
-        st.subheader(f"{'⚔️' if tipo == 'Ofensiva' else '🛡️'} Acciones {tipo}s")
-
-        fig = px.bar(
-            df_ranking,
-            x='Primer Contacto',
-            y='Recuento',
-            color='Ejecutor',
-            title=f"Total de acciones {tipo.lower()}s por tipo de contacto y jugador",
-            labels={'Primer Contacto': 'Tipo de contacto', 'Recuento': 'Cantidad'},
-            text='Recuento'
-        )
-        fig.update_layout(barmode='stack')
-        st.plotly_chart(fig, use_container_width=True)
