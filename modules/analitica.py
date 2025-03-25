@@ -21,23 +21,18 @@ def cargar_datos():
     try:
         # URL del CSV en GitHub
         url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
-        
-        # Cargar datos con timeout
         df = pd.read_csv(url)
         
-        # Renombrar columnas según corrección
+        # Renombrar columnas para estandarizar nombres
         df = df.rename(columns={
-            'Tipo EjecuciÃ³n': 'Tipo Acción',
+            'Tipo Ejecución': 'Tipo Acción',
             'Primer Contacto': 'Contacto'
         })
         
-        # Normalizar nombres de columnas
-        df.columns = df.columns.str.strip()
-        
-        # Columnas obligatorias para el análisis
+        # Columnas obligatorias para el análisis (actualizadas)
         columnas_requeridas = [
             'Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha',
-            'Gol', 'Contacto', 'Tipo Acción', 'Zona Saque', 'Zona Remate', 'Ejecutor', 'Resultado'
+            'Gol', 'Contacto', 'Tipo Acción', 'Zona Saque', 'Zona Remate', 'Ejecutor'
         ]
         
         # Verificar estructura completa
@@ -46,20 +41,13 @@ def cargar_datos():
             st.error(f"🚨 Estructura incompleta. Faltan: {', '.join(faltantes)}")
             return pd.DataFrame()
 
-        # Conversión de tipos de datos
+        # Resto del procesamiento...
         df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
         df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce')
-        
-        # Normalización de valores
         df['Gol'] = df['Gol'].apply(lambda x: 'Sí' if str(x).lower() in ['sí', 'si', '1', 'true'] else 'No')
         
-        # Normalizar valores de Contacto
-        if 'Contacto' in df.columns:
-            df['Contacto'] = df['Contacto'].apply(lambda x: 'Primer contacto' if 'Primer' in str(x) else 'Segundo contacto')
-        
         # Limpieza de datos
-        columnas_criticas = ['Zona Saque', 'Zona Remate', 'Ejecutor', 'Fecha']
-        df = df.dropna(subset=[col for col in columnas_criticas if col in df.columns])
+        df = df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor', 'Fecha'])
         
         return df
 
