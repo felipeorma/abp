@@ -124,6 +124,8 @@ def configurar_filtros(df):
         (df['Minuto'].between(*rango_minutos))
     ]
 
+
+
 def mostrar_kpis(df):
     cols = st.columns(4)
     
