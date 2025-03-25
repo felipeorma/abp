@@ -121,8 +121,20 @@ def mostrar_formulario(jugadores, equipos, zonas):
     with st.container(border=True):
         st.markdown("### 📊 Resultados")
         col1, col2 = st.columns(2)
+    
+        # Gol
         datos["Gol"] = col1.selectbox("¿Gol?", ["No", "Sí"])
-        datos["Resultado"] = col1.selectbox("Resultado final", ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco", "Gol"])
+    
+        # Resultado: se ajusta automáticamente si es Gol
+        if datos["Gol"] == "Sí":
+            datos["Resultado"] = "Gol"
+            col1.text_input("Resultado final", value="Gol", disabled=True)
+        else:
+            datos["Resultado"] = col1.selectbox(
+                "Resultado final", 
+                ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+            )
+    
         datos["Perfil"] = col2.selectbox("Perfil ejecutor", ["Hábil", "No hábil"])
         datos["Estrategia"] = col2.selectbox("Estrategia", ["Sí", "No"])
         datos["Tipo Ejecución"] = col2.selectbox("Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
