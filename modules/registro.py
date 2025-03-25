@@ -146,10 +146,10 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Estrategia"] = col2.selectbox("Estrategia", ["Sí", "No"])
         datos["Tipo Ejecución"] = col2.selectbox("Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
 
-    if st.button("✅ Registrar Acción"):
-        return datos
-    else:
-        return None
+        if st.button("✅ Registrar Acción"):
+            return datos
+        else:
+            return None
 
 
 
