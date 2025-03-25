@@ -125,7 +125,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
         else:
             datos["Resultado"] = col1.selectbox(
                 "Resultado final",
-                ["Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+                ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
             )
 
         datos["Perfil"] = col2.selectbox("Perfil ejecutor", ["Hábil", "No hábil"])
