@@ -286,7 +286,7 @@ def mostrar_ranking_parte_cuerpo(df):
     }
 
     for tipo in ['Ofensiva', 'Defensiva']:
-        df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte del cuerpo'].notna())]
+        df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte Cuerpo'].notna())]
 
         # Agrupamos por jugador y parte del cuerpo
         df_ranking = df_tipo.groupby(['Ejecutor', 'Parte del cuerpo']).size().reset_index(name='Cantidad')
