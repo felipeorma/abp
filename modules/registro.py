@@ -77,7 +77,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
     # Tipo de acción
     # Tipo de acción
     with st.container(border=True):
-    st.markdown("### ⚽ Acción")
+       st.markdown("### ⚽ Acción")
        col1, col2, col3 = st.columns(3)  # nueva columna para ejecutor
        datos["Acción"] = col1.selectbox("Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
        datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
