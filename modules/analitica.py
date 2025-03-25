@@ -22,7 +22,7 @@ def analitica_page():
     generar_seccion_temporal(df_filtrado)
     generar_seccion_efectividad(df_filtrado)
     configurar_descarga(df_filtrado)
-    mostrar_resumen_contactos(df)
+    mostrar_ranking_parte_cuerpo(df_filtrado)
 
 def cargar_datos():
     # Cargar datos desde GitHub
@@ -271,36 +271,42 @@ def configurar_descarga(df):
         help="Descarga los datos actualmente filtrados en formato CSV"
     )
 
-def mostrar_resumen_contactos(df):
-    st.header("💥 Primer Contacto por Tipo de Acción")
+def mostrar_ranking_parte_cuerpo(df):
+    st.header("🏅 Ranking por Parte del Cuerpo")
 
     # Clasificamos ofensiva/defensiva
     ACCIONES_OFENSIVAS = ['Córner', 'Tiro libre', 'Saque lateral', 'Penal', 'Centro', 'Remate']
     df['Tipo Acción'] = df['Acción'].apply(lambda x: 'Ofensiva' if x in ACCIONES_OFENSIVAS else 'Defensiva')
 
-    # Agrupamos solo por tipo de contacto y tipo de acción
-    df_resumen = df.groupby(['Primer Contacto', 'Tipo Acción']).size().reset_index(name='Cantidad')
-    df_resumen = df_resumen[df_resumen['Primer Contacto'].notna()]
+    # Colores personalizados por parte del cuerpo
+    color_map = {
+        'Cabeza': '#00C2A0',
+        'Pierna': '#FF5A5F',
+        'Otro': '#4B4B4B'
+    }
 
-    # Ordenamos por total
-    orden_contacto = (
-        df_resumen.groupby('Primer Contacto')['Cantidad'].sum()
-        .sort_values(ascending=False)
-        .index
-    )
-    df_resumen['Primer Contacto'] = pd.Categorical(df_resumen['Primer Contacto'], categories=orden_contacto, ordered=True)
+    for tipo in ['Ofensiva', 'Defensiva']:
+        df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte del cuerpo'].notna())]
 
-    # Gráfico de barras apiladas
-    fig = px.bar(
-        df_resumen,
-        x='Cantidad',
-        y='Primer Contacto',
-        color='Tipo Acción',
-        orientation='h',
-        text='Cantidad',
-        title="Totales por tipo de primer contacto",
-        labels={'Cantidad': 'Acciones', 'Primer Contacto': 'Tipo de contacto'}
-    )
-    fig.update_layout(barmode='stack')
-    st.plotly_chart(fig, use_container_width=True)
+        # Agrupamos por jugador y parte del cuerpo
+        df_ranking = df_tipo.groupby(['Ejecutor', 'Parte del cuerpo']).size().reset_index(name='Cantidad')
 
+        # Total por jugador para ordenar
+        total_jugadores = df_ranking.groupby('Ejecutor')['Cantidad'].sum().sort_values(ascending=False)
+        df_ranking['Ejecutor'] = pd.Categorical(df_ranking['Ejecutor'], categories=total_jugadores.index, ordered=True)
+
+        st.subheader(f"{'⚔️' if tipo == 'Ofensiva' else '🛡️'} Acciones {tipo}s")
+
+        fig = px.bar(
+            df_ranking,
+            x='Cantidad',
+            y='Ejecutor',
+            color='Parte del cuerpo',
+            orientation='h',
+            text='Cantidad',
+            title=f"Jugadores con más acciones {tipo.lower()}s por parte del cuerpo",
+            labels={'Cantidad': 'Acciones', 'Ejecutor': 'Jugador'},
+            color_discrete_map=color_map
+        )
+        fig.update_layout(barmode='stack')
+        st.plotly_chart(fig, use_container_width=True)
