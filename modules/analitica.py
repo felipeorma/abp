@@ -3,7 +3,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
-from datetime import datetime
 
 def analitica_page():
     st.title("⚽ Panel de Análisis Táctico Profesional")
@@ -29,9 +28,10 @@ def cargar_datos():
     url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
     df = pd.read_csv(url)
     
-    # Convertir y validar fecha
+    # Convertir y formatear fechas
     df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
     df = df.dropna(subset=['Fecha'])
+    df['Fecha_Str'] = df['Fecha'].dt.strftime('%Y-%m-%d')  # Nuevo campo formateado
     
     # Validar estructura del CSV
     columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
@@ -47,23 +47,17 @@ def configurar_filtros(df):
     with st.sidebar:
         st.header("🔍 Filtros Avanzados")
         
-        # Filtro de fechas
-        min_date = df['Fecha'].min().date()
-        max_date = df['Fecha'].max().date()
-        selected_dates = st.date_input(
-            "Rango de fechas",
-            value=(min_date, max_date),
-            min_value=min_date,
-            max_value=max_date
+        # Selector de partidos por fecha
+        fechas_unicas = df.sort_values('Fecha', ascending=False)['Fecha_Str'].unique()
+        partidos_seleccionados = st.multiselect(
+            "Partidos",
+            options=fechas_unicas,
+            default=fechas_unicas,
+            format_func=lambda x: f"{x} vs {df[df['Fecha_Str'] == x]['Rival'].iloc[0]}",
+            help="Selecciona los partidos a analizar"
         )
         
-        # Manejar selección de rango
-        if len(selected_dates) == 2:
-            start_date, end_date = selected_dates
-        else:
-            start_date = end_date = selected_dates[0]
-
-        # Filtros principales
+        # Resto de los filtros
         col1, col2 = st.columns(2)
         with col1:
             jornadas = st.multiselect(
@@ -78,7 +72,6 @@ def configurar_filtros(df):
                 default=df['Condición'].unique()
             )
         
-        # Filtros tácticos
         col3, col4 = st.columns(2)
         with col3:
             equipos = st.multiselect(
@@ -93,7 +86,6 @@ def configurar_filtros(df):
                 default=df['Rival'].unique()
             )
 
-        # Filtros adicionales
         jugadores = st.multiselect(
             "Jugadores",
             options=df['Ejecutor'].unique(),
@@ -106,7 +98,6 @@ def configurar_filtros(df):
             default=df['Acción'].unique()
         )
         
-        # Filtro temporal
         min_minuto = int(df['Minuto'].min())
         max_minuto = int(df['Minuto'].max())
         rango_minutos = st.slider(
@@ -116,15 +107,14 @@ def configurar_filtros(df):
         )
 
     return df[
+        (df['Fecha_Str'].isin(partidos_seleccionados)) &
         (df['Jornada'].isin(jornadas)) &
         (df['Condición'].isin(condicion)) &
         (df['Equipo'].isin(equipos)) &
         (df['Rival'].isin(rivals)) &
         (df['Ejecutor'].isin(jugadores)) &
         (df['Acción'].isin(acciones)) &
-        (df['Minuto'].between(*rango_minutos)) &
-        (df['Fecha'].dt.date >= start_date) &
-        (df['Fecha'].dt.date <= end_date)
+        (df['Minuto'].between(*rango_minutos))
     ]
 
 def mostrar_kpis(df):
