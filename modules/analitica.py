@@ -257,18 +257,24 @@ def generar_seccion_efectividad(df):
         df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
         total = df_sun['Cantidad'].sum()
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
-        df_sun['Label'] = df_sun.apply(
-            lambda x: f"{x['Resultado']} ({x['Porcentaje']:.1f}%)", axis=1
-        )
 
         fig = px.sunburst(
             df_sun,
-            path=['Acción', 'Label'],
+            path=['Acción', 'Resultado'],
             values='Cantidad',
             title="Composición de Resultados por Acción",
-            branchvalues='total'
+            branchvalues='total',
+            custom_data=['Cantidad', 'Porcentaje']
         )
+
+        fig.update_traces(
+            hovertemplate='<b>%{label}</b><br>' +
+                          'Cantidad: %{customdata[0]}<br>' +
+                          'Porcentaje: %{customdata[1]:.1f}%<extra></extra>'
+        )
+
         st.plotly_chart(fig, use_container_width=True)
+
 
 def mostrar_ranking_parte_cuerpo(df):
     st.header("🏅 Ranking por Parte del Cuerpo")
