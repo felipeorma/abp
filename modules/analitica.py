@@ -11,10 +11,17 @@ from io import BytesIO
 
 # Configuración inicial del logo
 def setup_logo():
+    # Usar versión PNG del logo directamente
     logo_url = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.svg.png"
-    response = requests.get(logo_url)
-    logo = Image.open(BytesIO(response.content))
-    st.sidebar.image(logo, width=200)
+    
+    try:
+        response = requests.get(logo_url, headers={'User-Agent': 'Mozilla/5.0'})
+        response.raise_for_status()
+        logo = Image.open(BytesIO(response.content))
+        st.sidebar.image(logo, width=200)
+    except Exception as e:
+        st.error(f"Error cargando logo: {str(e)}")
+        st.sidebar.markdown("[Logo Cavalry FC](https://upload.wikimedia.org/wikipedia/en/4/4c/Cavalry_FC_logo.svg)")
 
 def analitica_page():
     setup_logo()
