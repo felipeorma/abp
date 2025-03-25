@@ -53,6 +53,9 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Jornada"] = col1.selectbox("Jornada", ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
         datos["Rival"] = col2.selectbox("Rival", equipos)
         datos["Condición"] = col3.selectbox("Condición", ["Local", "Visitante"])
+        
+        # Añade esto debajo de las columnas existentes
+        datos["Fecha"] = st.date_input("Fecha", value=datetime.date.today())  # <-- Nuevo campo fecha
 
     # Tiempo de juego
     with st.container(border=True):
