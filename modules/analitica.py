@@ -4,6 +4,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
+from datetime import datetime
 
 def analitica_page():
     st.title("⚽ Panel de Análisis Táctico Profesional")
@@ -29,8 +30,12 @@ def cargar_datos():
     url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
     df = pd.read_csv(url)
     
+    # Convertir y validar fecha
+    df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
+    df = df.dropna(subset=['Fecha'])
+    
     # Validar estructura del CSV
-    columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo']
+    columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in columnas_requeridas):
         st.error("Estructura inválida del CSV")
         return pd.DataFrame()
@@ -43,6 +48,22 @@ def configurar_filtros(df):
     with st.sidebar:
         st.header("🔍 Filtros Avanzados")
         
+        # Filtro de fechas
+        min_date = df['Fecha'].min().date()
+        max_date = df['Fecha'].max().date()
+        selected_dates = st.date_input(
+            "Rango de fechas",
+            value=(min_date, max_date),
+            min_value=min_date,
+            max_value=max_date
+        )
+        
+        # Manejar selección de rango
+        if len(selected_dates) == 2:
+            start_date, end_date = selected_dates
+        else:
+            start_date = end_date = selected_dates[0]
+
         # Filtros principales
         col1, col2 = st.columns(2)
         with col1:
@@ -58,7 +79,7 @@ def configurar_filtros(df):
                 default=df['Condición'].unique()
             )
         
-        # Nuevos filtros tácticos
+        # Filtros tácticos
         col3, col4 = st.columns(2)
         with col3:
             equipos = st.multiselect(
@@ -73,7 +94,7 @@ def configurar_filtros(df):
                 default=df['Rival'].unique()
             )
 
-        # Resto de filtros
+        # Filtros adicionales
         jugadores = st.multiselect(
             "Jugadores",
             options=df['Ejecutor'].unique(),
@@ -86,7 +107,7 @@ def configurar_filtros(df):
             default=df['Acción'].unique()
         )
         
-        # Filtro temporal mejorado
+        # Filtro temporal
         min_minuto = int(df['Minuto'].min())
         max_minuto = int(df['Minuto'].max())
         rango_minutos = st.slider(
@@ -97,15 +118,18 @@ def configurar_filtros(df):
 
     return df[
         (df['Jornada'].isin(jornadas)) &
-        (df['Condición'].isin(condicion)) &  # Nuevo filtro
+        (df['Condición'].isin(condicion)) &
         (df['Equipo'].isin(equipos)) &
         (df['Rival'].isin(rivals)) &
         (df['Ejecutor'].isin(jugadores)) &
         (df['Acción'].isin(acciones)) &
-        (df['Minuto'].between(*rango_minutos))
+        (df['Minuto'].between(*rango_minutos)) &
+        (df['Fecha'].dt.date >= start_date) &
+        (df['Fecha'].dt.date <= end_date)
     ]
+
 def mostrar_kpis(df):
-    cols = st.columns(4)  # Aumentado a 4 métricas
+    cols = st.columns(4)
     
     with cols[0]:
         st.metric("📈 Acciones registradas", df.shape[0])
@@ -179,7 +203,7 @@ def generar_mapa_calor(df, tipo='saque'):
     pitch.kdeplot(
         df_coords['x'], df_coords['y'],
         ax=ax,
-        cmap='Greens' if tipo == 'saque' else 'Reds',  # Colores específicos
+        cmap='Greens' if tipo == 'saque' else 'Reds',
         levels=100,
         fill=True,
         alpha=0.75,
