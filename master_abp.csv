@@ -1,10 +1,10 @@
 Jornada,Fecha,Rival,Condición,Periodo,Minuto,Acción,Equipo,Ejecutor,Zona Saque,Zona Remate,Primer Contacto,Parte Cuerpo,Segundo Contacto,Gol,Resultado,Perfil,Estrategia,Tipo Ejecución,x_saque,y_saque,x_remate,y_remate
 Rueda 1,4/30/2023 20:36,Forge FC,Local,1T,12,Córner,Cavalry FC,Fraser Aird,2,7,Shamit Shome,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,80,114,40
-Rueda 3,7/9/2023 8:14,Pacific FC,Visitante,2T,63,Tiro libre,Rival,Rival,10,13,Oponente,Pie derecho,,SI,Disparo desviado,No hábil,No,Disparo directo,105,35,105,55
+Rueda 3,7/9/2023 8:14,Pacific FC,Visitante,2T,63,Tiro libre,Rival,Rival,10,13,Oponente,Pie derecho,,Si,Disparo desviado,No hábil,No,Disparo directo,105,35,105,55
 Rueda 2,5/5/2023 2:47,Valour FC,Local,1T,28,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,Sí,Gol,Hábil,Sí,Disparo directo,108,40,108,40
 Rueda 4,6/26/2023 1:35,York United FC,Visitante,2T,78,Lateral,Cavalry FC,Charlie Trafford,16,12,Jay Herdman,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,20,105,25
 Rueda 1,5/8/2023 22:26,HFX Wanderers FC,Local,1T,45+,Córner,Cavalry FC,Ali Musse,1,5,Myer Bevan,Pie derecho,,No,Posesión rival,Hábil,Sí,Centro,120,0,114,30
-Rueda 3,5/28/2023 1:44,Vancouver FC,Visitante,2T,67,Tiro libre,Rival,Rival,14,9,Oponente,Pie izquierdo,Oponente,No,Despeje,No hábil,No,Centro,93,29,111,65
+Rueda 3,5/28/2023 1:44,Vancouver FC,Visitante,2T,67,Tiro libre,Rival,Rival,14,9,Oponente,Pie izquierdo,Oponente,Si,Despeje,No hábil,No,Centro,93,29,111,65
 Rueda 2,9/2/2023 1:17,Atlético Ottawa,Local,1T,22,Lateral,Cavalry FC,Tom Field,17,11,Joseph Holliday,Cabeza,,No,Disparo al arco,Hábil,Sí,Pase corto,72,60,105,45
 Rueda 4,5/2/2023 19:40,Pacific FC,Visitante,2T,83,Penal,Cavalry FC,Marco Carducci,Penal,Penal,,,,No,Disparo al arco,Hábil,Sí,Disparo directo,108,40,108,40
 Rueda 3,9/28/2023 10:28,Valour FC,Local,1T,38,Córner,Cavalry FC,Sergio Camargo,1,8,Caniggia Elva,Pie izquierdo,,No,Posesión rival,Hábil,No,Centro,120,0,111,15
