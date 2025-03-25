@@ -109,6 +109,7 @@ def configurar_filtros(df):
             "Minutos:",
             min_min, max_min,
             (min_min, max_min)
+        )
         
     # Aplicar filtros
     return df[
