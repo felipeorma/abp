@@ -21,7 +21,7 @@ def setup_logo():
         st.sidebar.image(logo, width=200)
     except Exception as e:
         st.error(f"Error cargando logo: {str(e)}")
-        st.sidebar.markdown("[Logo Cavalry FC](https://upload.wikimedia.org/wikipedia/en/4/4c/Cavalry_FC_logo.svg)")
+        st.sidebar.markdown("[Logo Cavalry FC](https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/Cavalry_FC_logo.svg)")
 
 def analitica_page():
     setup_logo()
