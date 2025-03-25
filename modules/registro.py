@@ -131,8 +131,7 @@ def mostrar_formulario(jugadores, equipos, zonas):
 
 def procesar_registro(datos):
     st.session_state.registro.append(datos)
-    st.success("Acción registrada exitosamente!")
-    st.balloons()
+    st.success("Acción registrada exitosamente! ⚽")  
 
 def mostrar_datos_y_visualizaciones(zonas):
     if st.session_state.registro:
