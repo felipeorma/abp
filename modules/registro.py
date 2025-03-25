@@ -75,12 +75,18 @@ def mostrar_formulario(jugadores, equipos, zonas):
         datos["Periodo"] = periodo
 
     # Tipo de acción
+    # Tipo de acción
     with st.container(border=True):
-        st.markdown("### ⚽ Acción")
-        col1, col2 = st.columns(2)
-        datos["Acción"] = col1.selectbox("Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
-        datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
+    st.markdown("### ⚽ Acción")
+       col1, col2, col3 = st.columns(3)  # nueva columna para ejecutor
+       datos["Acción"] = col1.selectbox("Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
+       datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
 
+       if datos["Equipo"] == "Cavalry FC":
+           datos["Ejecutor"] = col3.selectbox("Ejecutor", jugadores)
+       else:
+           datos["Ejecutor"] = "Rival"
+           col3.text_input("Ejecutor", value="Rival", disabled=True)
     # Detalles de ejecución
     with st.container(border=True):
         st.markdown("### 🎯 Detalles de Ejecución")
