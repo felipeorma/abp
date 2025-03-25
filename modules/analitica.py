@@ -11,17 +11,25 @@ from io import BytesIO
 
 # Configuración inicial del logo
 def setup_logo():
-    # Usar versión PNG del logo directamente
     logo_url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/Cavalry_FC_logo.svg"
     
     try:
-        response = requests.get(logo_url, headers={'User-Agent': 'Mozilla/5.0'})
-        response.raise_for_status()
-        logo = Image.open(BytesIO(response.content))
-        st.sidebar.image(logo, width=200)
+        # Opción 1: Usar directamente con st.image (recomendado para SVG)
+        st.sidebar.markdown(
+            f'<div style="text-align: center;"><img src="{logo_url}" width="200"></div>',
+            unsafe_allow_html=True
+        )
+        
+        # Opción 2: Convertir SVG a PNG (requiere cairosvg)
+        # import cairosvg
+        # response = requests.get(logo_url)
+        # png_data = cairosvg.svg2png(bytestring=response.content)
+        # logo = Image.open(BytesIO(png_data))
+        # st.sidebar.image(logo, width=200)
+        
     except Exception as e:
-        st.error(f"Error cargando logo: {str(e)}")
-        st.sidebar.markdown("[Logo Cavalry FC](https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/Cavalry_FC_logo.svg)")
+        st.sidebar.markdown("**Cavalry FC**")
+        st.warning(f"No se pudo cargar el logo: {str(e)}")
 
 def analitica_page():
     setup_logo()
