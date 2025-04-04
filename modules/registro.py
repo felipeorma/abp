@@ -5,30 +5,27 @@ from mplsoccer import VerticalPitch
 import datetime
 from utils.i18n import get_text
 
-
 def registro_page(lang):
-    # Datos ordenados
-    jugadores, equipos, zonas_coords = cargar_datos()
+    jugadores, equipos, zonas_coords = cargar_datos(lang)
 
-    # Formulario
     with st.form("form_registro", clear_on_submit=True):
         datos = mostrar_formulario(jugadores, equipos, zonas_coords, lang)
 
-    if datos:  # Solo si se envió el formulario
+    if datos:
         procesar_registro(datos, lang)
 
     mostrar_datos_y_visualizaciones(zonas_coords, lang)
 
-def cargar_datos():
+def cargar_datos(lang):
     jugadores = sorted([
         "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
-        "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", 
+        "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird",
         "Mihail Gherasimencov", "Charlie Trafford", "Jesse Daley", "Sergio Camargo",
         "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome",
         "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
         "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
         "Myer Bevan"
-    ], key=lambda x: x.split()[-1]) + ["Marco Carducci", "Rival"]
+    ], key=lambda x: x.split()[-1]) + ["Marco Carducci", get_text(lang, "opponent")]
 
     equipos = sorted([
         "Atlético Ottawa", "Forge FC", "HFX Wanderers FC",
