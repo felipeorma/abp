@@ -6,6 +6,10 @@ from mplsoccer import VerticalPitch
 import datetime
 from utils.i18n import get_text
 
+# Helper para opciones traducidas
+def get_localized_options(lang: str, options: list, translation_prefix: str):
+    return {opt: get_text(lang, f"{translation_prefix}_{opt}") for opt in options}
+
 def registro_page(lang: str):
     jugadores, equipos, zonas_coords = cargar_datos()
     
@@ -51,15 +55,31 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
     with st.container(border=True):
         st.markdown(f"### {get_text(lang, 'match_context')}")
         col1, col2, col3 = st.columns(3)
+        
+        # Jornada
+        jornadas = ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"]
+        jornadas_tr = get_localized_options(lang, jornadas, "round")
         datos["Jornada"] = col1.selectbox(
-            get_text(lang, "round"), 
-            ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"]
+            get_text(lang, "round"),
+            options=jornadas,
+            format_func=lambda x: jornadas_tr[x]
         )
-        datos["Rival"] = col2.selectbox(get_text(lang, "opponent"), equipos)
+        
+        # Rival
+        datos["Rival"] = col2.selectbox(
+            get_text(lang, "opponent"), 
+            equipos
+        )
+        
+        # Condición
+        condiciones = ["Local", "Visitante"]
+        condiciones_tr = get_localized_options(lang, condiciones, "condition")
         datos["Condición"] = col3.selectbox(
-            get_text(lang, "condition"), 
-            ["Local", "Visitante"]
+            get_text(lang, "condition"),
+            options=condiciones,
+            format_func=lambda x: condiciones_tr[x]
         )
+        
         datos["Fecha"] = st.date_input(
             get_text(lang, "date"), 
             value=datetime.date.today()
@@ -69,14 +89,25 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
     with st.container(border=True):
         st.markdown(f"### {get_text(lang, 'game_time')}")
         col1, col2 = st.columns(2)
-        periodo = col1.selectbox(get_text(lang, "period"), ["1T", "2T"])
+        
+        # Periodo
+        periodos = ["1T", "2T"]
+        periodos_tr = get_localized_options(lang, periodos, "period")
+        periodo = col1.selectbox(
+            get_text(lang, "period"),
+            options=periodos,
+            format_func=lambda x: periodos_tr[x]
+        )
 
+        # Minutos
         minutos = (
             [str(x) for x in range(0, 46)] + ["45+"] if periodo == "1T"
             else [str(x) for x in range(45, 91)] + ["90+"]
         )
-
-        minuto_str = col2.selectbox(get_text(lang, "minute"), minutos)
+        minuto_str = col2.selectbox(
+            get_text(lang, "minute"),
+            minutos
+        )
         datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
         datos["Periodo"] = periodo
 
@@ -84,16 +115,24 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
     with st.container(border=True):
         st.markdown(f"### {get_text(lang, 'action_header')}")
         col1, col2, col3 = st.columns(3)
+        
+        # Acción
+        acciones = ["Tiro libre", "Córner", "Lateral", "Penal"]
+        acciones_tr = get_localized_options(lang, acciones, "action")
         datos["Acción"] = col1.selectbox(
-            get_text(lang, "action_type"), 
-            ["Tiro libre", "Córner", "Lateral", "Penal"], 
+            get_text(lang, "action_type"),
+            options=acciones,
+            format_func=lambda x: acciones_tr[x],
             key="accion_key"
         )
+        
+        # Equipo
         datos["Equipo"] = col2.selectbox(
-            get_text(lang, "executing_team"), 
+            get_text(lang, "executing_team"),
             ["Cavalry FC", "Rival"]
         )
 
+        # Ejecutor
         if datos["Equipo"] == "Cavalry FC":
             datos["Ejecutor"] = col3.selectbox(
                 get_text(lang, "executor"), 
@@ -122,29 +161,46 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
             st.info(get_text(lang, "auto_penal_config"))
         else:
             col1, col2 = st.columns(2)
-            zona_opciones_saque = [1, 2] if datos["Acción"] == "Córner" else [z for z in zonas if z != "Penal"]
+            
+            # Zonas de saque
+            zona_opciones = [z for z in zonas if z != "Penal"]
+            zonas_tr = {z: get_text(lang, f"zone_{z}") for z in zona_opciones}
             
             datos["Zona Saque"] = col1.selectbox(
-                get_text(lang, "kickoff_zone"), 
-                zona_opciones_saque
+                get_text(lang, "kickoff_zone"),
+                options=zona_opciones,
+                format_func=lambda x: zonas_tr[x]
             )
+            
             datos["Zona Remate"] = col2.selectbox(
-                get_text(lang, "shot_zone"), 
-                [z for z in zonas if z != "Penal"]
+                get_text(lang, "shot_zone"),
+                options=zona_opciones,
+                format_func=lambda x: zonas_tr[x]
             )
 
-            opciones_contacto = jugadores + ["Oponente"]
+            # Contactos
+            opciones_contacto = jugadores + [get_text(lang, "opponent")]
             datos["Primer Contacto"] = st.selectbox(
                 get_text(lang, "first_contact"), 
                 opciones_contacto
             )
+            
+            # Parte del cuerpo
+            partes_cuerpo = ["Cabeza", "Otro", "Pie"]
+            partes_tr = get_localized_options(lang, partes_cuerpo, "body_part")
             datos["Parte Cuerpo"] = st.selectbox(
-                get_text(lang, "body_part"), 
-                ["Cabeza", "Otro", "Pie"]
+                get_text(lang, "body_part"),
+                options=partes_cuerpo,
+                format_func=lambda x: partes_tr[x]
             )
+            
+            # Segundo contacto
+            segundo_opciones = ["Ninguno"] + opciones_contacto
+            segundo_tr = get_localized_options(lang, segundo_opciones, "second_contact")
             segundo_contacto = st.selectbox(
-                get_text(lang, "second_contact"), 
-                ["Ninguno"] + opciones_contacto
+                get_text(lang, "second_contact"),
+                options=segundo_opciones,
+                format_func=lambda x: segundo_tr[x]
             )
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
@@ -152,37 +208,59 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
     with st.container(border=True):
         st.markdown(f"### {get_text(lang, 'results_header')}")
         col1, col2 = st.columns(2)
-
+        
+        # Gol
+        gol_opciones = ["No", "Sí"]
+        gol_tr = get_localized_options(lang, gol_opciones, "is_goal")
         datos["Gol"] = col1.selectbox(
-            get_text(lang, "is_goal"), 
-            ["No", "Sí"], 
+            get_text(lang, "is_goal"),
+            options=gol_opciones,
+            format_func=lambda x: gol_tr[x],
             key="gol_key"
         )
 
+        # Resultado final
+        resultados = ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+        resultados_tr = get_localized_options(lang, resultados, "result")
         if st.session_state.get("gol_key") == "Sí":
             datos["Resultado"] = "Gol"
             col1.text_input(
                 get_text(lang, "final_result"), 
-                value="Gol", 
+                value=resultados_tr["Gol"], 
                 disabled=True
             )
         else:
             datos["Resultado"] = col1.selectbox(
                 get_text(lang, "final_result"),
-                ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+                options=resultados,
+                format_func=lambda x: resultados_tr[x]
             )
 
+        # Perfil
+        perfiles = ["Hábil", "No hábil"]
+        perfiles_tr = get_localized_options(lang, perfiles, "profile")
         datos["Perfil"] = col2.selectbox(
-            get_text(lang, "executor_profile"), 
-            ["Hábil", "No hábil"]
+            get_text(lang, "executor_profile"),
+            options=perfiles,
+            format_func=lambda x: perfiles_tr[x]
         )
+        
+        # Estrategia
+        estrategias = ["Sí", "No"]
+        estrategias_tr = get_localized_options(lang, estrategias, "strategy")
         datos["Estrategia"] = col2.selectbox(
-            get_text(lang, "strategy"), 
-            ["Sí", "No"]
+            get_text(lang, "strategy"),
+            options=estrategias,
+            format_func=lambda x: estrategias_tr[x]
         )
+        
+        # Tipo ejecución
+        ejecuciones = ["Centro", "Pase corto", "Disparo directo"]
+        ejecuciones_tr = get_localized_options(lang, ejecuciones, "exec_type")
         datos["Tipo Ejecución"] = col2.selectbox(
-            get_text(lang, "execution_type"), 
-            ["Centro", "Pase corto", "Disparo directo"]
+            get_text(lang, "execution_type"),
+            options=ejecuciones,
+            format_func=lambda x: ejecuciones_tr[x]
         )
 
     return datos if st.form_submit_button(get_text(lang, "register_action")) else None
