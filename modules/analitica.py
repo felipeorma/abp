@@ -10,21 +10,82 @@ def analitica_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
     
     try:
+        # Carga de datos con diagnóstico
         df = cargar_datos(lang)
+        
+        # Mostrar diagnóstico inicial
+        with st.expander("🔍 Diagnóstico inicial de datos (DEBUG)"):
+            st.write("Columnas disponibles:", df.columns.tolist())
+            st.write("Primeras 3 filas:", df.head(3))
+            st.write("Valores únicos en 'Gol':", df['Gol'].unique())
+            st.write("Valores únicos en 'Acción':", df['Acción'].unique())
+        
         if df.empty:
             st.warning(get_text(lang, "empty_db_warning"))
             return
+            
     except Exception as e:
-        st.error(get_text(lang, "critical_error").format(error=str(e)))
+        st.error(f"🚨 {get_text(lang, 'critical_error')}: {str(e)}")
         return
 
-    df_filtrado = configurar_filtros(lang, df)
-    mostrar_kpis(lang, df_filtrado)
-    generar_seccion_espacial(lang, df_filtrado)
-    generar_seccion_temporal(lang, df_filtrado)
-    generar_seccion_efectividad(lang, df_filtrado)
-    configurar_descarga(lang, df_filtrado)
-    mostrar_ranking_parte_cuerpo(lang, df_filtrado)
+    try:
+        df_filtrado = configurar_filtros(lang, df)
+        
+        # Diagnóstico post-filtrado
+        with st.expander("🔍 Diagnóstico post-filtrado (DEBUG)"):
+            st.write("Filas restantes:", df_filtrado.shape[0])
+            st.write("Columnas no vacías:", df_filtrado.count())
+        
+        if df_filtrado.empty:
+            st.warning(get_text(lang, "no_data_after_filter"))
+            return
+            
+        mostrar_kpis(lang, df_filtrado)
+        generar_seccion_espacial(lang, df_filtrado)
+        generar_seccion_temporal(lang, df_filtrado)
+        generar_seccion_efectividad(lang, df_filtrado)
+        configurar_descarga(lang, df_filtrado)
+        mostrar_ranking_parte_cuerpo(lang, df_filtrado)
+        
+    except Exception as e:
+        st.error(f"🚨 {get_text(lang, 'visualization_error')}: {str(e)}")
+
+def cargar_datos(lang: str):
+    try:
+        # URL modificada
+        url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
+        df = pd.read_csv(url, encoding='utf-8', delimiter=',', parse_dates=['Fecha'])
+        
+        # Mapeo seguro de valores
+        gol_map = {'Sí': get_text(lang, 'yes'), 'Si': get_text(lang, 'yes'), 'Yes': get_text(lang, 'yes'),
+                   'No': get_text(lang, 'no'), 'No ': get_text(lang, 'no')}  # Variantes comunes
+        df['Gol'] = df['Gol'].str.strip().map(gol_map).fillna(get_text(lang, 'no'))
+        
+        # Normalización de nombres de acciones
+        action_mapping = {
+            'Córner': 'corner',
+            'Tiro libre': 'free_kick',
+            'Saque lateral': 'throw_in',
+            'Penal': 'penalty',
+            'Centro': 'cross',
+            'Remate': 'shot'
+        }
+        df['Acción'] = df['Acción'].str.strip().map(action_mapping).apply(lambda x: get_text(lang, x))
+        
+        # Validación de estructura
+        required_columns = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
+        if not all(col in df.columns for col in required_columns):
+            st.error(f"❌ {get_text(lang, 'missing_columns')}: {', '.join([c for c in required_columns if c not in df.columns])}")
+            return pd.DataFrame()
+            
+        # Limpieza numérica robusta
+        df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce').fillna(0).astype(int)
+        
+        return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'], how='any')
+        
+    except Exception as e:
+        st.error(f"🚨 {get_text(lang, 'data_load_error')}: {str(e)}")
+        return pd.DataFrame()
 
 def cargar_datos(lang: str):
     url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
