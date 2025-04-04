@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
@@ -31,7 +30,7 @@ def main():
             index=0
         ) == "Español" else "en"
         
-        # Navegación traducida (CORRECCIÓN AQUÍ)
+        # Navegación
         opciones_navegacion = [
             get_text(lang, "live_registration"),
             get_text(lang, "analytics_panel")
