@@ -14,14 +14,13 @@ st.set_page_config(
 LOGO_PATH = "Cavalry_FC_logo.svg"
 
 def main():
-    lang = "es"  # Valor por defecto
+    lang = "es"
     
     with st.sidebar:
         try:
             st.image(LOGO_PATH, width=200)
         except Exception as e:
             st.error(get_text(lang, "logo_error").format(error=str(e)))
-            st.markdown(f"### ⚽ {get_text(lang, 'app_title')}")
         
         # Selector de idioma
         lang = "es" if st.radio(
@@ -45,7 +44,7 @@ def main():
     # Gestión del estado de sesión
     st.session_state.setdefault("registro", [])
 
-    # Navegación basada en índice
+    # Navegación
     if opciones_navegacion.index(pagina) == 0:
         registro_page(lang)
     else:
