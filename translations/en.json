@@ -1,5 +1,7 @@
 
-{
+{   "select_module": "Select module:",
+    "live_registration": "🏟️ Live Registration",
+    "analytics_panel": "📊 Analytics Panel",
     "registro_subheader": "📋 Register New Action",
     "match_context": "🗓️ Match Context",
     "round": "Round",
