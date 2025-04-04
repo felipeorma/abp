@@ -27,7 +27,7 @@ def analitica_page(lang: str):
     mostrar_ranking_parte_cuerpo(lang, df_filtrado)
 
 def cargar_datos(lang: str):
-    url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
+    url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
     df = pd.read_csv(url)
     
     # Traducción de valores del dataset
