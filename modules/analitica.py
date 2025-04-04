@@ -1,153 +1,39 @@
-import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
-import plotly.express as px
+import pandas as pd
+import datetime
 from mplsoccer import VerticalPitch
 from utils.i18n import get_text
 
-def analitica_page(lang: str):
-    st.title(get_text(lang, "analytics_title"))
-    
-    try:
-        df = cargar_datos(lang)
-        if df.empty:
-            st.warning(get_text(lang, "empty_db_warning"))
-            return
-    except Exception as e:
-        st.error(get_text(lang, "critical_error").format(error=str(e)))
-        return
+def get_localized_options(lang: str, options: list, translation_prefix: str):
+    return {opt: get_text(lang, f"{translation_prefix}_{opt}") for opt in options}
 
-    df_filtrado = configurar_filtros(lang, df)
-    mostrar_kpis(lang, df_filtrado)
-    generar_seccion_espacial(lang, df_filtrado)
-    generar_seccion_temporal(lang, df_filtrado)
-    generar_seccion_efectividad(lang, df_filtrado)
-    configurar_descarga(lang, df_filtrado)
-    mostrar_ranking_parte_cuerpo(lang, df_filtrado)
+def registro_page(lang: str):
+    jugadores, equipos, zonas_coords = cargar_datos()
+    
+    with st.form("form_registro", clear_on_submit=True):
+        datos = mostrar_formulario(lang, jugadores, equipos, zonas_coords)
+    
+    if datos:
+        procesar_registro(lang, datos)
+    
+    mostrar_datos_y_visualizaciones(lang, zonas_coords)
 
-def cargar_datos(lang: str):
-    url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
-    df = pd.read_csv(url)
-    
-    # Traducción de valores
-    df['Gol'] = df['Gol'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
-    df['Acción'] = df['Acción'].apply(lambda x: get_text(lang, x.lower().replace(' ', '_')))
-    
-    # Procesamiento de fechas
-    df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
-    df = df.dropna(subset=['Fecha'])
-    
-    # Validación de estructura
-    columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
-    if not all(col in df.columns for col in columnas_requeridas):
-        return pd.DataFrame()
-    
-    # Limpieza numérica
-    df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce')
-    return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
+def cargar_datos():
+    jugadores = sorted([
+        "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
+        "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", 
+        "Mihail Gherasimencov", "Charlie Trafford", "Jesse Daley", "Sergio Camargo",
+        "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome",
+        "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
+        "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
+        "Myer Bevan"
+    ], key=lambda x: x.split()[-1]) + ["Marco Carducci", "Rival"]
 
-def configurar_filtros(lang: str, df):
-    with st.sidebar:
-        st.header(get_text(lang, "advanced_filters"))
-        
-        ABREVIACIONES = {
-            "York United FC": get_text(lang, "YOR"),
-            "Vancouver FC": get_text(lang, "VAN"),
-            "Pacific FC": get_text(lang, "PAC"),
-            "Atlético Ottawa": get_text(lang, "OTT"),
-            "Forge FC": get_text(lang, "FOR"),
-            "HFX Wanderers FC": get_text(lang, "HFX"),
-            "Valour FC": get_text(lang, "VAL")
-        }
-        
-        # Procesar partidos
-        df = df.sort_values('Fecha', ascending=False)
-        df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
-        df['Rival_abr'] = df['Rival'].map(ABREVIACIONES).fillna(df['Rival'])
-        df['Partido'] = df.apply(lambda x: f"{x['Fecha_str']} vs {x['Rival_abr']}", axis=1)
-        
-        partidos_seleccionados = st.multiselect(
-            get_text(lang, "select_matches"),
-            options=df['Partido'].unique(),
-            default=df['Partido'].unique()
-        )
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            jornadas = st.multiselect(
-                get_text(lang, "round"),
-                options=df['Jornada'].unique(),
-                default=df['Jornada'].unique()
-            )
-        with col2:
-            condiciones = st.multiselect(
-                get_text(lang, "condition"),
-                options=df['Condición'].unique(),
-                default=df['Condición'].unique()
-            )
+    equipos = sorted([
+        "Atlético Ottawa", "Forge FC", "HFX Wanderers FC",
+        "Pacific FC", "Valour FC", "Vancouver FC", "York United FC"
+    ])
 
-        col3, col4 = st.columns(2)
-        with col3:
-            acciones = st.multiselect(
-                get_text(lang, "actions"),
-                options=df['Acción'].unique(),
-                default=df['Acción'].unique()
-            )
-        with col4:
-            jugadores = st.multiselect(
-                get_text(lang, "players"),
-                options=df['Ejecutor'].unique(),
-                default=df['Ejecutor'].unique()
-            )
-
-        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
-        rango_minutos = st.slider(
-            get_text(lang, "minutes"),
-            min_min, max_min,
-            (min_min, max_min)
-        )
-        
-    return df[
-        (df['Partido'].isin(partidos_seleccionados)) &
-        (df['Jornada'].isin(jornadas)) &
-        (df['Condición'].isin(condiciones)) &
-        (df['Acción'].isin(acciones)) &
-        (df['Ejecutor'].isin(jugadores)) &
-        (df['Minuto'].between(*rango_minutos))
-    ]
-
-def mostrar_kpis(lang: str, df):
-    cols = st.columns(5)
-    
-    with cols[0]:
-        st.metric(get_text(lang, "registered_actions"), df.shape[0])
-    
-    goles_favor = df[(df['Gol'] == get_text(lang, 'yes')) & (df['Equipo'] == 'Cavalry FC')].shape[0]
-    with cols[1]:
-        st.metric(get_text(lang, "goals_for"), goles_favor)
-    
-    goles_contra = df[(df['Gol'] == get_text(lang, 'yes')) & (df['Equipo'] != 'Cavalry FC')].shape[0]
-    with cols[2]:
-        st.metric(get_text(lang, "goals_against"), goles_contra)
-    
-    eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
-    with cols[3]:
-        st.metric(get_text(lang, "offensive_effectiveness"), f"{eficacia:.1f}%")
-    
-    eficacia_def = 100 - (goles_contra / df.shape[0] * 100) if df.shape[0] > 0 else 0
-    with cols[4]:
-        st.metric(get_text(lang, "defensive_effectiveness"), f"{eficacia_def:.1f}%")
-
-def generar_seccion_espacial(lang: str, df):
-    st.header(get_text(lang, "tactical_mapping"))
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        generar_mapa_calor(lang, df, tipo='saque')
-    with col2:
-        generar_mapa_calor(lang, df, tipo='remate')
-
-def generar_mapa_calor(lang: str, df, tipo='saque'):
     zonas_coords = {
         1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
         5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
@@ -156,173 +42,302 @@ def generar_mapa_calor(lang: str, df, tipo='saque'):
         17: (72, 60), "Penal": (108, 40)
     }
     
-    coord_col = 'Zona Saque' if tipo == 'saque' else 'Zona Remate'
-    
-    df_temp = df.copy()
-    df_temp[coord_col] = df_temp[coord_col].apply(
-        lambda x: int(x) if str(x).isdigit() else x
-    )
-    df_coords = df_temp[coord_col].map(zonas_coords).dropna().apply(pd.Series)
-    
-    if df_coords.empty:
-        st.warning(get_text(lang, "no_data_warning").format(tipo=get_text(lang, tipo)))
-        return
-    
-    df_coords.columns = ['x', 'y']
-    
-    pitch = VerticalPitch(
-        pitch_type='statsbomb',
-        pitch_color='grass',
-        line_color='white',
-        linewidth=1.2,
-        half=True,
-        goal_type='box'
-    )
-    
-    fig, ax = plt.subplots(figsize=(12, 8))
-    pitch.draw(ax=ax)
-    
-    pitch.kdeplot(
-        df_coords['x'], df_coords['y'],
-        ax=ax,
-        cmap='Greens' if tipo == 'saque' else 'Reds',
-        levels=100,
-        fill=True,
-        alpha=0.75,
-        bw_adjust=0.65,
-        zorder=2
-    )
-    
-    ax.set_title(get_text(lang, "density_title").format(tipo=get_text(lang, tipo)), 
-                fontsize=16, 
-                pad=20,
-                fontweight='bold')
-    
-    st.pyplot(fig)
-    plt.close()
+    return jugadores, equipos, zonas_coords
 
-def generar_seccion_temporal(lang: str, df):
-    st.header(get_text(lang, "temporal_evolution"))
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        fig = px.histogram(
-            df, x='Jornada', color='Periodo',
-            title=get_text(lang, "actions_by_round"),
-            labels={'count': get_text(lang, "actions")}
-        )
-        st.plotly_chart(fig, use_container_width=True)
+def mostrar_formulario(lang: str, jugadores, equipos, zonas):
+    datos = {}
+    st.subheader(get_text(lang, "registro_subheader"))
+
+    # Contexto del partido
+    with st.container(border=True):
+        st.markdown(f"### {get_text(lang, 'match_context')}")
+        col1, col2, col3 = st.columns(3)
         
-    with col2:
-        fig = px.box(
-            df, x='Acción', y='Minuto',
-            color='Equipo', 
-            title=get_text(lang, "time_distribution"),
-            points="all"
+        # Jornada
+        jornadas = ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"]
+        datos["Jornada"] = col1.selectbox(
+            get_text(lang, "round"),
+            options=jornadas,
+            format_func=lambda x: get_text(lang, f"round_{x.replace(' ', '_')}")
         )
-        st.plotly_chart(fig, use_container_width=True)
-
-def generar_seccion_efectividad(lang: str, df):
-    st.header(get_text(lang, "effectiveness_section"))
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        df_efectividad = df.groupby('Ejecutor').agg(
-            Acciones=('Ejecutor', 'count'),
-            Goles=('Gol', lambda x: (x == get_text(lang, 'yes')).sum())
-        ).reset_index()
-
-        fig = px.scatter(
-            df_efectividad, 
-            x='Acciones', y='Goles',
-            size='Goles', color='Ejecutor',
-            title=get_text(lang, "actions_goals_relation")
-        )
-
-        fig.update_traces(marker=dict(line=dict(width=1, color='black')))
-        fig.update_layout(
-            plot_bgcolor='#F9F9F9',
-            paper_bgcolor='#F9F9F9'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
-        df_sun = df_sun[df_sun['Resultado'].notna()]
-
-        total = df_sun['Cantidad'].sum()
-        df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
-
-        df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
-        df_accion['Resultado'] = get_text(lang, "total")
-        df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
-
-        df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
-        df_sunburst['Porcentaje'] = df_sunburst['Porcentaje'].fillna(0)
-
-        fig = px.sunburst(
-            df_sunburst,
-            path=['Acción', 'Resultado'],
-            values='Cantidad',
-            title=get_text(lang, "results_composition"),
-            branchvalues='total',
-            custom_data=['Cantidad', 'Porcentaje']
-        )
-
-        fig.update_traces(
-            hovertemplate=f'<b>%{{label}}</b><br>{get_text(lang, "quantity")}: %{{customdata[0]}}<br>{get_text(lang, "percentage")}: %{{customdata[1]:.1f}}%<extra></extra>'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-def mostrar_ranking_parte_cuerpo(lang: str, df):
-    st.header(get_text(lang, "body_part_ranking"))
-    ACCIONES_OFENSIVAS = [get_text(lang, acc) for acc in 
-                        ["corner", "free_kick", "throw_in", "penalty", "cross", "shot"]]
-    
-    df['Tipo Acción'] = df['Acción'].apply(
-        lambda x: get_text(lang, "offensive") if x in ACCIONES_OFENSIVAS else get_text(lang, "defensive"))
-    
-    color_map = {
-        get_text(lang, "head"): '#00C2A0',
-        get_text(lang, "leg"): '#FF5A5F',
-        get_text(lang, "other"): '#4B4B4B'
-    }
-
-    for tipo in [get_text(lang, "offensive"), get_text(lang, "defensive")]:
-        df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte Cuerpo'].notna())]
-        df_ranking = df_tipo.groupby(['Ejecutor', 'Parte Cuerpo']).size().reset_index(name='Cantidad')
         
-        total_jugadores = df_ranking.groupby('Ejecutor')['Cantidad'].sum().sort_values(ascending=False)
-        df_ranking['Ejecutor'] = pd.Categorical(
-            df_ranking['Ejecutor'], 
-            categories=total_jugadores.index, 
-            ordered=True
+        # Rival
+        datos["Rival"] = col2.selectbox(
+            get_text(lang, "opponent"), 
+            equipos
+        )
+        
+        # Condición
+        condiciones = ["Local", "Visitante"]
+        datos["Condición"] = col3.selectbox(
+            get_text(lang, "condition"),
+            options=condiciones,
+            format_func=lambda x: get_text(lang, f"condition_{x}")
+        )
+        
+        datos["Fecha"] = st.date_input(
+            get_text(lang, "date"), 
+            value=datetime.date.today()
         )
 
-        st.subheader(f"{'⚔️' if tipo == get_text(lang, "offensive") else '🛡️'} {tipo} {get_text(lang, "actions")}")
-
-        fig = px.bar(
-            df_ranking,
-            x='Cantidad',
-            y='Ejecutor',
-            color='Parte Cuerpo',
-            orientation='h',
-            text='Cantidad',
-            title=get_text(lang, "players_actions_by_body").format(tipo=tipo),
-            labels={'Cantidad': get_text(lang, "actions"), 'Ejecutor': get_text(lang, "player")},
-            color_discrete_map=color_map,
-            category_orders={'Ejecutor': total_jugadores.index.tolist()}
+    # Tiempo de juego
+    with st.container(border=True):
+        st.markdown(f"### {get_text(lang, 'game_time')}")
+        col1, col2 = st.columns(2)
+        
+        # Periodo
+        periodos = ["1T", "2T"]
+        datos["Periodo"] = col1.selectbox(
+            get_text(lang, "period"),
+            options=periodos,
+            format_func=lambda x: get_text(lang, f"period_{x.replace('T', '')}")
         )
-        fig.update_layout(barmode='stack')
-        st.plotly_chart(fig, use_container_width=True)
 
-def configurar_descarga(lang: str, df):
-    st.divider()
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        get_text(lang, "export_data"),
-        data=csv,
-        file_name="analisis_tactico.csv",
-        mime="text/csv",
-        help=get_text(lang, "export_data_help")
-    )
+        # Minutos
+        minutos = (
+            [str(x) for x in range(0, 46)] + ["45+"] if datos["Periodo"] == "1T"
+            else [str(x) for x in range(45, 91)] + ["90+"]
+        )
+        minuto_str = col2.selectbox(
+            get_text(lang, "minute"),
+            minutos
+        )
+        datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
+
+    # Tipo de acción
+    with st.container(border=True):
+        st.markdown(f"### {get_text(lang, 'action_header')}")
+        col1, col2, col3 = st.columns(3)
+        
+        # Acción
+        acciones = ["Tiro libre", "Córner", "Lateral", "Penal"]
+        datos["Acción"] = col1.selectbox(
+            get_text(lang, "action_type"),
+            options=acciones,
+            format_func=lambda x: get_text(lang, x.lower().replace(' ', '_'))
+        )
+        
+        # Equipo
+        datos["Equipo"] = col2.selectbox(
+            get_text(lang, "executing_team"),
+            ["Cavalry FC", "Rival"]
+        )
+
+        # Ejecutor
+        if datos["Equipo"] == "Cavalry FC":
+            datos["Ejecutor"] = col3.selectbox(
+                get_text(lang, "executor"), 
+                jugadores
+            )
+        else:
+            datos["Ejecutor"] = "Rival"
+            col3.text_input(
+                get_text(lang, "executor"), 
+                value="Rival", 
+                disabled=True
+            )
+
+    # Detalles de ejecución
+    with st.container(border=True):
+        st.markdown(f"### {get_text(lang, 'execution_details')}")
+        st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", 
+                use_column_width=True)
+
+        if datos["Acción"] == "Penal":
+            datos["Zona Saque"] = "Penal"
+            datos["Zona Remate"] = "Penal"
+            datos["Primer Contacto"] = "N/A"
+            datos["Parte Cuerpo"] = "N/A"
+            datos["Segundo Contacto"] = ""
+            st.info(get_text(lang, "auto_penal_config"))
+        else:
+            col1, col2 = st.columns(2)
+            
+            # Zonas de saque
+            zona_opciones = [str(z) for z in zonas_coords if z != "Penal"]
+            datos["Zona Saque"] = col1.selectbox(
+                get_text(lang, "kickoff_zone"),
+                options=zona_opciones,
+                format_func=lambda x: get_text(lang, f"zone_{x}")
+            )
+            
+            datos["Zona Remate"] = col2.selectbox(
+                get_text(lang, "shot_zone"),
+                options=zona_opciones,
+                format_func=lambda x: get_text(lang, f"zone_{x}")
+            )
+
+            # Contactos
+            opciones_contacto = jugadores + [get_text(lang, "opponent")]
+            datos["Primer Contacto"] = st.selectbox(
+                get_text(lang, "first_contact"), 
+                opciones_contacto
+            )
+            
+            # Parte del cuerpo
+            partes_cuerpo = ["Cabeza", "Otro", "Pie"]
+            datos["Parte Cuerpo"] = st.selectbox(
+                get_text(lang, "body_part"),
+                options=partes_cuerpo,
+                format_func=lambda x: get_text(lang, f"body_part_{x}")
+            )
+            
+            # Segundo contacto
+            segundo_opciones = ["Ninguno"] + jugadores + [get_text(lang, "opponent")]
+            segundo_contacto = st.selectbox(
+                get_text(lang, "second_contact"),
+                options=segundo_opciones,
+                format_func=lambda x: get_text(lang, "second_contact_ninguno") if x == "Ninguno" else x
+            )
+            datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
+
+    # Resultados
+    with st.container(border=True):
+        st.markdown(f"### {get_text(lang, 'results_header')}")
+        col1, col2 = st.columns(2)
+        
+        # Gol
+        gol_opciones = ["No", "Sí"]
+        datos["Gol"] = col1.selectbox(
+            get_text(lang, "is_goal"),
+            options=gol_opciones,
+            format_func=lambda x: get_text(lang, f"is_goal_{x}")
+        )
+
+        # Resultado final
+        resultados = ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
+        if datos["Gol"] == "Sí":
+            datos["Resultado"] = "Gol"
+            col1.text_input(
+                get_text(lang, "final_result"), 
+                value=get_text(lang, "result_Gol"), 
+                disabled=True
+            )
+        else:
+            datos["Resultado"] = col1.selectbox(
+                get_text(lang, "final_result"),
+                options=resultados,
+                format_func=lambda x: get_text(lang, f"result_{x}")
+            )
+
+        # Perfil
+        perfiles = ["Hábil", "No hábil"]
+        datos["Perfil"] = col2.selectbox(
+            get_text(lang, "executor_profile"),
+            options=perfiles,
+            format_func=lambda x: get_text(lang, f"profile_{x}")
+        )
+        
+        # Estrategia
+        estrategias = ["Sí", "No"]
+        datos["Estrategia"] = col2.selectbox(
+            get_text(lang, "strategy"),
+            options=estrategias,
+            format_func=lambda x: get_text(lang, f"strategy_{x}")
+        )
+        
+        # Tipo ejecución
+        ejecuciones = ["Centro", "Pase corto", "Disparo directo"]
+        datos["Tipo Ejecución"] = col2.selectbox(
+            get_text(lang, "execution_type"),
+            options=ejecuciones,
+            format_func=lambda x: get_text(lang, f"exec_type_{x}")
+        )
+
+    return datos if st.form_submit_button(get_text(lang, "register_action")) else None
+
+def procesar_registro(lang: str, datos):
+    st.session_state.registro.append(datos)
+    st.success(get_text(lang, "registration_success"))  
+
+def mostrar_datos_y_visualizaciones(lang: str, zonas):
+    if st.session_state.registro:
+        df = pd.DataFrame(st.session_state.registro)
+        
+        col1, col2 = st.columns([3,1])
+        with col1:
+            st.subheader(get_text(lang, "registered_data"))
+            st.dataframe(df, use_container_width=True)
+        with col2:
+            index_to_delete = st.number_input(
+                get_text(lang, "delete_index"), 
+                min_value=0, 
+                max_value=len(df)-1
+            )
+            if st.button(f"🗑️ {get_text(lang, 'delete_record')}"):
+                st.session_state.registro.pop(index_to_delete)
+                st.rerun()
+
+        st.markdown(f"### {get_text(lang, 'filter_header')}")
+        equipo_filtro = st.radio(
+            get_text(lang, "team_filter"),
+            ["Cavalry FC", "Oponente"],
+            index=0
+        )
+        
+        filtered_df = df[df["Equipo"] == ("Cavalry FC" if equipo_filtro == "Cavalry FC" else "Rival")]
+        generar_heatmaps(lang, filtered_df, zonas)
+
+def generar_heatmaps(lang: str, df, zonas):
+    try:
+        if df.empty:
+            st.warning(get_text(lang, "no_data_warning"))
+            return
+
+        df = df.copy()
+        df["coords_saque"] = df["Zona Saque"].map(zonas)
+        df["coords_remate"] = df["Zona Remate"].map(zonas)
+        df = df.dropna(subset=["coords_saque", "coords_remate"])
+        
+        df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
+        df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
+        
+        pitch = VerticalPitch(
+            pitch_type='statsbomb',
+            pitch_color='grass',
+            line_color='white',
+            half=True,
+            goal_type='box',
+            linewidth=1.5
+        )
+
+        heatmap_params = {
+            'cmap': 'Greens',
+            'levels': 100,
+            'fill': True,
+            'alpha': 0.7,
+            'bw_adjust': 0.48,
+            'thresh': 0.01,
+            'zorder': 2
+        }
+
+        # Heatmap de Saques
+        fig1, ax1 = plt.subplots(figsize=(12, 8))
+        pitch.draw(ax=ax1)
+        pitch.kdeplot(df['x_saque'], df['y_saque'], ax=ax1, **heatmap_params)
+        ax1.set_title(get_text(lang, "kickoff_distribution"), fontsize=16, pad=20, fontweight='bold')
+        st.pyplot(fig1)
+
+        # Heatmap de Remates
+        fig2, ax2 = plt.subplots(figsize=(12, 8))
+        pitch.draw(ax=ax2)
+        heatmap_params['cmap'] = 'Reds'
+        pitch.kdeplot(df['x_remate'], df['y_remate'], ax=ax2, **heatmap_params)
+        ax2.set_title(get_text(lang, "shot_zones"), fontsize=16, pad=20, fontweight='bold')
+        st.pyplot(fig2)
+
+        # Descargar CSV
+        csv = df.drop(columns=["coords_saque", "coords_remate", 
+                             "x_saque", "y_saque", 
+                             "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
+        
+        st.download_button(
+            f"⬇️ {get_text(lang, 'download_csv')}",
+            csv,
+            "acciones_filtradas.csv",
+            "text/csv",
+            key='download-csv'
+        )
+
+    except Exception as e:
+        st.error(f"{get_text(lang, 'critical_error')}: {str(e)}")
