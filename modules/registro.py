@@ -3,22 +3,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
 import datetime
+from utils.i18n import get_text
 
 
-
-
-def registro_page():
+def registro_page(lang):
     # Datos ordenados
     jugadores, equipos, zonas_coords = cargar_datos()
-    
+
     # Formulario
     with st.form("form_registro", clear_on_submit=True):
-        datos = mostrar_formulario(jugadores, equipos, zonas_coords)
-    
+        datos = mostrar_formulario(jugadores, equipos, zonas_coords, lang)
+
     if datos:  # Solo si se envió el formulario
-        procesar_registro(datos)
-    
-    mostrar_datos_y_visualizaciones(zonas_coords)
+        procesar_registro(datos, lang)
+
+    mostrar_datos_y_visualizaciones(zonas_coords, lang)
 
 def cargar_datos():
     jugadores = sorted([
@@ -43,53 +42,49 @@ def cargar_datos():
         13: (105, 55), 14: (93, 29), 15: (93, 51), 16: (72, 20),
         17: (72, 60), "Penal": (108, 40)
     }
-    
+
     return jugadores, equipos, zonas_coords
 
-def mostrar_formulario(jugadores, equipos, zonas):
+def mostrar_formulario(jugadores, equipos, zonas, lang):
     datos = {}
-    st.subheader("📋 Registrar nueva acción")
+    st.subheader(get_text(lang, "register_new_action"))
 
-    # Contexto del partido
     with st.container(border=True):
-        st.markdown("### 🗓️ Contexto del Partido")
+        st.markdown(get_text(lang, "match_context"))
         col1, col2, col3 = st.columns(3)
-        datos["Jornada"] = col1.selectbox("Jornada", ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
-        datos["Rival"] = col2.selectbox("Rival", equipos)
-        datos["Condición"] = col3.selectbox("Condición", ["Local", "Visitante"])
-        datos["Fecha"] = st.date_input("Fecha", value=datetime.date.today())
+        datos["Jornada"] = col1.selectbox(get_text(lang, "matchday"), ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
+        datos["Rival"] = col2.selectbox(get_text(lang, "opponent"), equipos)
+        datos["Condición"] = col3.selectbox(get_text(lang, "home_away"), ["Local", "Visitante"])
+        datos["Fecha"] = st.date_input(get_text(lang, "date"), value=datetime.date.today())
 
-    # Tiempo de juego
     with st.container(border=True):
-        st.markdown("### ⏱️ Tiempo de Juego")
+        st.markdown(get_text(lang, "game_time"))
         col1, col2 = st.columns(2)
-        periodo = col1.selectbox("Periodo", ["1T", "2T"])
+        periodo = col1.selectbox(get_text(lang, "period"), ["1T", "2T"])
 
         if periodo == "1T":
             minutos = [str(x) for x in range(0, 46)] + ["45+"]
         else:
             minutos = [str(x) for x in range(45, 91)] + ["90+"]
 
-        minuto_str = col2.selectbox("Minuto", minutos)
+        minuto_str = col2.selectbox(get_text(lang, "minute"), minutos)
         datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
         datos["Periodo"] = periodo
 
-    # Tipo de acción
-    # Tipo de acción
     with st.container(border=True):
-       st.markdown("### ⚽ Acción")
-       col1, col2, col3 = st.columns(3)  # nueva columna para ejecutor
-       datos["Acción"] = col1.selectbox("Tipo de acción", ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
-       datos["Equipo"] = col2.selectbox("Equipo ejecutor", ["Cavalry FC", "Rival"])
+        st.markdown(get_text(lang, "action"))
+        col1, col2, col3 = st.columns(3)
+        datos["Acción"] = col1.selectbox(get_text(lang, "action_type"), ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
+        datos["Equipo"] = col2.selectbox(get_text(lang, "executing_team"), ["Cavalry FC", "Rival"])
 
-       if datos["Equipo"] == "Cavalry FC":
-           datos["Ejecutor"] = col3.selectbox("Ejecutor", jugadores)
-       else:
-           datos["Ejecutor"] = "Rival"
-           col3.text_input("Ejecutor", value="Rival", disabled=True)
-    # Detalles de ejecución
+        if datos["Equipo"] == "Cavalry FC":
+            datos["Ejecutor"] = col3.selectbox(get_text(lang, "executor"), jugadores)
+        else:
+            datos["Ejecutor"] = "Rival"
+            col3.text_input(get_text(lang, "executor"), value="Rival", disabled=True)
+
     with st.container(border=True):
-        st.markdown("### 🎯 Detalles de Ejecución")
+        st.markdown(get_text(lang, "execution_details"))
         st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", use_column_width=True)
 
         if datos["Acción"] == "Penal":
@@ -98,95 +93,82 @@ def mostrar_formulario(jugadores, equipos, zonas):
             datos["Primer Contacto"] = "N/A"
             datos["Parte Cuerpo"] = "N/A"
             datos["Segundo Contacto"] = ""
-            st.info("Configuración automática para penales")
+            st.info(get_text(lang, "penalty_auto_config"))
         else:
             col1, col2 = st.columns(2)
-
-            # Zona de saque condicionada si es córner
-            if datos["Acción"] == "Córner":
-                zona_opciones_saque = [1, 2]
-            else:
-                zona_opciones_saque = [z for z in zonas if z != "Penal"]
-
-            datos["Zona Saque"] = col1.selectbox("Zona de saque", zona_opciones_saque)
-            datos["Zona Remate"] = col2.selectbox("Zona de remate", [z for z in zonas if z != "Penal"])
+            zona_opciones_saque = [1, 2] if datos["Acción"] == "Córner" else [z for z in zonas if z != "Penal"]
+            datos["Zona Saque"] = col1.selectbox(get_text(lang, "kick_zone"), zona_opciones_saque)
+            datos["Zona Remate"] = col2.selectbox(get_text(lang, "shot_zone"), [z for z in zonas if z != "Penal"])
 
             opciones_contacto = jugadores + ["Oponente"]
-            datos["Primer Contacto"] = st.selectbox("Primer contacto", opciones_contacto)
-            datos["Parte Cuerpo"] = st.selectbox("Parte del cuerpo", ["Cabeza","Otro", "Pie"])
-            segundo_contacto = st.selectbox("Segundo contacto (opcional)", ["Ninguno"] + opciones_contacto)
+            datos["Primer Contacto"] = st.selectbox(get_text(lang, "first_contact"), opciones_contacto)
+            datos["Parte Cuerpo"] = st.selectbox(get_text(lang, "body_part"), ["Cabeza", "Otro", "Pie"])
+            segundo_contacto = st.selectbox(get_text(lang, "second_contact_optional"), ["Ninguno"] + opciones_contacto)
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
-    # Resultados
     with st.container(border=True):
-        st.markdown("### 📊 Resultados")
+        st.markdown(get_text(lang, "results"))
         col1, col2 = st.columns(2)
 
-        datos["Gol"] = col1.selectbox("¿Gol?", ["No", "Sí"], key="gol_key")
+        datos["Gol"] = col1.selectbox(get_text(lang, "goal"), ["No", "Sí"], key="gol_key")
 
-        # Forzar Resultado = Gol si Gol = Sí
         if st.session_state.get("gol_key") == "Sí":
             datos["Resultado"] = "Gol"
-            col1.text_input("Resultado final", value="Gol", disabled=True)
+            col1.text_input(get_text(lang, "final_result"), value="Gol", disabled=True)
         else:
             datos["Resultado"] = col1.selectbox(
-                "Resultado final",
+                get_text(lang, "final_result"),
                 ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
             )
 
-        datos["Perfil"] = col2.selectbox("Perfil ejecutor", ["Hábil", "No hábil"])
-        datos["Estrategia"] = col2.selectbox("Estrategia", ["Sí", "No"])
-        datos["Tipo Ejecución"] = col2.selectbox("Tipo de ejecución", ["Centro", "Pase corto", "Disparo directo"])
+        datos["Perfil"] = col2.selectbox(get_text(lang, "foot_profile"), ["Hábil", "No hábil"])
+        datos["Estrategia"] = col2.selectbox(get_text(lang, "strategy"), ["Sí", "No"])
+        datos["Tipo Ejecución"] = col2.selectbox(get_text(lang, "execution_type"), ["Centro", "Pase corto", "Disparo directo"])
 
-    return datos if st.form_submit_button("✅ Registrar Acción") else None
+    return datos if st.form_submit_button(get_text(lang, "register_button")) else None
 
-def procesar_registro(datos):
+def procesar_registro(datos, lang):
     st.session_state.registro.append(datos)
-    st.success("Acción registrada exitosamente! ⚽")  
+    st.success(get_text(lang, "registered_successfully"))
 
-def mostrar_datos_y_visualizaciones(zonas):
+def mostrar_datos_y_visualizaciones(zonas, lang):
     if st.session_state.registro:
         df = pd.DataFrame(st.session_state.registro)
-        
-        # Eliminar registros
-        col1, col2 = st.columns([3,1])
+
+        col1, col2 = st.columns([3, 1])
         with col1:
-            st.subheader("📊 Datos Registrados")
+            st.subheader(get_text(lang, "registered_data"))
             st.dataframe(df, use_container_width=True)
         with col2:
-            index_to_delete = st.number_input("Índice a eliminar", min_value=0, max_value=len(df)-1)
-            if st.button("🗑️ Eliminar Registro"):
+            index_to_delete = st.number_input(get_text(lang, "index_to_delete"), min_value=0, max_value=len(df) - 1)
+            if st.button(get_text(lang, "delete_record")):
                 st.session_state.registro.pop(index_to_delete)
                 st.experimental_rerun()
 
-        # Filtro y visualización
-        st.markdown("### 🔍 Filtro de Equipo")
+        st.markdown(get_text(lang, "team_filter"))
         equipo_filtro = st.radio(
-            "Seleccionar equipo para visualizar:",
+            get_text(lang, "select_team_to_visualize"),
             ["Cavalry FC", "Oponente"],
             index=0
         )
-        
-        filtered_df = df[df["Equipo"] == ("Cavalry FC" if equipo_filtro == "Cavalry FC" else "Rival")]
-        generar_heatmaps(filtered_df, zonas)
 
-def generar_heatmaps(df, zonas):
+        filtered_df = df[df["Equipo"] == ("Cavalry FC" if equipo_filtro == "Cavalry FC" else "Rival")]
+        generar_heatmaps(filtered_df, zonas, lang)
+
+def generar_heatmaps(df, zonas, lang):
     try:
         if df.empty:
-            st.warning("🚨 No hay datos para visualizar con los filtros actuales")
+            st.warning(get_text(lang, "no_data_warning"))
             return
 
-        # Procesar coordenadas
         df = df.copy()
         df["coords_saque"] = df["Zona Saque"].map(zonas)
         df["coords_remate"] = df["Zona Remate"].map(zonas)
         df = df.dropna(subset=["coords_saque", "coords_remate"])
-        
-        # Convertir coordenadas a columnas separadas
+
         df[["x_saque", "y_saque"]] = pd.DataFrame(df["coords_saque"].tolist(), index=df.index)
         df[["x_remate", "y_remate"]] = pd.DataFrame(df["coords_remate"].tolist(), index=df.index)
-        
-        # Configuración del campo (original)
+
         pitch = VerticalPitch(
             pitch_type='statsbomb',
             pitch_color='grass',
@@ -196,66 +178,33 @@ def generar_heatmaps(df, zonas):
             linewidth=1.5
         )
 
-        # Parámetros clave para expansión del heatmap
         heatmap_params = {
             'cmap': 'Greens',
             'levels': 100,
             'fill': True,
             'alpha': 0.7,
-            'bw_adjust': 0.48,  # Control principal de expansión
-            'thresh': 0.01,      # Mostrar áreas de baja densidad
+            'bw_adjust': 0.48,
+            'thresh': 0.01,
             'zorder': 2
         }
 
-        # ========== HEATMAP DE SAQUES ==========
         fig1, ax1 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax1)
-        
-        # Gráfico de densidad para saques
-        pitch.kdeplot(
-            df['x_saque'], 
-            df['y_saque'],
-            ax=ax1,
-            **heatmap_params
-        )
-        
-        # Configuración visual
-        ax1.set_title('Distribución de Saques', 
-                     fontsize=16, 
-                     pad=20,
-                     fontweight='bold')
-        
+        pitch.kdeplot(df['x_saque'], df['y_saque'], ax=ax1, **heatmap_params)
+        ax1.set_title(get_text(lang, "kick_distribution"), fontsize=16, pad=20, fontweight='bold')
         st.pyplot(fig1)
 
-        # ========== HEATMAP DE REMATES ==========
         fig2, ax2 = plt.subplots(figsize=(12, 8))
         pitch.draw(ax=ax2)
-        
-        # Cambiar colores para remates
         heatmap_params['cmap'] = 'Reds'
-        
-        # Gráfico de densidad para remates
-        pitch.kdeplot(
-            df['x_remate'], 
-            df['y_remate'],
-            ax=ax2,
-            **heatmap_params
-        )
-        
-        ax2.set_title('Zonas de Remate', 
-                     fontsize=16, 
-                     pad=20,
-                     fontweight='bold')
-        
+        pitch.kdeplot(df['x_remate'], df['y_remate'], ax=ax2, **heatmap_params)
+        ax2.set_title(get_text(lang, "shot_zones"), fontsize=16, pad=20, fontweight='bold')
         st.pyplot(fig2)
 
-        # ========== DESCARGAR DATOS ==========
-        csv = df.drop(columns=["coords_saque", "coords_remate", 
-                             "x_saque", "y_saque", 
-                             "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
-        
+        csv = df.drop(columns=["coords_saque", "coords_remate", "x_saque", "y_saque", "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
+
         st.download_button(
-            "⬇️ Descargar CSV Filtrado",
+            get_text(lang, "download_filtered_csv"),
             csv,
             "acciones_filtradas.csv",
             "text/csv",
@@ -263,4 +212,4 @@ def generar_heatmaps(df, zonas):
         )
 
     except Exception as e:
-        st.error(f"🔥 Error crítico al generar visualizaciones: {str(e)}")
+        st.error(get_text(lang, "critical_error") + f": {str(e)}")
