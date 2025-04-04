@@ -4,7 +4,7 @@ from modules.registro import registro_page
 from modules.analitica import analitica_page
 from utils.i18n import get_text
 
-# Configuración de página (no cambiar)
+# Configuración de página
 st.set_page_config(
     page_title="Set Piece Analytics Pro",
     page_icon="⚽",
@@ -12,22 +12,20 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Ruta CORREGIDA para el logo (asumiendo que está en raíz del repositorio)
-LOGO_PATH = "Cavalry_FC_logo.svg"  # Archivo debe estar en mismo nivel que app.py
+LOGO_PATH = "Cavalry_FC_logo.svg"
 
 def main():
-    # Configuración de idioma
-    lang = "es"  # Valor inicial
+    lang = "es"  # Valor por defecto
     
     with st.sidebar:
-        # Carga del logo con manejo de errores
+        # Logo con manejo de errores
         try:
             st.image(LOGO_PATH, width=200)
         except Exception as e:
-            st.error(f"Error loading logo: {str(e)}")
-            st.markdown("### ⚽ Set Piece Analytics Pro")  # Fallback textual
+            st.error(get_text(lang, "logo_error").format(error=str(e)))
+            st.markdown(f"### ⚽ {get_text(lang, 'app_title')}")
         
-        # Selector de idioma mejorado
+        # Selector de idioma
         lang_option = st.radio(
             "🌐 Idioma / Language",
             ("Español", "English"),
@@ -35,22 +33,28 @@ def main():
         )
         lang = "es" if lang_option == "Español" else "en"
         
-        # Navegación internacionalizada
-        pagina = st.radio(
+        # Opciones de navegación con valores internos en español
+        nav_options = [
+            (get_text(lang, "live_registration"), "registro"),
+            (get_text(lang, "analytics_panel"), "analitica")
+        ]
+        
+        # Mostrar opciones traducidas pero mantener lógica en español
+        pagina_label = st.radio(
             get_text(lang, "select_module"),
-            (
-                get_text(lang, "live_registration"),
-                get_text(lang, "analytics_panel")
-            ),
+            options=[option[0] for option in nav_options],
             index=0
         )
+        
+        # Obtener el valor interno correspondiente
+        pagina = [option[1] for option in nav_options if option[0] == pagina_label][0]
 
-    # Estado de sesión
+    # Inicializar estado de sesión
     if "registro" not in st.session_state:
         st.session_state.registro = []
 
-    # Navegación
-    if pagina == get_text(lang, "live_registration"):
+    # Navegación basada en valores internos
+    if pagina == "registro":
         registro_page(lang)
     else:
         analitica_page(lang)
