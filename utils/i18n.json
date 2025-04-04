@@ -44,7 +44,13 @@
         "export_data": "Export Data",
         "export_data_help": "Download filtered data in CSV format",
         "critical_error": "Critical error: {error}",
-        "empty_db_warning": "Empty database! Register actions first"
+        "empty_db_warning": "Empty database! Register actions first",
+        "cavalry_team": "Cavalry FC",
+        "opponent": "Opponent",
+        "action_Tiro libre": "Free kick",
+        "action_Córner": "Corner",
+        "action_Lateral": "Throw-in",
+        "action_Penal": "Penalty"
     },
     "es": {
         "analytics_title": "Panel de Análisis Táctico Profesional",
@@ -91,6 +97,12 @@
         "export_data": "Exportar Datos",
         "export_data_help": "Descargar datos filtrados en formato CSV",
         "critical_error": "Error crítico: {error}",
-        "empty_db_warning": "¡Base de datos vacía! Registra acciones primero"
+        "empty_db_warning": "¡Base de datos vacía! Registra acciones primero",
+        "cavalry_team": "Cavalry FC",
+        "opponent": "Oponente",
+        "action_Tiro libre": "Tiro libre",
+        "action_Córner": "Córner",
+        "action_Lateral": "Lateral",
+        "action_Penal": "Penal"
     }
 }
