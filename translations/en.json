@@ -70,5 +70,10 @@
     "download_csv": "Download Filtered CSV",
     "no_data_warning": "🚨 No data to display with current filters",
     "critical_error": "🔥 Critical error generating visualizations",
-    "opponent": "Opponent"
+    "opponent": "Opponent",
+    "select_module": "Select module:",
+    "live_registration": "🏟️ Live Registration",
+    "analytics_panel": "📊 Analytics Panel",
+    "logo_error": "Error loading logo: {error}",
+    "app_title": "Set Piece Analytics Pro"
 }
