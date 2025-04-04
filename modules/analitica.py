@@ -1,4 +1,3 @@
-# modules/analitica.py
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -30,7 +29,7 @@ def cargar_datos(lang: str):
     url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
     df = pd.read_csv(url)
     
-    # Traducir valores clave
+    # Traducción de valores
     df['Gol'] = df['Gol'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
     df['Acción'] = df['Acción'].apply(lambda x: get_text(lang, x.lower().replace(' ', '_')))
     
@@ -38,7 +37,7 @@ def cargar_datos(lang: str):
     df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
     df = df.dropna(subset=['Fecha'])
     
-    # Validar estructura
+    # Validación de estructura
     columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in columnas_requeridas):
         return pd.DataFrame()
@@ -61,7 +60,7 @@ def configurar_filtros(lang: str, df):
             "Valour FC": get_text(lang, "VAL")
         }
         
-        # Procesar partidos con traducciones
+        # Procesar partidos
         df = df.sort_values('Fecha', ascending=False)
         df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
         df['Rival_abr'] = df['Rival'].map(ABREVIACIONES).fillna(df['Rival'])
@@ -237,7 +236,14 @@ def generar_seccion_efectividad(lang: str, df):
             df_efectividad, 
             x='Acciones', y='Goles',
             size='Goles', color='Ejecutor',
-            title=get_text(lang, "actions_goals_relation"))
+            title=get_text(lang, "actions_goals_relation")
+        )
+
+        fig.update_traces(marker=dict(line=dict(width=1, color='black')))
+        fig.update_layout(
+            plot_bgcolor='#F9F9F9',
+            paper_bgcolor='#F9F9F9'
+        )
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
@@ -248,7 +254,7 @@ def generar_seccion_efectividad(lang: str, df):
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
 
         df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
-        df_accion['Resultado'] = get_text(lang, "total"))
+        df_accion['Resultado'] = get_text(lang, "total")
         df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
 
         df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
@@ -316,7 +322,7 @@ def configurar_descarga(lang: str, df):
     st.download_button(
         get_text(lang, "export_data"),
         data=csv,
-        file_name="tactical_analysis.csv",
+        file_name="analisis_tactico.csv",
         mime="text/csv",
         help=get_text(lang, "export_data_help")
     )
