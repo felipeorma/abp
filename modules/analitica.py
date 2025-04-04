@@ -10,88 +10,27 @@ def analitica_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
     
     try:
-        # Carga de datos con diagnóstico
         df = cargar_datos(lang)
-        
-        # Mostrar diagnóstico inicial
-        with st.expander("🔍 Diagnóstico inicial de datos (DEBUG)"):
-            st.write("Columnas disponibles:", df.columns.tolist())
-            st.write("Primeras 3 filas:", df.head(3))
-            st.write("Valores únicos en 'Gol':", df['Gol'].unique())
-            st.write("Valores únicos en 'Acción':", df['Acción'].unique())
-        
         if df.empty:
             st.warning(get_text(lang, "empty_db_warning"))
             return
-            
     except Exception as e:
-        st.error(f"🚨 {get_text(lang, 'critical_error')}: {str(e)}")
+        st.error(get_text(lang, "critical_error").format(error=str(e)))
         return
 
-    try:
-        df_filtrado = configurar_filtros(lang, df)
-        
-        # Diagnóstico post-filtrado
-        with st.expander("🔍 Diagnóstico post-filtrado (DEBUG)"):
-            st.write("Filas restantes:", df_filtrado.shape[0])
-            st.write("Columnas no vacías:", df_filtrado.count())
-        
-        if df_filtrado.empty:
-            st.warning(get_text(lang, "no_data_after_filter"))
-            return
-            
-        mostrar_kpis(lang, df_filtrado)
-        generar_seccion_espacial(lang, df_filtrado)
-        generar_seccion_temporal(lang, df_filtrado)
-        generar_seccion_efectividad(lang, df_filtrado)
-        configurar_descarga(lang, df_filtrado)
-        mostrar_ranking_parte_cuerpo(lang, df_filtrado)
-        
-    except Exception as e:
-        st.error(f"🚨 {get_text(lang, 'visualization_error')}: {str(e)}")
+    df_filtrado = configurar_filtros(lang, df)
+    mostrar_kpis(lang, df_filtrado)
+    generar_seccion_espacial(lang, df_filtrado)
+    generar_seccion_temporal(lang, df_filtrado)
+    generar_seccion_efectividad(lang, df_filtrado)
+    configurar_descarga(lang, df_filtrado)
+    mostrar_ranking_parte_cuerpo(lang, df_filtrado)
 
 def cargar_datos(lang: str):
-    try:
-        # URL modificada
-        url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
-        df = pd.read_csv(url, encoding='utf-8', delimiter=',', parse_dates=['Fecha'])
-        
-        # Mapeo seguro de valores
-        gol_map = {'Sí': get_text(lang, 'yes'), 'Si': get_text(lang, 'yes'), 'Yes': get_text(lang, 'yes'),
-                   'No': get_text(lang, 'no'), 'No ': get_text(lang, 'no')}  # Variantes comunes
-        df['Gol'] = df['Gol'].str.strip().map(gol_map).fillna(get_text(lang, 'no'))
-        
-        # Normalización de nombres de acciones
-        action_mapping = {
-            'Córner': 'corner',
-            'Tiro libre': 'free_kick',
-            'Saque lateral': 'throw_in',
-            'Penal': 'penalty',
-            'Centro': 'cross',
-            'Remate': 'shot'
-        }
-        df['Acción'] = df['Acción'].str.strip().map(action_mapping).apply(lambda x: get_text(lang, x))
-        
-        # Validación de estructura
-        required_columns = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
-        if not all(col in df.columns for col in required_columns):
-            st.error(f"❌ {get_text(lang, 'missing_columns')}: {', '.join([c for c in required_columns if c not in df.columns])}")
-            return pd.DataFrame()
-            
-        # Limpieza numérica robusta
-        df['Minuto'] = pd.to_numeric(df['Minuto'], errors='coerce').fillna(0).astype(int)
-        
-        return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'], how='any')
-        
-    except Exception as e:
-        st.error(f"🚨 {get_text(lang, 'data_load_error')}: {str(e)}")
-        return pd.DataFrame()
-
-def cargar_datos(lang: str):
-    url = "https://raw.githubusercontent.com/felipeorma/abp/refs/heads/main/master_abp.csv"
+    url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
     df = pd.read_csv(url)
     
-    # Traducción de valores del dataset
+    # Traducir valores clave
     df['Gol'] = df['Gol'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
     df['Acción'] = df['Acción'].apply(lambda x: get_text(lang, x.lower().replace(' ', '_')))
     
@@ -99,7 +38,7 @@ def cargar_datos(lang: str):
     df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
     df = df.dropna(subset=['Fecha'])
     
-    # Validación de estructura
+    # Validar estructura
     columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in columnas_requeridas):
         return pd.DataFrame()
@@ -122,13 +61,12 @@ def configurar_filtros(lang: str, df):
             "Valour FC": get_text(lang, "VAL")
         }
         
-        # Procesamiento de partidos
+        # Procesar partidos con traducciones
         df = df.sort_values('Fecha', ascending=False)
         df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
         df['Rival_abr'] = df['Rival'].map(ABREVIACIONES).fillna(df['Rival'])
         df['Partido'] = df.apply(lambda x: f"{x['Fecha_str']} vs {x['Rival_abr']}", axis=1)
         
-        # Selectores
         partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
             options=df['Partido'].unique(),
@@ -163,7 +101,6 @@ def configurar_filtros(lang: str, df):
                 default=df['Ejecutor'].unique()
             )
 
-        # Slider de minutos
         min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
         rango_minutos = st.slider(
             get_text(lang, "minutes"),
@@ -300,14 +237,7 @@ def generar_seccion_efectividad(lang: str, df):
             df_efectividad, 
             x='Acciones', y='Goles',
             size='Goles', color='Ejecutor',
-            title=get_text(lang, "actions_goals_relation")
-        )
-
-        fig.update_traces(marker=dict(line=dict(width=1, color='black')))
-        fig.update_layout(
-            plot_bgcolor='#F9F9F9',
-            paper_bgcolor='#F9F9F9'
-        )
+            title=get_text(lang, "actions_goals_relation"))
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
@@ -318,7 +248,7 @@ def generar_seccion_efectividad(lang: str, df):
         df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
 
         df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
-        df_accion['Resultado'] = get_text(lang, "total")
+        df_accion['Resultado'] = get_text(lang, "total"))
         df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
 
         df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
