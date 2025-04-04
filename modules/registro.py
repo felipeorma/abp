@@ -30,7 +30,7 @@ def cargar_datos():
         "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
         "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
         "Myer Bevan"
-    ], key=lambda x: x.split()[-1]) + ["Marco Carducci", "Rival"]
+    ], key=lambda x: x.split()[-1]) + ["Marco Carducci"]
 
     equipos = sorted([
         "Atlético Ottawa", "Forge FC", "HFX Wanderers FC",
