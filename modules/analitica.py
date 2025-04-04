@@ -32,7 +32,6 @@ def cargar_datos():
     
     df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
     df = df.dropna(subset=['Fecha'])
-    df['Fecha_Str'] = df['Fecha'].dt.strftime('%Y-%m-%d')
     
     columnas_requeridas = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in columnas_requeridas):
@@ -63,8 +62,7 @@ def configurar_filtros(lang: str, df):
         partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
             options=df['Partido'].unique(),
-            default=df['Partido'].unique(),
-            help=get_text(lang, "select_matches_help")
+            default=df['Partido'].unique()
         )
         
         col1, col2 = st.columns(2)
@@ -75,7 +73,7 @@ def configurar_filtros(lang: str, df):
                 default=df['Jornada'].unique()
             )
         with col2:
-            condicion = st.multiselect(
+            condiciones = st.multiselect(
                 get_text(lang, "condition"),
                 options=df['Condición'].unique(),
                 default=df['Condición'].unique()
@@ -105,7 +103,7 @@ def configurar_filtros(lang: str, df):
     return df[
         (df['Partido'].isin(partidos_seleccionados)) &
         (df['Jornada'].isin(jornadas)) &
-        (df['Condición'].isin(condicion)) &
+        (df['Condición'].isin(condiciones)) &
         (df['Acción'].isin(acciones)) &
         (df['Ejecutor'].isin(jugadores)) &
         (df['Minuto'].between(*rango_minutos))
