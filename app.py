@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-LOGO_URL = "https://upload.wikimedia.org/wikipedia/en/thumb/6/6a/Cavalry_FC_logo.svg/1200px-Cavalry_FC_logo.svg.png"
+LOGO_URL = "abp/Cavalry_FC_logo.svg"
 
 def main():
     # Configurar idioma (podría venir de una cookie/config más adelante)
