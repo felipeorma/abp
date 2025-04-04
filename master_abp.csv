@@ -1,51 +1,23 @@
-Jornada,Fecha,Rival,Condición,Periodo,Minuto,Acción,Equipo,Ejecutor,Zona Saque,Zona Remate,Primer Contacto,Parte Cuerpo,Segundo Contacto,Gol,Resultado,Perfil,Estrategia,Tipo Ejecución,x_saque,y_saque,x_remate,y_remate
-Jornada 4,05/11/2024 20:11,Forge FC,Visitante,2T,43,Penal,Pacific FC,Jugador_Rival,10,12,Jugador_Rival,Cabeza,,No,Despeje,Hábil,Sí,Disparo directo,115,6,87,66
+jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
 Jornada 1,04/20/2024 20:42,Valour FC,Local,2T,27,Penal,Cavalry FC,Neven Fewster,4,1,Josh Belbin,Tronco,Neven Fewster,No,Disparo al arco,No hábil,No,Centro,75,73,100,20
-Jornada 2,04/27/2024 18:55,Forge FC,Visitante,2T,31,Tiro libre,Pacific FC,Jugador_Rival,12,3,Jugador_Rival,Pie derecho,,No,Disparo al arco,Hábil,Sí,Centro,75,33,93,1
 Jornada 2,04/27/2024 19:46,Forge FC,Local,2T,17,Penal,Vancouver FC,Jugador_Rival,17,9,Jugador_Rival,Tronco,Jugador_Rival,No,Posesión rival,Hábil,Sí,Disparo directo,117,8,79,2
-Jornada 1,04/20/2024 19:21,Atlético Ottawa,Local,2T,2,Córner,HFX Wanderers FC,Jugador_Rival,11,8,Jugador_Rival,Pie derecho,,Sí,Gol,Hábil,Sí,Disparo directo,100,69,105,17
 Jornada 4,05/11/2024 18:38,Cavalry FC,Local,1T,40,Lateral,Atlético Ottawa,Jugador_Rival,16,14,Jugador_Rival,Cabeza,,Sí,Gol,Hábil,No,Centro,88,30,111,20
-Jornada 1,04/20/2024 21:17,Atlético Ottawa,Local,2T,43,Lateral,HFX Wanderers FC,Jugador_Rival,12,9,Jugador_Rival,Cabeza,,No,Disparo desviado,No hábil,Sí,Centro,114,28,119,33
 Jornada 1,04/20/2024 21:26,Vancouver FC,Visitante,1T,82,Lateral,Pacific FC,Jugador_Rival,14,11,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,Hábil,No,Disparo directo,117,17,111,76
-Jornada 1,04/20/2024 18:28,Valour FC,Local,2T,14,Tiro libre,York United FC,Jugador_Rival,8,8,Jugador_Rival,Tronco,,No,Despeje,Hábil,No,Centro,74,23,90,78
 Jornada 4,05/11/2024 19:10,Cavalry FC,Local,1T,88,Lateral,Atlético Ottawa,Jugador_Rival,15,14,Jugador_Rival,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,69,95,11
-Jornada 4,05/11/2024 19:22,Valour FC,Local,1T,76,Lateral,Cavalry FC,Neven Fewster,9,5,Shamit Shome,Pie derecho,Tom Field,Sí,Gol,Hábil,No,Centro,119,9,86,35
 Jornada 4,05/11/2024 19:28,York United FC,Visitante,1T,23,Córner,Vancouver FC,Jugador_Rival,1,3,Jugador_Rival,Tronco,,No,Disparo al arco,No hábil,Sí,Centro,101,27,94,21
-Jornada 3,05/04/2024 19:17,Atlético Ottawa,Local,2T,84,Córner,York United FC,Jugador_Rival,6,4,Jugador_Rival,Pie derecho,,Sí,Gol,Hábil,Sí,Pase corto,86,52,108,56
 Jornada 4,05/11/2024 18:34,Pacific FC,Local,1T,51,Penal,Forge FC,Jugador_Rival,16,3,Jugador_Rival,Pie derecho,Jugador_Rival,No,Despeje,No hábil,Sí,Disparo directo,99,11,82,26
 Jornada 4,05/11/2024 19:28,Valour FC,Local,2T,31,Lateral,Cavalry FC,James McGlinchey,3,6,Ali Musse,Pie derecho,Ali Musse,Sí,Gol,Hábil,Sí,Pase corto,84,7,73,59
 Jornada 4,05/11/2024 21:12,Vancouver FC,Local,2T,13,Lateral,York United FC,Jugador_Rival,2,16,Jugador_Rival,Pie derecho,,Sí,Gol,No hábil,No,Centro,84,40,108,44
 Jornada 2,04/27/2024 18:57,Forge FC,Local,2T,77,Penal,Atlético Ottawa,Jugador_Rival,14,16,Jugador_Rival,Tronco,Jugador_Rival,No,Disparo desviado,Hábil,Sí,Disparo directo,112,42,97,31
-Jornada 4,05/11/2024 20:00,Forge FC,Visitante,2T,53,Lateral,Pacific FC,Jugador_Rival,10,17,Jugador_Rival,Pie derecho,,Sí,Gol,No hábil,Sí,Centro,98,46,96,35
 Jornada 3,05/04/2024 19:20,Forge FC,Local,1T,34,Penal,Valour FC,Jugador_Rival,4,7,Jugador_Rival,Pie derecho,Jugador_Rival,No,Despeje,Hábil,Sí,Pase corto,89,40,113,27
-Jornada 4,05/11/2024 20:02,Forge FC,Local,1T,27,Córner,Vancouver FC,Jugador_Rival,10,14,Jugador_Rival,Cabeza,Jugador_Rival,Sí,Gol,No hábil,No,Centro,82,15,87,6
 Jornada 1,04/20/2024 20:58,Atlético Ottawa,Local,2T,46,Córner,HFX Wanderers FC,Jugador_Rival,1,9,Jugador_Rival,Cabeza,Jugador_Rival,Sí,Gol,Hábil,No,Centro,85,46,99,69
-Jornada 2,04/27/2024 18:07,Forge FC,Local,1T,56,Penal,Atlético Ottawa,Jugador_Rival,12,14,Jugador_Rival,Pie izquierdo,,No,Disparo al arco,No hábil,No,Centro,79,13,117,45
-Jornada 2,04/27/2024 21:12,Cavalry FC,Visitante,2T,50,Lateral,Valour FC,Jugador_Rival,7,12,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,Hábil,Sí,Disparo directo,89,59,101,44
-Jornada 2,04/27/2024 18:50,Forge FC,Visitante,2T,39,Córner,Pacific FC,Jugador_Rival,10,17,Jugador_Rival,Pie izquierdo,Jugador_Rival,No,Disparo al arco,Hábil,Sí,Disparo directo,76,7,75,7
-Jornada 1,04/20/2024 18:04,Valour FC,Local,1T,67,Penal,Vancouver FC,Jugador_Rival,10,12,Jugador_Rival,Tronco,,No,Disparo desviado,No hábil,Sí,Disparo directo,99,63,94,23
 Jornada 4,05/11/2024 21:01,Vancouver FC,Local,1T,43,Penal,York United FC,Jugador_Rival,2,10,Jugador_Rival,Pie derecho,Jugador_Rival,Sí,Gol,No hábil,No,Centro,90,71,74,44
-Jornada 1,04/20/2024 18:49,York United FC,Visitante,2T,5,Córner,Valour FC,Jugador_Rival,5,13,Jugador_Rival,Pie derecho,Jugador_Rival,Sí,Gol,No hábil,No,Pase corto,108,29,93,31
 Jornada 2,04/27/2024 19:21,Valour FC,Local,1T,84,Tiro libre,Forge FC,Jugador_Rival,17,12,Jugador_Rival,Tronco,,No,Disparo al arco,No hábil,Sí,Disparo directo,72,49,91,5
-Jornada 2,04/27/2024 20:30,Atlético Ottawa,Visitante,1T,2,Lateral,Forge FC,Jugador_Rival,13,16,Jugador_Rival,Cabeza,,Sí,Gol,Hábil,Sí,Pase corto,95,28,111,56
-Jornada 2,04/27/2024 19:24,HFX Wanderers FC,Local,2T,12,Tiro libre,Valour FC,Jugador_Rival,8,10,Jugador_Rival,Cabeza,Jugador_Rival,No,Disparo desviado,No hábil,Sí,Centro,74,16,77,46
-Jornada 3,05/04/2024 19:20,HFX Wanderers FC,Local,1T,9,Penal,Vancouver FC,Jugador_Rival,8,12,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,No hábil,No,Centro,82,9,93,25
-Jornada 3,05/04/2024 21:24,Vancouver FC,Visitante,2T,4,Lateral,HFX Wanderers FC,Jugador_Rival,11,14,Jugador_Rival,Pie derecho,,Sí,Gol,Hábil,Sí,Centro,113,66,107,41
-Jornada 1,04/20/2024 20:46,HFX Wanderers FC,Visitante,1T,6,Penal,Vancouver FC,Jugador_Rival,8,5,Jugador_Rival,Pie izquierdo,,No,Posesión rival,No hábil,No,Centro,82,35,107,52
-Jornada 2,04/27/2024 19:24,Cavalry FC,Visitante,1T,84,Córner,Valour FC,Jugador_Rival,10,1,Jugador_Rival,Cabeza,,No,Disparo desviado,Hábil,No,Centro,92,71,97,43
 Jornada 2,04/27/2024 18:05,Valour FC,Visitante,2T,90,Córner,HFX Wanderers FC,Jugador_Rival,14,8,Jugador_Rival,Pie izquierdo,Jugador_Rival,Sí,Gol,Hábil,No,Disparo directo,83,75,70,50
 Jornada 1,04/20/2024 18:48,Vancouver FC,Visitante,1T,17,Lateral,Valour FC,Jugador_Rival,17,16,Jugador_Rival,Cabeza,Jugador_Rival,Sí,Gol,Hábil,No,Centro,81,15,117,66
-Jornada 3,05/04/2024 21:10,Forge FC,Visitante,1T,24,Lateral,HFX Wanderers FC,Jugador_Rival,10,7,Jugador_Rival,Pie derecho,Jugador_Rival,Sí,Gol,Hábil,No,Pase corto,106,73,85,3
-Jornada 3,05/04/2024 20:35,Vancouver FC,Visitante,1T,15,Tiro libre,Forge FC,Jugador_Rival,11,14,Jugador_Rival,Tronco,,Sí,Gol,No hábil,Sí,Disparo directo,72,75,94,5
 Jornada 2,04/27/2024 19:23,Forge FC,Local,1T,29,Tiro libre,Cavalry FC,Fraser Aird,3,1,Maël Henry,Cabeza,James McGlinchey,Sí,Gol,Hábil,No,Disparo directo,119,22,94,69
 Jornada 4,05/11/2024 20:21,Forge FC,Local,2T,72,Tiro libre,Vancouver FC,Jugador_Rival,1,8,Jugador_Rival,Tronco,,Sí,Gol,Hábil,Sí,Disparo directo,94,43,112,54
 Jornada 2,04/27/2024 19:36,Vancouver FC,Visitante,1T,76,Lateral,Forge FC,Jugador_Rival,2,6,Jugador_Rival,Cabeza,Jugador_Rival,No,Despeje,No hábil,No,Disparo directo,71,79,105,29
-Jornada 3,05/04/2024 20:53,HFX Wanderers FC,Local,2T,38,Córner,Forge FC,Jugador_Rival,7,7,Jugador_Rival,Cabeza,Jugador_Rival,No,Disparo desviado,No hábil,Sí,Centro,79,18,81,10
-Jornada 1,04/20/2024 20:04,Vancouver FC,Local,1T,76,Tiro libre,HFX Wanderers FC,Jugador_Rival,8,2,Jugador_Rival,Pie izquierdo,,No,Disparo desviado,Hábil,Sí,Centro,95,0,112,38
-Jornada 2,04/27/2024 19:20,Forge FC,Local,1T,52,Córner,Vancouver FC,Jugador_Rival,10,1,Jugador_Rival,Cabeza,Jugador_Rival,No,Disparo al arco,Hábil,No,Centro,102,58,97,52
 Jornada 1,04/20/2024 19:34,York United FC,Visitante,2T,44,Córner,Valour FC,Jugador_Rival,2,13,Jugador_Rival,Pie izquierdo,Jugador_Rival,No,Despeje,Hábil,No,Pase corto,95,61,75,21
-Jornada 1,04/20/2024 20:34,Pacific FC,Local,2T,43,Lateral,Valour FC,Jugador_Rival,7,13,Jugador_Rival,Cabeza,Jugador_Rival,No,Disparo al arco,Hábil,No,Disparo directo,75,39,80,45
 Jornada 2,04/27/2024 18:28,Valour FC,Visitante,2T,57,Tiro libre,HFX Wanderers FC,Jugador_Rival,16,15,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,Hábil,Sí,Disparo directo,94,77,71,65
-Jornada 1,04/20/2024 20:16,Valour FC,Local,2T,19,Penal,Vancouver FC,Jugador_Rival,5,10,Jugador_Rival,Pie izquierdo,Jugador_Rival,No,Posesión rival,Hábil,No,Centro,120,16,114,52
-Jornada 4,05/11/2024 20:13,Atlético Ottawa,Visitante,2T,41,Lateral,Cavalry FC,Jay Herdman,9,5,Joseph Holliday,Tronco,Maël Henry,Sí,Gol,No hábil,Sí,Centro,91,37,93,80
 Jornada 1,04/20/2024 18:12,Vancouver FC,Visitante,1T,84,Lateral,Valour FC,Jugador_Rival,14,8,Jugador_Rival,Pie derecho,,Sí,Gol,No hábil,No,Pase corto,95,61,117,25
