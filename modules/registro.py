@@ -197,14 +197,14 @@ def mostrar_formulario(lang: str, jugadores, equipos, zonas):
             # Segundo contacto
             segundo_opciones = ["Ninguno"] + jugadores + [get_text(lang, "opponent")]
             segundo_tr = {
-                "Ninguno": get_text(lang, "second_contact_ninguno"),  # Traduce "Ninguno"
-                **{jugador: jugador for jugador in jugadores},  # Mantiene nombres originales
-                get_text(lang, "opponent"): get_text(lang, "opponent")  # Traduce "Oponente"
+                "Ninguno": get_text(lang, "second_contact_ninguno"),
+                **{jugador: jugador for jugador in jugadores},
+                get_text(lang, "opponent"): get_text(lang, "opponent")
             }
-           segundo_contacto = st.selectbox(
+            segundo_contacto = st.selectbox(  # ← Alineado con el bloque else
                 get_text(lang, "second_contact"),
                 options=segundo_opciones,
-                format_func=lambda x: segundo_tr.get(x, x)  # Usa el mapeo personalizado
+                format_func=lambda x: segundo_tr.get(x, x)
             )
             datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
 
