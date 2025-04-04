@@ -1,5 +1,8 @@
 
 {
+    "select_module": "Seleccionar módulo:",
+    "live_registration": "🏟️ Registro en Vivo",
+    "analytics_panel": "📊 Panel Analítico",
     "registro_subheader": "📋 Registrar nueva acción",
     "match_context": "🗓️ Contexto del Partido",
     "round": "Jornada",
