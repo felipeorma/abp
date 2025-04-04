@@ -8,7 +8,10 @@ def load_translations(lang: str = "es"):
     
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            try:
+                return json.load(f)
+            except json.JSONDecodeError as e:
+                raise Exception(f"Invalid JSON in {file_path}: {str(e)}")
     except FileNotFoundError:
         raise Exception(f"Translation file not found: {file_path}")
 
