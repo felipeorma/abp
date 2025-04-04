@@ -2,9 +2,9 @@
 import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from utils.i18n import get_text  # Nuevo import
+from utils.i18n import get_text
 
-# Configuración inicial ÚNICA de la página (se mantiene igual)
+# Configuración de página (no cambiar)
 st.set_page_config(
     page_title="Set Piece Analytics Pro",
     page_icon="⚽",
@@ -12,24 +12,30 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-LOGO_URL = "abp/Cavalry_FC_logo.svg"
+# Ruta CORREGIDA para el logo (asumiendo que está en raíz del repositorio)
+LOGO_PATH = "Cavalry_FC_logo.svg"  # Archivo debe estar en mismo nivel que app.py
 
 def main():
-    # Configurar idioma (podría venir de una cookie/config más adelante)
-    lang = "es"  # Default: español. Podemos hacerlo dinámico después
+    # Configuración de idioma
+    lang = "es"  # Valor inicial
     
     with st.sidebar:
-        st.image(LOGO_URL, width=200)
+        # Carga del logo con manejo de errores
+        try:
+            st.image(LOGO_PATH, width=200)
+        except Exception as e:
+            st.error(f"Error loading logo: {str(e)}")
+            st.markdown("### ⚽ Set Piece Analytics Pro")  # Fallback textual
         
-        # Selector de idioma
-        lang = st.radio(
+        # Selector de idioma mejorado
+        lang_option = st.radio(
             "🌐 Idioma / Language",
             ("Español", "English"),
-            index=0 if lang == "es" else 1
+            index=0
         )
-        lang = "es" if lang == "Español" else "en"
+        lang = "es" if lang_option == "Español" else "en"
         
-        # Navegación traducida
+        # Navegación internacionalizada
         pagina = st.radio(
             get_text(lang, "select_module"),
             (
@@ -39,11 +45,13 @@ def main():
             index=0
         )
 
+    # Estado de sesión
     if "registro" not in st.session_state:
         st.session_state.registro = []
 
+    # Navegación
     if pagina == get_text(lang, "live_registration"):
-        registro_page(lang)  # Pasamos el idioma al módulo
+        registro_page(lang)
     else:
         analitica_page(lang)
 
