@@ -18,7 +18,6 @@ def main():
     lang = "es"  # Valor por defecto
     
     with st.sidebar:
-        # Logo con manejo de errores
         try:
             st.image(LOGO_PATH, width=200)
         except Exception as e:
@@ -26,35 +25,29 @@ def main():
             st.markdown(f"### ⚽ {get_text(lang, 'app_title')}")
         
         # Selector de idioma
-        lang_option = st.radio(
+        lang = "es" if st.radio(
             "🌐 Idioma / Language",
-            ("Español", "English"),
+            ["Español", "English"],
             index=0
-        )
-        lang = "es" if lang_option == "Español" else "en"
+        ) == "Español" else "en"
         
-        # Opciones de navegación con valores internos en español
-        nav_options = [
-            (get_text(lang, "live_registration"), "registro"),
-            (get_text(lang, "analytics_panel"), "analitica")
+        # Navegación traducida
+        opciones_navegacion = [
+            (get_text(lang, "live_registration"), 
+            (get_text(lang, "analytics_panel"))
         ]
         
-        # Mostrar opciones traducidas pero mantener lógica en español
-        pagina_label = st.radio(
+        pagina = st.radio(
             get_text(lang, "select_module"),
-            options=[option[0] for option in nav_options],
+            opciones_navegacion,
             index=0
         )
-        
-        # Obtener el valor interno correspondiente
-        pagina = [option[1] for option in nav_options if option[0] == pagina_label][0]
 
-    # Inicializar estado de sesión
-    if "registro" not in st.session_state:
-        st.session_state.registro = []
+    # Gestión del estado de sesión
+    st.session_state.setdefault("registro", [])
 
-    # Navegación basada en valores internos
-    if pagina == "registro":
+    # Navegación basada en índice
+    if opciones_navegacion.index(pagina) == 0:
         registro_page(lang)
     else:
         analitica_page(lang)
