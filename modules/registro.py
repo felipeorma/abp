@@ -42,88 +42,6 @@ def cargar_datos(lang):
 
     return jugadores, equipos, zonas_coords
 
-def mostrar_formulario(jugadores, equipos, zonas, lang):
-    datos = {}
-    st.subheader(get_text(lang, "register_new_action"))
-
-    with st.container(border=True):
-        st.markdown(get_text(lang, "match_context"))
-        col1, col2, col3 = st.columns(3)
-        datos["Jornada"] = col1.selectbox(get_text(lang, "matchday"), ["Rueda 1", "Rueda 2", "Rueda 3", "Rueda 4"])
-        datos["Rival"] = col2.selectbox(get_text(lang, "opponent"), equipos)
-        datos["Condición"] = col3.selectbox(get_text(lang, "home_away"), ["Local", "Visitante"])
-        datos["Fecha"] = st.date_input(get_text(lang, "date"), value=datetime.date.today())
-
-    with st.container(border=True):
-        st.markdown(get_text(lang, "game_time"))
-        col1, col2 = st.columns(2)
-        periodo = col1.selectbox(get_text(lang, "period"), ["1T", "2T"])
-
-        if periodo == "1T":
-            minutos = [str(x) for x in range(0, 46)] + ["45+"]
-        else:
-            minutos = [str(x) for x in range(45, 91)] + ["90+"]
-
-        minuto_str = col2.selectbox(get_text(lang, "minute"), minutos)
-        datos["Minuto"] = 46 if "45+" in minuto_str else 91 if "90+" in minuto_str else int(minuto_str)
-        datos["Periodo"] = periodo
-
-    with st.container(border=True):
-        st.markdown(get_text(lang, "action"))
-        col1, col2, col3 = st.columns(3)
-        datos["Acción"] = col1.selectbox(get_text(lang, "action_type"), ["Tiro libre", "Córner", "Lateral", "Penal"], key="accion_key")
-        datos["Equipo"] = col2.selectbox(get_text(lang, "executing_team"), ["Cavalry FC", "Rival"])
-
-        if datos["Equipo"] == "Cavalry FC":
-            datos["Ejecutor"] = col3.selectbox(get_text(lang, "executor"), jugadores)
-        else:
-            datos["Ejecutor"] = "Rival"
-            col3.text_input(get_text(lang, "executor"), value="Rival", disabled=True)
-
-    with st.container(border=True):
-        st.markdown(get_text(lang, "execution_details"))
-        st.image("https://github.com/felipeorma/abp/blob/main/MedioCampo_enumerado.JPG?raw=true", use_column_width=True)
-
-        if datos["Acción"] == "Penal":
-            datos["Zona Saque"] = "Penal"
-            datos["Zona Remate"] = "Penal"
-            datos["Primer Contacto"] = "N/A"
-            datos["Parte Cuerpo"] = "N/A"
-            datos["Segundo Contacto"] = ""
-            st.info(get_text(lang, "penalty_auto_config"))
-        else:
-            col1, col2 = st.columns(2)
-            zona_opciones_saque = [1, 2] if datos["Acción"] == "Córner" else [z for z in zonas if z != "Penal"]
-            datos["Zona Saque"] = col1.selectbox(get_text(lang, "kick_zone"), zona_opciones_saque)
-            datos["Zona Remate"] = col2.selectbox(get_text(lang, "shot_zone"), [z for z in zonas if z != "Penal"])
-
-            opciones_contacto = jugadores + ["Oponente"]
-            datos["Primer Contacto"] = st.selectbox(get_text(lang, "first_contact"), opciones_contacto)
-            datos["Parte Cuerpo"] = st.selectbox(get_text(lang, "body_part"), ["Cabeza", "Otro", "Pie"])
-            segundo_contacto = st.selectbox(get_text(lang, "second_contact_optional"), ["Ninguno"] + opciones_contacto)
-            datos["Segundo Contacto"] = segundo_contacto if segundo_contacto != "Ninguno" else ""
-
-    with st.container(border=True):
-        st.markdown(get_text(lang, "results"))
-        col1, col2 = st.columns(2)
-
-        datos["Gol"] = col1.selectbox(get_text(lang, "goal"), ["No", "Sí"], key="gol_key")
-
-        if st.session_state.get("gol_key") == "Sí":
-            datos["Resultado"] = "Gol"
-            col1.text_input(get_text(lang, "final_result"), value="Gol", disabled=True)
-        else:
-            datos["Resultado"] = col1.selectbox(
-                get_text(lang, "final_result"),
-                ["Gol", "Despeje", "Posesión rival", "Disparo desviado", "Disparo al arco"]
-            )
-
-        datos["Perfil"] = col2.selectbox(get_text(lang, "foot_profile"), ["Hábil", "No hábil"])
-        datos["Estrategia"] = col2.selectbox(get_text(lang, "strategy"), ["Sí", "No"])
-        datos["Tipo Ejecución"] = col2.selectbox(get_text(lang, "execution_type"), ["Centro", "Pase corto", "Disparo directo"])
-
-    return datos if st.form_submit_button(get_text(lang, "register_button")) else None
-
 def procesar_registro(datos, lang):
     st.session_state.registro.append(datos)
     st.success(get_text(lang, "registered_successfully"))
@@ -145,11 +63,11 @@ def mostrar_datos_y_visualizaciones(zonas, lang):
         st.markdown(get_text(lang, "team_filter"))
         equipo_filtro = st.radio(
             get_text(lang, "select_team_to_visualize"),
-            ["Cavalry FC", "Oponente"],
+            ["Cavalry FC", get_text(lang, "opponent")],
             index=0
         )
 
-        filtered_df = df[df["Equipo"] == ("Cavalry FC" if equipo_filtro == "Cavalry FC" else "Rival")]
+        filtered_df = df[df["Equipo"] == ("Cavalry FC" if equipo_filtro == "Cavalry FC" else get_text(lang, "opponent"))]
         generar_heatmaps(filtered_df, zonas, lang)
 
 def generar_heatmaps(df, zonas, lang):
@@ -210,3 +128,4 @@ def generar_heatmaps(df, zonas, lang):
 
     except Exception as e:
         st.error(get_text(lang, "critical_error") + f": {str(e)}")
+
