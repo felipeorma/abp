@@ -31,10 +31,10 @@ def main():
             index=0
         ) == "Español" else "en"
         
-        # Navegación traducida
+        # Navegación traducida (CORRECCIÓN AQUÍ)
         opciones_navegacion = [
-            (get_text(lang, "live_registration"), 
-            (get_text(lang, "analytics_panel"))
+            get_text(lang, "live_registration"),
+            get_text(lang, "analytics_panel")
         ]
         
         pagina = st.radio(
