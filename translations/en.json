@@ -35,8 +35,9 @@
     "body_part_Cabeza": "Head",
     "body_part_Otro": "Other",
     "body_part_Pie": "Foot",
-    "second_contact": "Second Contact",
-    "second_contact_Ninguno": "None",
+    "second_contact": "Second contact (optional)",
+    "second_contact_ninguno": "None",
+    "opponent": "Opponent"
     "results_header": "📊 Results",
     "is_goal": "Is Goal?",
     "is_goal_No": "No",
