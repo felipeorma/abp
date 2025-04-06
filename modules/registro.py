@@ -26,7 +26,7 @@ def cargar_datos():
         "Joseph Holliday", "Neven Fewster", "Callum Montgomery", "Bradley Kamdem",
         "Tom Field", "Eryk Kobza", "Michael Harms", "Fraser Aird", 
         "Mihail Gherasimencov", "Charlie Trafford", "Jesse Daley", "Sergio Camargo",
-        "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome",
+        "Jay Herdman", "Caniggia Elva", "Maël Henry", "Shamit Shome", "Michael Baldisimo",
         "Diego Gutiérrez", "Niko Myroniuk", "Josh Belbin", "James McGlinchey",
         "Ali Musse", "Tobias Warschewski", "Nicolas Wähling", "Chanan Chanda",
         "Myer Bevan"
