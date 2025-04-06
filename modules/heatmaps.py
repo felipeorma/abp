@@ -1,5 +1,3 @@
-# modules/heatmaps.py
-
 import streamlit as st
 import pandas as pd
 import requests
@@ -102,11 +100,11 @@ def heatmaps_page(lang="es"):
     def get_position_order(pos):
         pos = str(pos).upper()
         if pos == "GK": return 0
-        if pos == "DF" or pos == "RB" or pos == "LB": return 1
+        if pos in ["DF", "RB", "LB"]: return 1
         if pos == "DMF": return 2
-        if pos == "MF" or pos == "AMF" or pos == "CMF": return 3
-        if pos == "RW" or pos == "LW": return 4
-        if pos == "FW" or pos == "CF" or pos.startswith("F"): return 5
+        if pos in ["MF", "AMF", "CMF"]: return 3
+        if pos in ["RW", "LW"]: return 4
+        if pos in ["FW", "CF"] or pos.startswith("F"): return 5
         return 99
 
     def get_position_group(pos):
@@ -122,7 +120,6 @@ def heatmaps_page(lang="es"):
     df_filtered = df_filtered.sort_values(by="Position", key=lambda x: x.apply(get_position_order))
     players_list = df_filtered["Player"].unique()
 
-    # Asegurar consistencia en el session state
     if "selected_player" not in st.session_state:
         st.session_state.selected_player = None
 
@@ -134,14 +131,20 @@ def heatmaps_page(lang="es"):
         with cols[idx % 6]:
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
-                if player_data["Team"] == "Cavalry":
-                    st.image(player_data["Photo"], width=70, use_container_width=False)
+
+                # 🔐 Imagen segura con headers
+                photo_url = player_data["Photo"]
+                headers = {"User-Agent": "Mozilla/5.0"}
+                response = requests.get(photo_url, headers=headers)
+                image = Image.open(BytesIO(response.content))
+                st.image(image, width=70, use_container_width=False)
+
                 pos_group = get_position_group(player_data["Position"])
                 team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
-            except:
-                st.warning("⚠️ Image not found")
+            except Exception:
+                st.warning("⚠️ Imagen no disponible")
             if st.button(f"Show Heatmaps - {player_name}", key=f"btn_{player_name}"):
                 st.session_state.selected_player = player_name
                 selected_player = player_name
@@ -158,11 +161,10 @@ def heatmaps_page(lang="es"):
             else:
                 st.markdown(f"Minutes: `{row['Minutes played']}` | Goals: `{row['Goals']}` | Assists: `{row['Assists']}`")
             try:
-                headers = {"User-Agent": "Mozilla/5.0"}
-                response = requests.get(row["heatmap"], headers=headers)
+                response = requests.get(row["heatmap"], headers={"User-Agent": "Mozilla/5.0"})
                 image = Image.open(BytesIO(response.content))
                 st.image(image, width=300)
-            except:
+            except Exception:
                 st.warning(f"⚠️ Could not load heatmap for Round {row['Round']}")
 
     st.markdown("""
