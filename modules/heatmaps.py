@@ -3,10 +3,10 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
-from utils.i18n import get_text  # Asegúrate de tener esta utilidad
+from utils.i18n import get_text
 
 def heatmaps_page(lang="es"):
-    # Configuración de estilos y título
+    # Configuración de estilos
     st.markdown("""
     <style>
         .main { background-color: #f9f9f9; }
@@ -27,9 +27,6 @@ def heatmaps_page(lang="es"):
         .player-card:hover {
             transform: scale(1.03);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .opponent-card {
-            background-color: #f3f3f3 !important;
         }
         .player-img {
             border-radius: 50%;
@@ -66,7 +63,7 @@ def heatmaps_page(lang="es"):
         }
     </style>
     """, unsafe_allow_html=True)
-    
+
     st.title("⚽ " + get_text(lang, "heatmap_title"))
 
     # Carga de datos
@@ -74,43 +71,55 @@ def heatmaps_page(lang="es"):
     def load_data():
         df = pd.read_csv("matches.csv")
         df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
+        df = df.sort_values("Date", ascending=False)
         df["Team"] = df["Team"].apply(lambda x: "Cavalry" if str(x).strip().lower() == "cavalry" else "Opponent")
         return df.fillna(0)
-    
+
     df = load_data()
     df["Round"] = df["Round"].astype(str)
 
-    # Filtros en el área principal
+    # Filtros
     with st.container():
-        cols = st.columns(5)
+        cols = st.columns([2, 2, 2, 2, 2])
         with cols[0]:
-            team_view = st.radio(get_text(lang, "show_players_from"), ["Cavalry", "Opponent"], index=0)
+            team_view = st.radio(
+                get_text(lang, "show_players_from"),
+                ["Cavalry", "Opponent"],
+                index=0
+            )
         with cols[1]:
-            round_filter = st.selectbox(get_text(lang, "match_round"), ["All"] + sorted(df["Round"].unique().tolist()))
+            round_filter = st.selectbox(
+                get_text(lang, "match_round"),
+                ["All"] + sorted(df["Round"].unique().tolist())
+            )
         with cols[2]:
-            side_filter = st.selectbox(get_text(lang, "team_side"), ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist()))
+            side_filter = st.selectbox(
+                get_text(lang, "team_side"),
+                ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist())
+            )
         with cols[3]:
-            opponent_filter = st.selectbox(get_text(lang, "opponent"), ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist()))
+            opponent_filter = st.selectbox(
+                get_text(lang, "opponent"),
+                ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist())
+            )
         with cols[4]:
-            date_filter = st.selectbox(get_text(lang, "match_date"), ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist()))
+            date_filter = st.selectbox(
+                get_text(lang, "match_date"),
+                ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist())
+            )
 
     # Aplicar filtros
     df_filtered = df[df["Player"].astype(str) != "0"].copy()
     df_filtered = df_filtered[df_filtered["Team"] == team_view]
     
-    filter_mapping = [
-        (round_filter, "Round"),
-        (side_filter, "Local/Visit"),
-        (opponent_filter, "Cavalry/Opponent"),
-        (date_filter, "Date")
-    ]
-    
-    for filter_value, column in filter_mapping:
-        if filter_value != "All":
-            if column == "Date":
-                df_filtered = df_filtered[df_filtered[column].dt.date.astype(str) == filter_value]
-            else:
-                df_filtered = df_filtered[df_filtered[column] == filter_value]
+    if round_filter != "All":
+        df_filtered = df_filtered[df_filtered["Round"] == round_filter]
+    if side_filter != "All":
+        df_filtered = df_filtered[df_filtered["Local/Visit"] == side_filter]
+    if opponent_filter != "All":
+        df_filtered = df_filtered[df_filtered["Cavalry/Opponent"] == opponent_filter]
+    if date_filter != "All":
+        df_filtered = df_filtered[df_filtered["Date"].dt.date.astype(str) == date_filter]
 
     # Mostrar jugadores
     st.subheader(get_text(lang, "players_header"))
@@ -123,16 +132,26 @@ def heatmaps_page(lang="es"):
         with cols[idx % 6]:
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
-                if player_data["Team"] == "Cavalry":
-                    response = requests.get(player_data["Photo"], headers={"User-Agent": "Mozilla/5.0"})
-                    image = Image.open(BytesIO(response.content))
-                    st.image(image, width=70, use_container_width=False)
+                response = requests.get(player_data["Photo"], headers={"User-Agent": "Mozilla/5.0"})
+                image = Image.open(BytesIO(response.content))
+                st.image(image, width=70, use_container_width=False)
+                
                 pos_group = get_position_group(player_data["Position"])
-                team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"{get_text(lang, 'opponent')} ({player_data['Cavalry/Opponent']})"
-                st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
+                team_label = (get_text(lang, "cavalry") if player_data['Team'] == 'Cavalry' 
+                            else f"{get_text(lang, 'opponent')} ({player_data['Cavalry/Opponent']})")
+                
+                st.markdown(
+                    f"<div class='player-info'>"
+                    f"<strong>{player_name}</strong><br>"
+                    f"<span>{team_label}</span><br>"
+                    f"<span class='position-badge {pos_group}'>{player_data['Position']}</span>"
+                    f"</div>", 
+                    unsafe_allow_html=True
+                )
                 st.markdown("</div>", unsafe_allow_html=True)
             except Exception as e:
                 st.error(get_text(lang, "image_error"))
+                
             if st.button(f"{get_text(lang, 'show_heatmaps')} - {player_name}", key=f"btn_{player_name}"):
                 st.session_state.selected_player = player_name
 
@@ -143,30 +162,28 @@ def heatmaps_page(lang="es"):
         df_player = df[df["Player"] == st.session_state.selected_player].sort_values("Date", ascending=False)
         
         for _, row in df_player.iterrows():
-            with st.expander(f"📅 {row['Date'].date()} - {row['Cavalry/Opponent']}"):
-                col1, col2 = st.columns([1, 3])
-                with col1:
-                    position = str(row.get("Position", "")).strip().upper()
-                    stats = {
-                        get_text(lang, 'minutes"): row['Minutes played'],
-                        get_text(lang, 'goals"): row['Goals'],
-                        get_text(lang, 'assists"): row['Assists']
-                    }
-                    if position == "GK":
-                        stats.update({
-                            get_text(lang, 'saves"): row['Saves'],
-                            get_text(lang, 'goals_against"): row['Goal Against']
-                        })
-                    st.json(stats)
-                with col2:
-                    try:
-                        response = requests.get(row["heatmap"], headers={"User-Agent": "Mozilla/5.0"})
-                        image = Image.open(BytesIO(response.content))
-                        st.image(image, use_column_width=True)
-                    except:
-                        st.error(get_text(lang, "heatmap_error"))
+            st.markdown(f"**{get_text(lang, 'round')} {row['Round']}** - "
+                        f"{get_text(lang, 'date')}: `{row['Date'].date()}` - "
+                        f"{get_text(lang, 'opponent')}: `{row['Cavalry/Opponent']}`")
+            
+            position = str(row.get("Position", "")).strip().upper()
+            if position == "GK":
+                st.markdown(f"{get_text(lang, 'minutes')}: `{row['Minutes played']}` | "
+                            f"{get_text(lang, 'saves')}: `{row['Saves']}` | "
+                            f"{get_text(lang, 'goals_against')}: `{row['Goal Against']}`")
+            else:
+                st.markdown(f"{get_text(lang, 'minutes')}: `{row['Minutes played']}` | "
+                            f"{get_text(lang, 'goals')}: `{row['Goals']}` | "
+                            f"{get_text(lang, 'assists')}: `{row['Assists']}`")
+            
+            try:
+                response = requests.get(row["heatmap"], headers={"User-Agent": "Mozilla/5.0"})
+                image = Image.open(BytesIO(response.content))
+                st.image(image, width=300)
+            except Exception as e:
+                st.error(f"{get_text(lang, 'heatmap_error')} {row['Round']}")
 
-    # Footer internacionalizado
+    # Footer
     st.markdown(f"""
     ---
     <div class='footer'>
@@ -175,7 +192,7 @@ def heatmaps_page(lang="es"):
     </div>
     """, unsafe_allow_html=True)
 
-# Funciones de utilidad
+# Funciones auxiliares
 def get_position_order(pos):
     pos = str(pos).upper()
     order = {
