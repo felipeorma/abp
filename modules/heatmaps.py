@@ -70,6 +70,7 @@ def heatmaps_page(lang):
     def load_data():
         df = pd.read_csv("matches.csv")
         df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
+        df["Photo"] = df["Photo"].astype(str).str.strip().str.replace('"', '', regex=False)
         df = df.sort_values("Date", ascending=False)
         df["Team"] = df["Team"].apply(lambda x: "Cavalry" if str(x).strip().lower() == "cavalry" else "Opponent")
         return df.fillna(0)
@@ -130,26 +131,15 @@ def heatmaps_page(lang):
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
                 if player_data["Team"] == "Cavalry":
-                    # Limpieza de la URL para remover espacios o comillas extra
-                    photo_url = str(player_data["Photo"]).strip().replace('"', '')
-                    if isinstance(photo_url, str) and photo_url.startswith("http"):
-                        try:
-                            headers = {"User-Agent": "Mozilla/5.0"}
-                            response = requests.get(photo_url, headers=headers, timeout=10)
-                            response.raise_for_status()
-                            image = Image.open(BytesIO(response.content))
-                            st.image(image, width=70, use_container_width=False)
-                        except (requests.RequestException, UnidentifiedImageError):
-                            st.warning("⚠️ Imagen no disponible")
-                    else:
-                        st.warning("📷 URL inválida")
+                    photo_url = player_data["Photo"]
+                    st.image(photo_url, width=70, use_container_width=False)
                 pos_group = get_position_group(player_data["Position"])
                 team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
-            except Exception as e:
-                st.warning("Error al cargar tarjeta de jugador")
-                st.caption(f"Error: {e}")
+            except:
+                st.warning("⚠️ Error al cargar tarjeta de jugador")
+
             if st.button(f"Show Heatmaps - {player_name}"):
                 st.session_state.selected_player = player_name
                 selected_player = player_name
@@ -180,4 +170,5 @@ def heatmaps_page(lang):
       Soccer Scout & Data Analyst
     </div>
     """, unsafe_allow_html=True)
+
 
