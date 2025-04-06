@@ -3,9 +3,8 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
-from utils.i18n import get_text
 
-def heatmaps_page(lang="es"):
+def heatmaps_page():
     # Configuración de estilos
     st.markdown("""
     <style>
@@ -64,65 +63,48 @@ def heatmaps_page(lang="es"):
     </style>
     """, unsafe_allow_html=True)
 
-    st.title("⚽ " + get_text(lang, "heatmap_title"))
+    st.title("⚽ Cavalry FC - Player Heatmap Match Dashboard")
 
     # Carga de datos
     @st.cache_data
     def load_data():
         df = pd.read_csv("matches.csv")
         df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
-        df = df.sort_values("Date", ascending=False)
         df["Team"] = df["Team"].apply(lambda x: "Cavalry" if str(x).strip().lower() == "cavalry" else "Opponent")
         return df.fillna(0)
-
+    
     df = load_data()
     df["Round"] = df["Round"].astype(str)
 
     # Filtros
-    with st.container():
-        cols = st.columns([2, 2, 2, 2, 2])
-        with cols[0]:
-            team_view = st.radio(
-                get_text(lang, "show_players_from"),
-                ["Cavalry", "Opponent"],
-                index=0
-            )
-        with cols[1]:
-            round_filter = st.selectbox(
-                get_text(lang, "match_round"),
-                ["All"] + sorted(df["Round"].unique().tolist())
-            )
-        with cols[2]:
-            side_filter = st.selectbox(
-                get_text(lang, "team_side"),
-                ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist())
-            )
-        with cols[3]:
-            opponent_filter = st.selectbox(
-                get_text(lang, "opponent"),
-                ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist())
-            )
-        with cols[4]:
-            date_filter = st.selectbox(
-                get_text(lang, "match_date"),
-                ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist())
-            )
+    with st.sidebar:
+        st.header("🔎 Filters")
+        team_view = st.radio("👥 Show Players From:", ["Cavalry", "Opponent"], index=0)
+        round_filter = st.selectbox("Match Round", ["All"] + sorted(df["Round"].unique().tolist()))
+        side_filter = st.selectbox("Team Side", ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist()))
+        opponent_filter = st.selectbox("Opponent", ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist()))
+        date_filter = st.selectbox("Match Date", ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist()))
 
     # Aplicar filtros
     df_filtered = df[df["Player"].astype(str) != "0"].copy()
     df_filtered = df_filtered[df_filtered["Team"] == team_view]
     
-    if round_filter != "All":
-        df_filtered = df_filtered[df_filtered["Round"] == round_filter]
-    if side_filter != "All":
-        df_filtered = df_filtered[df_filtered["Local/Visit"] == side_filter]
-    if opponent_filter != "All":
-        df_filtered = df_filtered[df_filtered["Cavalry/Opponent"] == opponent_filter]
-    if date_filter != "All":
-        df_filtered = df_filtered[df_filtered["Date"].dt.date.astype(str) == date_filter]
+    filter_config = [
+        (round_filter, "Round"),
+        (side_filter, "Local/Visit"),
+        (opponent_filter, "Cavalry/Opponent"),
+        (date_filter, "Date")
+    ]
+    
+    for value, col in filter_config:
+        if value != "All":
+            if col == "Date":
+                df_filtered = df_filtered[df_filtered[col].dt.date.astype(str) == value]
+            else:
+                df_filtered = df_filtered[df_filtered[col] == value]
 
     # Mostrar jugadores
-    st.subheader(get_text(lang, "players_header"))
+    st.subheader("🧍 Players")
     df_filtered = df_filtered.sort_values(by="Position", key=lambda x: x.apply(get_position_order))
     players_list = df_filtered["Player"].unique()
     
@@ -132,13 +114,13 @@ def heatmaps_page(lang="es"):
         with cols[idx % 6]:
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
-                response = requests.get(player_data["Photo"], headers={"User-Agent": "Mozilla/5.0"})
-                image = Image.open(BytesIO(response.content))
-                st.image(image, width=70, use_container_width=False)
+                
+                # Cargar imagen directamente con Streamlit
+                if player_data["Team"] == "Cavalry":
+                    st.image(player_data["Photo"], width=70, use_column_width=False)
                 
                 pos_group = get_position_group(player_data["Position"])
-                team_label = (get_text(lang, "cavalry") if player_data['Team'] == 'Cavalry' 
-                            else f"{get_text(lang, 'opponent')} ({player_data['Cavalry/Opponent']})")
+                team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 
                 st.markdown(
                     f"<div class='player-info'>"
@@ -150,45 +132,37 @@ def heatmaps_page(lang="es"):
                 )
                 st.markdown("</div>", unsafe_allow_html=True)
             except Exception as e:
-                st.error(get_text(lang, "image_error"))
+                st.warning(f"Could not load image for {player_name}")
                 
-            if st.button(f"{get_text(lang, 'show_heatmaps')} - {player_name}", key=f"btn_{player_name}"):
+            if st.button(f"Show Heatmaps - {player_name}", key=f"btn_{player_name}"):
                 st.session_state.selected_player = player_name
 
     # Mostrar heatmaps
     if "selected_player" in st.session_state and st.session_state.selected_player:
         st.divider()
-        st.markdown(f"## 🔥 {get_text(lang, 'heatmaps_for')} {st.session_state.selected_player}")
+        st.markdown(f"## 🔥 Heatmaps - {st.session_state.selected_player}")
         df_player = df[df["Player"] == st.session_state.selected_player].sort_values("Date", ascending=False)
         
         for _, row in df_player.iterrows():
-            st.markdown(f"**{get_text(lang, 'round')} {row['Round']}** - "
-                        f"{get_text(lang, 'date')}: `{row['Date'].date()}` - "
-                        f"{get_text(lang, 'opponent')}: `{row['Cavalry/Opponent']}`")
+            st.markdown(f"**Round {row['Round']}** - Date: `{row['Date'].date()}` - Opponent: `{row['Cavalry/Opponent']}`")
             
             position = str(row.get("Position", "")).strip().upper()
             if position == "GK":
-                st.markdown(f"{get_text(lang, 'minutes')}: `{row['Minutes played']}` | "
-                            f"{get_text(lang, 'saves')}: `{row['Saves']}` | "
-                            f"{get_text(lang, 'goals_against')}: `{row['Goal Against']}`")
+                st.markdown(f"Minutes: `{row['Minutes played']}` | Saves: `{row['Saves']}` | Goals Against: `{row['Goal Against']}`")
             else:
-                st.markdown(f"{get_text(lang, 'minutes')}: `{row['Minutes played']}` | "
-                            f"{get_text(lang, 'goals')}: `{row['Goals']}` | "
-                            f"{get_text(lang, 'assists')}: `{row['Assists']}`")
+                st.markdown(f"Minutes: `{row['Minutes played']}` | Goals: `{row['Goals']}` | Assists: `{row['Assists']}`")
             
             try:
-                response = requests.get(row["heatmap"], headers={"User-Agent": "Mozilla/5.0"})
-                image = Image.open(BytesIO(response.content))
-                st.image(image, width=300)
-            except Exception as e:
-                st.error(f"{get_text(lang, 'heatmap_error')} {row['Round']}")
+                st.image(row["heatmap"], width=300)
+            except:
+                st.warning(f"Could not load heatmap for Round {row['Round']}")
 
     # Footer
-    st.markdown(f"""
+    st.markdown("""
     ---
     <div class='footer'>
-        {get_text(lang, "created_by")}<br>
-        {get_text(lang, "footer_roles")}
+        Created by Felipe Ormazabal<br>
+        Soccer Scout & Data Analyst
     </div>
     """, unsafe_allow_html=True)
 
