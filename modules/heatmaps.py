@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from io import BytesIO
 
 def heatmaps_page(lang):
@@ -130,13 +130,22 @@ def heatmaps_page(lang):
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
                 if player_data["Team"] == "Cavalry":
-                    st.image(player_data["Photo"], width=70, use_container_width=False)
+                    photo_url = player_data["Photo"]
+                    if isinstance(photo_url, str) and photo_url.startswith("http"):
+                        try:
+                            headers = {"User-Agent": "Mozilla/5.0"}
+                            response = requests.get(photo_url, headers=headers, timeout=10)
+                            response.raise_for_status()
+                            image = Image.open(BytesIO(response.content))
+                            st.image(image, width=70, use_container_width=False)
+                        except (requests.RequestException, UnidentifiedImageError):
+                            st.warning("⚠️ Imagen no disponible")
                 pos_group = get_position_group(player_data["Position"])
                 team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
             except:
-                st.warning("Image not found")
+                st.warning("Error al cargar tarjeta de jugador")
             if st.button(f"Show Heatmaps - {player_name}"):
                 st.session_state.selected_player = player_name
                 selected_player = player_name
@@ -154,7 +163,7 @@ def heatmaps_page(lang):
                 st.markdown(f"Minutes: `{row['Minutes played']}` | Goals: `{row['Goals']}` | Assists: `{row['Assists']}`")
             try:
                 headers = {"User-Agent": "Mozilla/5.0"}
-                response = requests.get(row["heatmap"], headers=headers)
+                response = requests.get(row["heatmap"], headers=headers, timeout=10)
                 image = Image.open(BytesIO(response.content))
                 st.image(image, width=300)
             except:
@@ -167,3 +176,4 @@ def heatmaps_page(lang):
       Soccer Scout & Data Analyst
     </div>
     """, unsafe_allow_html=True)
+
