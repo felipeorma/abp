@@ -174,3 +174,4 @@ def heatmaps_page(lang="es"):
       Soccer Scout & Data Analyst
     </div>
     """, unsafe_allow_html=True)
+
