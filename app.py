@@ -1,7 +1,7 @@
 import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from modules.heatmaps import heatmaps_page  # 🔥 NUEVA IMPORTACIÓN
+from modules.heatmaps import heatmaps_page   # 🔥 NUEVA IMPORTACIÓN
 from utils.i18n import get_text
 
 # Configuración de página
