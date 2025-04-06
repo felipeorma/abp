@@ -130,7 +130,8 @@ def heatmaps_page(lang):
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
                 if player_data["Team"] == "Cavalry":
-                    photo_url = player_data["Photo"]
+                    # Limpieza de la URL para remover espacios o comillas extra
+                    photo_url = str(player_data["Photo"]).strip().replace('"', '')
                     if isinstance(photo_url, str) and photo_url.startswith("http"):
                         try:
                             headers = {"User-Agent": "Mozilla/5.0"}
@@ -140,12 +141,15 @@ def heatmaps_page(lang):
                             st.image(image, width=70, use_container_width=False)
                         except (requests.RequestException, UnidentifiedImageError):
                             st.warning("⚠️ Imagen no disponible")
+                    else:
+                        st.warning("📷 URL inválida")
                 pos_group = get_position_group(player_data["Position"])
                 team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
-            except:
+            except Exception as e:
                 st.warning("Error al cargar tarjeta de jugador")
+                st.caption(f"Error: {e}")
             if st.button(f"Show Heatmaps - {player_name}"):
                 st.session_state.selected_player = player_name
                 selected_player = player_name
