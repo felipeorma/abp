@@ -247,7 +247,8 @@
         "strategy": "Strategy",
         "strategy_yes": "Yes",
         "execution_type": "Execution Type",
-        "exec_type_cross": "Cross"
+        "exec_type_cross": "Cross",
+        "heatmaps_tab": "🗺️ Heatmaps"
         },
     "es": {
         "analytics_title": "Panel de Análisis Táctico Profesional",
@@ -497,6 +498,8 @@
         "strategy": "Estrategia",
         "strategy_yes": "Sí",
         "execution_type": "Tipo de Ejecución",
-        "exec_type_cross": "Centro"
+        "exec_type_cross": "Centro",
+        "heatmaps_tab": "🗺️ Heatmaps"
+
     }
 }
