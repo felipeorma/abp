@@ -1,23 +1,31 @@
-jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
-Jornada 1,4/20/2024 20:58,Atlético Ottawa,Local,2T,46,Córner,HFX Wanderers FC,Jugador_Rival,1,9,Jugador_Rival,Cabeza,Jugador_Rival,Sí,Gol,Hábil,No,Centro,85,46,99,69
-Jornada 4,5/11/2024 19:28,York United FC,Visitante,1T,23,Córner,Vancouver FC,Jugador_Rival,1,5,Jugador_Rival,Tronco,,No,Disparo al arco,No hábil,Sí,Centro,101,27,94,21
-Jornada 4,5/11/2024 20:21,Forge FC,Local,2T,72,Tiro libre,Vancouver FC,Jugador_Rival,1,8,Jugador_Rival,Tronco,,Sí,Gol,Hábil,Sí,Disparo directo,94,43,112,54
-Jornada 1,4/20/2024 19:34,York United FC,Visitante,2T,44,Córner,Valour FC,Jugador_Rival,2,13,Jugador_Rival,Pie izquierdo,Jugador_Rival,No,Despeje,Hábil,No,Pase corto,95,61,75,21
-Jornada 2,4/27/2024 19:36,Vancouver FC,Visitante,1T,76,Lateral,Forge FC,Jugador_Rival,2,6,Jugador_Rival,Cabeza,Jugador_Rival,No,Despeje,No hábil,No,Disparo directo,71,79,105,29
-Jornada 4,5/11/2024 21:12,Vancouver FC,Local,2T,13,Lateral,York United FC,Jugador_Rival,2,10,Jugador_Rival,Pie derecho,,Sí,Gol,No hábil,No,Centro,84,40,108,44
-Jornada 4,5/11/2024 21:01,Vancouver FC,Local,1T,43,Penal,York United FC,Jugador_Rival,2,10,Jugador_Rival,Pie derecho,Jugador_Rival,Sí,Gol,No hábil,No,Centro,90,71,74,44
-Jornada 2,4/27/2024 19:23,Forge FC,Local,1T,29,Tiro libre,Cavalry FC,Fraser Aird,3,7,Maël Henry,Cabeza,James McGlinchey,Sí,Gol,Hábil,No,Disparo directo,119,22,94,69
-Jornada 4,5/11/2024 19:28,Valour FC,Local,2T,31,Lateral,Cavalry FC,James McGlinchey,3,6,Ali Musse,Pie derecho,Ali Musse,Sí,Gol,Hábil,Sí,Pase corto,84,7,73,59
-Jornada 1,4/20/2024 20:42,Valour FC,Local,2T,27,Penal,Cavalry FC,Neven Fewster,4,7,Josh Belbin,Tronco,Neven Fewster,No,Disparo al arco,No hábil,No,Centro,75,73,100,20
-Jornada 3,5/4/2024 19:20,Forge FC,Local,1T,34,Penal,Valour FC,Jugador_Rival,4,7,Jugador_Rival,Pie derecho,Jugador_Rival,No,Despeje,Hábil,Sí,Pase corto,89,40,113,27
-Jornada 1,4/20/2024 21:26,Vancouver FC,Visitante,1T,82,Lateral,Pacific FC,Jugador_Rival,14,11,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,Hábil,No,Disparo directo,117,17,111,76
-Jornada 1,4/20/2024 18:12,Vancouver FC,Visitante,1T,84,Lateral,Valour FC,Jugador_Rival,14,8,Jugador_Rival,Pie derecho,,Sí,Gol,No hábil,No,Pase corto,95,61,117,25
-Jornada 2,4/27/2024 18:57,Forge FC,Local,2T,77,Penal,Atlético Ottawa,Jugador_Rival,14,10,Jugador_Rival,Tronco,Jugador_Rival,No,Disparo desviado,Hábil,Sí,Disparo directo,112,42,97,31
-Jornada 2,4/27/2024 18:05,Valour FC,Visitante,2T,90,Córner,HFX Wanderers FC,Jugador_Rival,14,8,Jugador_Rival,Pie izquierdo,Jugador_Rival,Sí,Gol,Hábil,No,Disparo directo,83,75,70,50
-Jornada 4,5/11/2024 19:10,Cavalry FC,Local,1T,88,Lateral,Atlético Ottawa,Jugador_Rival,15,14,Jugador_Rival,Tronco,,Sí,Gol,No hábil,No,Pase corto,72,69,95,11
-Jornada 2,4/27/2024 18:28,Valour FC,Visitante,2T,57,Tiro libre,HFX Wanderers FC,Jugador_Rival,16,15,Jugador_Rival,Tronco,Jugador_Rival,Sí,Gol,Hábil,Sí,Disparo directo,94,77,71,65
-Jornada 4,5/11/2024 18:38,Cavalry FC,Local,1T,40,Lateral,Atlético Ottawa,Jugador_Rival,16,14,Jugador_Rival,Cabeza,,Sí,Gol,Hábil,No,Centro,88,30,111,20
-Jornada 4,5/11/2024 18:34,Pacific FC,Local,1T,51,Penal,Forge FC,Jugador_Rival,16,3,Jugador_Rival,Pie derecho,Jugador_Rival,No,Despeje,No hábil,Sí,Disparo directo,99,11,82,26
-Jornada 1,4/20/2024 18:48,Vancouver FC,Visitante,1T,17,Lateral,Valour FC,Jugador_Rival,17,10,Jugador_Rival,Cabeza,Jugador_Rival,Sí,Gol,Hábil,No,Centro,81,15,117,66
-Jornada 2,4/27/2024 19:46,Forge FC,Local,2T,17,Penal,Vancouver FC,Jugador_Rival,17,9,Jugador_Rival,Tronco,Jugador_Rival,No,Posesión rival,Hábil,Sí,Disparo directo,117,8,79,2
-Jornada 2,4/27/2024 19:21,Valour FC,Local,1T,84,Tiro libre,Forge FC,Jugador_Rival,17,12,Jugador_Rival,Tronco,,No,Disparo al arco,No hábil,Sí,Disparo directo,72,49,91,5
+Round,Date,Local/Visit,Cavalry/Opponent,Team,Position,Player,Photo,heatmap,Minutes played,Goals,Assists,Saves,Goal Against
+1,4/5/2025,visit,Forge,Cavalry,GK,Carducci,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04130741/CFC_MARCO-CARDUCCI_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-carducci.png,90,0,0,3,1
+1,4/5/2025,visit,Forge,Cavalry,RB,Field,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04133104/CFC_TOM-FIELD_318-x-530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-field.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,DF,Aird,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04125814/CFC_FRASER-AIRD_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-aird.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,DF,Montgomery,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04125254/CFC_CALLUM-MONTGOMERY_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-montgomery.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,LB,Kamdem,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04125155/CFC_BRADLEY-KAMDEM-FEWO_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-kamdem.png,77,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,DMF,Shome,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04133016/CFC_SHAMIT-SHOME_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-shome.png,77,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,DMF,Myroniuk,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04132654/CFC_NIKO-MYRONIUK_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-myroniuk.png,65,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,RW,Musse,https://cdn.canpl.ca/app/uploads/cpl/2025/04/02123648/CFC_ALI-MUSSE_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-musse.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,MF,Camargo,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04132916/CFC_SERGIO-CAMARGO_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-camargo.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,LW,Herdman,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04130017/CFC_JAY-HERDMAN_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-herdman.png,65,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,CF,Warschewski,https://cpl-network.s3.amazonaws.com/opta_photos/players/__placeholders/placeholder_120x120-100.jpg,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-warschewski.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,LW,Wahling,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04132052/CFC_NICHOLAS-WAHLING_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-wahling.png,25,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,DF,Baldisimo,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04131115/CFC_MICHAEL-BALDISIMO_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-baldisimo.png,25,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,LB,Gherasimencov,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04131716/CFC_MIHAIL-GHERASIMENCOV_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-gherasimencov.png,13,0,0,0,0
+1,4/5/2025,visit,Forge,Cavalry,CF,Elva,https://cdn.canpl.ca/app/uploads/cpl/2025/04/04125357/CFC_CANIGGIA-ELVA_318x530.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-elva.png,13,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,LW,Babouli,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-babouli.png,90,1,0,0,0
+1,4/5/2025,visit,Forge,Forge,CF,Wright,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-wright.png,81,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,RW,Choiniere,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-choiniere.png,81,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,MF,Jensen,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-jensen.png,82,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,DMF,Hojabrpour,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-hoja.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,MF,Bekker,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-bekker.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,LW,Jevremovic,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-jevremovic.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,DF,Jonsson,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-jonsson.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,DF,Nimick,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-nimick.png,90,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,RB,Bruno,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-bruno.png,72,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,CF,Filion,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/no_heatmap.png,9,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,RW,Ampomah,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-ampomah.png,9,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,MF,Paton,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/no_heatmap.png,8,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,LW,Kane,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-kane.png,14,0,0,0,0
+1,4/5/2025,visit,Forge,Forge,GK,Koleilat,https://github.com/felipeorma/heatmap/blob/main/profile_image.png,https://raw.githubusercontent.com/felipeorma/heatmap/main/heatmap/4-5-koleilat.png,90,0,0,6,0
