@@ -90,16 +90,19 @@ with st.container():
     st.markdown('<div class="filter-container">', unsafe_allow_html=True)
     st.header("🔎 Filters")
     
-    cols = st.columns([2, 2, 2, 2, 2])
+    # Añadir filtro de jugador y ajustar columnas
+    cols = st.columns([2, 2, 2, 2, 2, 2])  # 6 columnas ahora
     with cols[0]:
         team_view = st.radio("👥 Show Players From:", ["Cavalry", "Opponent"], index=0)
     with cols[1]:
-        round_filter = st.selectbox("Match Round", ["All"] + sorted(df["Round"].unique().tolist()))
+        player_filter = st.selectbox("Player", ["All"] + sorted(df["Player"].astype(str).unique().tolist()))
     with cols[2]:
-        side_filter = st.selectbox("Team Side", ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist()))
+        round_filter = st.selectbox("Match Round", ["All"] + sorted(df["Round"].unique().tolist()))
     with cols[3]:
-        opponent_filter = st.selectbox("Opponent", ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist()))
+        side_filter = st.selectbox("Team Side", ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist()))
     with cols[4]:
+        opponent_filter = st.selectbox("Opponent", ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist()))
+    with cols[5]:
         date_filter = st.selectbox("Match Date", ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist()))
     
     st.markdown('</div>', unsafe_allow_html=True)
