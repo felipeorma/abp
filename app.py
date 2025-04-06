@@ -6,7 +6,7 @@ from utils.i18n import get_text
 
 # Configuración de página
 st.set_page_config(
-    page_title="Set Piece Analytics Pro",
+    page_title="Cavalry FC Analytics Pro",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="expanded"
