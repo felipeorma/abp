@@ -132,8 +132,11 @@ def heatmaps_page(lang="es"):
         with cols[idx % 6]:
             try:
                 st.markdown("<div class='player-card'>", unsafe_allow_html=True)
-                if player_data["Team"] == "Cavalry":
-                    st.image(player_data["Photo"], width=70, use_container_width=False)
+                photo_url = player_data.get("Photo", "")
+                if photo_url and isinstance(photo_url, str) and photo_url.startswith("http"):
+                    st.image(photo_url, width=70, use_container_width=False)
+                else:
+                    st.markdown("🖼️ Imagen no disponible")
                 pos_group = get_position_group(player_data["Position"])
                 team_label = player_data['Team'] if player_data['Team'] == 'Cavalry' else f"Opponent ({player_data['Cavalry/Opponent']})"
                 st.markdown(f"<div class='player-info'><strong>{player_name}</strong><br><span>{team_label}</span><br><span class='position-badge {pos_group}'>{player_data['Position']}</span></div>", unsafe_allow_html=True)
