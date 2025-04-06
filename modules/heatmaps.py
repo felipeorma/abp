@@ -3,159 +3,146 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
-from utils.i18n import get_text  # Asegúrate de importar tu utilidad de traducción
+from utils.i18n import get_text
 
 def heatmaps_page(lang="es"):
-    # Estilos CSS (sin cambios)
+    # Configuración inicial
+    st.session_state.setdefault("selected_player", None)
+    apply_custom_styles()
+    
+    # Título y carga de datos
+    st.title("⚽ " + get_text(lang, "heatmap_title"))
+    df = load_data()
+    
+    # Controles de filtrado
+    filters = render_filters(df, lang)
+    
+    # Aplicar filtros
+    filtered_df = apply_filters(df, filters)
+    
+    # Mostrar jugadores
+    render_players(filtered_df, lang)
+    
+    # Mostrar heatmaps si hay selección
+    if st.session_state.selected_player:
+        render_heatmaps(st.session_state.selected_player, df, lang)
+
+def apply_custom_styles():
     st.markdown("""
-        <style>
-            /* Mantener los mismos estilos CSS */
-        </style>
+    <style>
+        .player-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .player-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .player-img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+    </style>
     """, unsafe_allow_html=True)
 
-    st.title("⚽ Cavalry FC - Player Heatmap Match Dashboard")
-
+def load_data():
     @st.cache_data
-    def load_data():
-        # Ajustar path si es necesario (ej: "../matches.csv")
-        return pd.read_csv("matches.csv").pipe(process_data)
+    def fetch_data():
+        df = pd.read_csv("matches.csv")
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df["Team"] = df["Team"].apply(lambda x: "Cavalry" if str(x).lower().strip() == "cavalry" else "Opponent")
+        return df.dropna(subset=["Player"])
+    return fetch_data()
+
+def render_filters(df, lang):
+    cols = st.columns(3)
+    filters = {}
     
-    def process_data(df):
-        df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
-        df = df.sort_values("Date", ascending=False)
-        df["Team"] = df["Team"].apply(
-            lambda x: "Cavalry" if str(x).strip().lower() == "cavalry" else "Opponent")
-        return df.fillna(0)
+    with cols[0]:
+        filters["team"] = st.radio(
+            get_text(lang, "team_filter"),
+            ["Cavalry", "Opponent"]
+        )
+    
+    with cols[1]:
+        filters["player"] = st.selectbox(
+            get_text(lang, "player_filter"),
+            ["All"] + sorted(df["Player"].unique())
+        )
+    
+    with cols[2]:
+        filters["date"] = st.selectbox(
+            get_text(lang, "date_filter"),
+            ["All"] + sorted(df["Date"].dt.strftime("%Y-%m-%d").unique())
+        )
+    
+    return filters
 
-    df = load_data()
-    df["Round"] = df["Round"].astype(str)
+def apply_filters(df, filters):
+    filtered = df[df["Team"] == filters["team"]]
+    
+    if filters["player"] != "All":
+        filtered = filtered[filtered["Player"] == filters["player"]]
+    
+    if filters["date"] != "All":
+        filtered = filtered[filtered["Date"].dt.strftime("%Y-%m-%d") == filters["date"]]
+    
+    return filtered
 
-    # Contenedor para filtros en el área principal
-    with st.container():
-        st.subheader(get_text(lang, "filters_header"))
-        
-        cols = st.columns([2, 2, 2, 2, 2, 2])
-        with cols[0]:
-            team_view = st.radio(
-                get_text(lang, "show_players_from"), 
-                ["Cavalry", "Opponent"],
-                index=0
-            )
-        with cols[1]:
-            round_filter = st.selectbox(
-                get_text(lang, "match_round"),
-                ["All"] + sorted(df["Round"].unique().tolist())
-            )
-        with cols[2]:
-            side_filter = st.selectbox(
-                get_text(lang, "team_side"),
-                ["All"] + sorted(df["Local/Visit"].astype(str).unique().tolist())
-            )
-        with cols[3]:
-            opponent_filter = st.selectbox(
-                get_text(lang, "opponent"),
-                ["All"] + sorted(df["Cavalry/Opponent"].astype(str).unique().tolist())
-            )
-        with cols[4]:
-            player_filter = st.selectbox(
-                get_text(lang, "player"),
-                ["All"] + sorted(df["Player"].astype(str).unique().tolist())
-            )
-        with cols[5]:
-            date_filter = st.selectbox(
-                get_text(lang, "match_date"),
-                ["All"] + sorted(df["Date"].dt.date.astype(str).unique().tolist())
-            )
-
-    # Filtrado de datos (sin cambios)
-    df_filtered = df[df["Player"].astype(str) != "0"].copy()
-    # ... (resto del filtrado)
-
-    # Sección de jugadores (sin cambios)
+def render_players(df, lang):
     st.subheader(get_text(lang, "players_header"))
-    df_filtered = df_filtered.sort_values(by="Position", key=lambda x: x.apply(get_position_order))
+    cols = st.columns(4)
     
-    # Mostrar jugadores en columnas
-    cols = st.columns(6)
-    for idx, player_name in enumerate(players_list):
-        with cols[idx % 6]:
-            # Usar una tarjeta clickeable en lugar de botón
-            if st.markdown(generate_player_card(player_data), unsafe_allow_html=True):
-                st.session_state.selected_player = player_name
+    for idx, (_, row) in enumerate(df.iterrows()):
+        with cols[idx % 4]:
+            render_player_card(row, lang)
 
-    # Manejo de heatmaps (sin cambios)
-    if st.session_state.get("selected_player"):
-        display_heatmaps(st.session_state.selected_player, df)
-
-def generate_player_card(player_data):
-    """Genera HTML para la tarjeta de jugador"""
-    return f"""
-    <div class='player-card' onclick="this.closest('.element-container').dispatchEvent(new CustomEvent('cardClick'))">
-        <img src="{player_data['Photo']}" class="player-img">
-        <div class='player-info'>
-            <strong>{player_data['Player']}</strong><br>
-            <span>{get_team_label(player_data)}</span><br>
-            <span class='position-badge {get_position_group(player_data["Position"])}'>
-                {player_data["Position"]}
-            </span>
+def render_player_card(row, lang):
+    card = st.container()
+    with card:
+        try:
+            response = requests.get(row["Photo"], headers={"User-Agent": "Mozilla/5.0"})
+            img = Image.open(BytesIO(response.content))
+            st.image(img, use_column_width=True, caption=row["Player"])
+        except:
+            st.error(get_text(lang, "image_error"))
+        
+        st.markdown(f"""
+        <div class='player-card'>
+            <h4>{row['Player']}</h4>
+            <p>Position: <strong>{row['Position']}</strong></p>
+            <p>Team: {row['Team']}</p>
         </div>
-    </div>
-    """
+        """, unsafe_allow_html=True)
+        
+        if st.button(get_text(lang, "view_heatmap") + f" {row['Player']}", key=f"btn_{row['Player']}"):
+            st.session_state.selected_player = row["Player"]
 
-def display_heatmaps(player_name, df):
-    """Muestra los heatmaps del jugador seleccionado"""
-    st.divider()
-    st.markdown(f"## 🔥 Heatmaps - {player_name}")
+def render_heatmaps(player, df, lang):
+    st.subheader(f"🔥 {get_text(lang, 'heatmaps_for')} {player}")
+    player_data = df[df["Player"] == player]
     
-    df_player = df[df["Player"] == player_name].sort_values("Date", ascending=False)
-    
-    for _, row in df_player.iterrows():
-        with st.expander(f"🗓️ {row['Date'].date()} - Round {row['Round']}"):
+    for _, match in player_data.iterrows():
+        with st.expander(f"🗓️ {match['Date'].date()} - {match['Cavalry/Opponent']}"):
             col1, col2 = st.columns([1, 3])
+            
             with col1:
-                display_match_stats(row)
+                st.write(f"**{get_text(lang, 'stats')}:**")
+                st.json({
+                    "Minutes": match["Minutes played"],
+                    "Goals": match["Goals"],
+                    "Assists": match["Assists"]
+                })
+            
             with col2:
-                display_heatmap_image(row["heatmap"])
-
-def display_match_stats(row):
-    """Muestra las estadísticas del partido"""
-    position = str(row.get("Position", "")).strip().upper()
-    
-    stats = {
-        "Minutes": row['Minutes played'],
-        "Position": position,
-        "Opponent": row['Cavalry/Opponent']
-    }
-    
-    if position == "GK":
-        stats.update({
-            "Saves": row['Saves'],
-            "Goals Against": row['Goal Against']
-        })
-    else:
-        stats.update({
-            "Goals": row['Goals'],
-            "Assists": row['Assists']
-        })
-    
-    st.json(stats)
-
-def display_heatmap_image(url):
-    """Muestra el heatmap desde la URL"""
-    try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-        response.raise_for_status()
-        image = Image.open(BytesIO(response.content))
-        st.image(image, use_column_width=True)
-    except Exception as e:
-        st.error(f"Error loading heatmap: {str(e)}")
-
-# Footer internacionalizado
-st.markdown(f"""
-    ---
-    <div class='footer'>
-        {get_text(lang, "created_by")}<br>
-        {get_text(lang, "footer_roles")}
-    </div>
-""", unsafe_allow_html=True)
-
+                try:
+                    response = requests.get(match["heatmap"], headers={"User-Agent": "Mozilla/5.0"})
+                    img = Image.open(BytesIO(response.content))
+                    st.image(img, use_column_width=True)
+                except:
+                    st.error(get_text(lang, "heatmap_load_error"))
