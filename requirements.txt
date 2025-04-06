@@ -13,3 +13,7 @@ Pillow
 requests
 streamlit-aggrid
 streamlit-extras
+pandas
+streamlit
+requests
+pillow
