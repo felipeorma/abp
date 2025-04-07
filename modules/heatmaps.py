@@ -4,6 +4,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 
+def heatmaps_page():
 st.set_page_config(page_title="Cavalry Player Heatmap Dashboard", layout="wide")
 
 st.markdown("""
@@ -188,3 +189,6 @@ st.markdown("""
   Soccer Scout & Data Analyst
 </div>
 """, unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    heatmaps_page()
