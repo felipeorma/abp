@@ -114,56 +114,120 @@ def evolucion_page(lang):
     # --- PPDA by Half + Rolling Average ---
     st.markdown("### 🧠 PPDA by Half vs Rolling Average")
 
-    # Valores actuales
-    val_2023_1st = matches_2023[matches_2023["Match"] == match_2023]["PPDA 1st Half"].values[0]
-    val_2023_2nd = matches_2023[matches_2023["Match"] == match_2023]["PPDA 2nd Half"].values[0]
-    val_2024_1st = matches_2024[matches_2024["Match"] == match_2024]["PPDA 1st Half"].values[0]
-    val_2024_2nd = matches_2024[matches_2024["Match"] == match_2024]["PPDA 2nd Half"].values[0]
+    option = st.radio("Select view:", ["Both Halves", "1st Half Only", "2nd Half Only"], horizontal=True)
 
-    # Rolling averages hasta la ronda seleccionada
-    rolling_2023_1st = df_2023[df_2023["Round"] <= round_2023]["PPDA 1st Half"].expanding().mean().iloc[-1]
-    rolling_2023_2nd = df_2023[df_2023["Round"] <= round_2023]["PPDA 2nd Half"].expanding().mean().iloc[-1]
-    rolling_2024_1st = df_2024[df_2024["Round"] <= round_2024]["PPDA 1st Half"].expanding().mean().iloc[-1]
-    rolling_2024_2nd = df_2024[df_2024["Round"] <= round_2024]["PPDA 2nd Half"].expanding().mean().iloc[-1]
+    tab1, tab2 = st.tabs(["🔙 2023 Season", "🔜 2024 Season"])
 
-    # --- Mostrar en dos columnas por temporada ---
-    st.markdown("#### 🔙 2023 Season")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("1st Half", round(val_2023_1st, 2))
-    with col2:
-        st.metric("2nd Half", round(val_2023_2nd, 2))
-    with col3:
-        st.metric("90 mins Avg", round(val_2023, 2))
+    with tab1:
+        st.markdown("#### PPDA Comparison – 2023")
 
-    col4, col5 = st.columns(2)
-    with col4:
-        st.metric("Rolling Avg 1st Half", round(rolling_2023_1st, 2))
-    with col5:
-        st.metric("Rolling Avg 2nd Half", round(rolling_2023_2nd, 2))
+        val_1st = matches_2023[matches_2023["Match"] == match_2023]["PPDA 1st Half"].values[0]
+        val_2nd = matches_2023[matches_2023["Match"] == match_2023]["PPDA 2nd Half"].values[0]
+        val_full = matches_2023[matches_2023["Match"] == match_2023]["PPDA"].values[0]
+        rolling_1st = df_2023[df_2023["Round"] <= round_2023]["PPDA 1st Half"].expanding().mean().iloc[-1]
+        rolling_2nd = df_2023[df_2023["Round"] <= round_2023]["PPDA 2nd Half"].expanding().mean().iloc[-1]
 
-    st.markdown("#### 🔜 2024 Season")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("1st Half", round(val_2024_1st, 2))
-    with col2:
-        st.metric("2nd Half", round(val_2024_2nd, 2))
-    with col3:
-        st.metric("90 mins Avg", round(val_2024, 2))
+        fig_2023 = go.Figure()
 
-    col4, col5 = st.columns(2)
-    with col4:
-        st.metric("Rolling Avg 1st Half", round(rolling_2024_1st, 2))
-    with col5:
-        st.metric("Rolling Avg 2nd Half", round(rolling_2024_2nd, 2))
+        if option != "2nd Half Only":
+            fig_2023.add_trace(go.Bar(
+                x=["1st Half"],
+                y=[val_1st],
+                name="Match Value",
+                text=[f"<b>{val_1st:.2f}</b>"],
+                textposition="outside",
+                marker_color="#C8102E"
+            ))
+            fig_2023.add_trace(go.Bar(
+                x=["1st Half"],
+                y=[rolling_1st],
+                name="Rolling Avg",
+                text=[f"<b>{rolling_1st:.2f}</b>"],
+                textposition="outside",
+                marker_color="#6C6C6C"
+            ))
 
-    # --- Footer signature ---
-    st.markdown(
-        """
-        <hr style='margin-top: 40px; margin-bottom: 10px'>
-        <div style='text-align: center; font-size: 14px; color: gray;'>
-            <strong>Felipe Ormazabal</strong> &nbsp;|&nbsp; Soccer Scout & Data Analyst
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        if option != "1st Half Only":
+            fig_2023.add_trace(go.Bar(
+                x=["2nd Half"],
+                y=[val_2nd],
+                name="Match Value",
+                text=[f"<b>{val_2nd:.2f}</b>"],
+                textposition="outside",
+                marker_color="#00843D"
+            ))
+            fig_2023.add_trace(go.Bar(
+                x=["2nd Half"],
+                y=[rolling_2nd],
+                name="Rolling Avg",
+                text=[f"<b>{rolling_2nd:.2f}</b>"],
+                textposition="outside",
+                marker_color="#6C6C6C"
+            ))
+
+        fig_2023.update_layout(
+            barmode='group',
+            template='simple_white',
+            height=400,
+            yaxis_title='PPDA',
+            title=dict(text=f"<b>{match_2023}</b> - PPDA by Half", x=0.5),
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center')
+        )
+        st.plotly_chart(fig_2023, use_container_width=True)
+
+    with tab2:
+        st.markdown("#### PPDA Comparison – 2024")
+
+        val_1st = matches_2024[matches_2024["Match"] == match_2024]["PPDA 1st Half"].values[0]
+        val_2nd = matches_2024[matches_2024["Match"] == match_2024]["PPDA 2nd Half"].values[0]
+        val_full = matches_2024[matches_2024["Match"] == match_2024]["PPDA"].values[0]
+        rolling_1st = df_2024[df_2024["Round"] <= round_2024]["PPDA 1st Half"].expanding().mean().iloc[-1]
+        rolling_2nd = df_2024[df_2024["Round"] <= round_2024]["PPDA 2nd Half"].expanding().mean().iloc[-1]
+
+        fig_2024 = go.Figure()
+
+        if option != "2nd Half Only":
+            fig_2024.add_trace(go.Bar(
+                x=["1st Half"],
+                y=[val_1st],
+                name="Match Value",
+                text=[f"<b>{val_1st:.2f}</b>"],
+                textposition="outside",
+                marker_color="#C8102E"
+            ))
+            fig_2024.add_trace(go.Bar(
+                x=["1st Half"],
+                y=[rolling_1st],
+                name="Rolling Avg",
+                text=[f"<b>{rolling_1st:.2f}</b>"],
+                textposition="outside",
+                marker_color="#6C6C6C"
+            ))
+
+        if option != "1st Half Only":
+            fig_2024.add_trace(go.Bar(
+                x=["2nd Half"],
+                y=[val_2nd],
+                name="Match Value",
+                text=[f"<b>{val_2nd:.2f}</b>"],
+                textposition="outside",
+                marker_color="#00843D"
+            ))
+            fig_2024.add_trace(go.Bar(
+                x=["2nd Half"],
+                y=[rolling_2nd],
+                name="Rolling Avg",
+                text=[f"<b>{rolling_2nd:.2f}</b>"],
+                textposition="outside",
+                marker_color="#6C6C6C"
+            ))
+
+        fig_2024.update_layout(
+            barmode='group',
+            template='simple_white',
+            height=400,
+            yaxis_title='PPDA',
+            title=dict(text=f"<b>{match_2024}</b> - PPDA by Half", x=0.5),
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center')
+        )
+        st.plotly_chart(fig_2024, use_container_width=True)
