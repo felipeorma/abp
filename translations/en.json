@@ -167,7 +167,7 @@
         "analytics_panel": "📊 Analytics Panel",
         "logo_error": "Error loading logo: {error}",
         "app_title": "Set Piece Analytics Pro",
-        "analytics_title": "⚽ Professional Tactical Analysis Dashboard",
+        "analytics_title": "⚽ Set Pieces Analysis Dashboard",
         "empty_db_warning": "Empty database! Record actions in the Registration module",
         "advanced_filters": "🔍 Advanced Filters",
         "select_matches": "Select matches:",
