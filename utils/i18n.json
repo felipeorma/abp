@@ -1,6 +1,6 @@
 {
     "en": {
-        "analytics_title": "Professional Tactical Analysis Dashboard",
+        "analytics_title": "Set Pieces Analysis Dashboard",
         "yes": "Yes",
         "no": "No",
         "corner": "Corner",
@@ -261,7 +261,7 @@
         "logo_error": "Error loading logo: {error}"
         },
     "es": {
-        "analytics_title": "Panel de Análisis Táctico Profesional",
+        "analytics_title": "Panel de Análisis ABP",
         "yes": "Sí",
         "no": "No",
         "corner": "Córner",
