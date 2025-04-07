@@ -205,3 +205,13 @@ def evolucion_page(lang):
     )
 
     st.plotly_chart(fig_rolling, use_container_width=True)
+
+
+# Footer
+    st.markdown("""
+    ---
+    <div class='footer'>
+        Created by Felipe Ormazabal<br>
+        Soccer Scout & Data Analyst
+    </div>
+    """, unsafe_allow_html=True)
