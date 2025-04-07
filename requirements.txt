@@ -17,3 +17,4 @@ pandas
 streamlit
 requests
 pillow
+openpyxl>=3.1.2
