@@ -111,123 +111,63 @@ def evolucion_page(lang):
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- PPDA by Half + Rolling Average ---
-    st.markdown("### 🧠 PPDA by Half vs Rolling Average")
+    # --- Rolling PPDA Comparison by Season ---
+    st.markdown("### 🔁 Rolling PPDA Comparison – 2023 vs 2024")
 
-    option = st.radio("Select view:", ["Both Halves", "1st Half Only", "2nd Half Only"], horizontal=True)
+    # Filtro de tipo
+    ppda_option = st.selectbox("Select PPDA Type", ["1st Half", "2nd Half", "Full Match (90 mins)"])
 
-    tab1, tab2 = st.tabs(["🔙 2023 Season", "🔜 2024 Season"])
+    # Mapeo de columnas
+    col_map = {
+        "1st Half": "PPDA 1st Half",
+        "2nd Half": "PPDA 2nd Half",
+        "Full Match (90 mins)": "PPDA"
+    }
 
-    with tab1:
-        st.markdown("#### PPDA Comparison – 2023")
+    col_selected = col_map[ppda_option]
 
-        val_1st = matches_2023[matches_2023["Match"] == match_2023]["PPDA 1st Half"].values[0]
-        val_2nd = matches_2023[matches_2023["Match"] == match_2023]["PPDA 2nd Half"].values[0]
-        val_full = matches_2023[matches_2023["Match"] == match_2023]["PPDA"].values[0]
-        rolling_1st = df_2023[df_2023["Round"] <= round_2023]["PPDA 1st Half"].expanding().mean().iloc[-1]
-        rolling_2nd = df_2023[df_2023["Round"] <= round_2023]["PPDA 2nd Half"].expanding().mean().iloc[-1]
+    # Ordenar por ronda descendente (mayor a menor)
+    df_2023_sorted = df_2023.sort_values("Round", ascending=False).copy()
+    df_2024_sorted = df_2024.sort_values("Round", ascending=False).copy()
 
-        fig_2023 = go.Figure()
+    df_2023_sorted["Rolling"] = df_2023_sorted[col_selected].rolling(window=3, min_periods=1).mean()
+    df_2024_sorted["Rolling"] = df_2024_sorted[col_selected].rolling(window=3, min_periods=1).mean()
 
-        if option != "2nd Half Only":
-            fig_2023.add_trace(go.Bar(
-                x=["1st Half"],
-                y=[val_1st],
-                name="Match Value",
-                text=[f"<b>{val_1st:.2f}</b>"],
-                textposition="outside",
-                marker_color="#C8102E"
-            ))
-            fig_2023.add_trace(go.Bar(
-                x=["1st Half"],
-                y=[rolling_1st],
-                name="Rolling Avg",
-                text=[f"<b>{rolling_1st:.2f}</b>"],
-                textposition="outside",
-                marker_color="#6C6C6C"
-            ))
+    fig_rolling = go.Figure()
 
-        if option != "1st Half Only":
-            fig_2023.add_trace(go.Bar(
-                x=["2nd Half"],
-                y=[val_2nd],
-                name="Match Value",
-                text=[f"<b>{val_2nd:.2f}</b>"],
-                textposition="outside",
-                marker_color="#00843D"
-            ))
-            fig_2023.add_trace(go.Bar(
-                x=["2nd Half"],
-                y=[rolling_2nd],
-                name="Rolling Avg",
-                text=[f"<b>{rolling_2nd:.2f}</b>"],
-                textposition="outside",
-                marker_color="#6C6C6C"
-            ))
+    # 2023 trace
+    fig_rolling.add_trace(go.Scatter(
+        x=df_2023_sorted["Round"],
+        y=df_2023_sorted["Rolling"],
+        mode='lines+markers',
+        name="2023",
+        line=dict(color="#C8102E", width=2),
+        text=df_2023_sorted["Match"],
+        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Round:</b> %{x}"
+    ))
 
-        fig_2023.update_layout(
-            barmode='group',
-            template='simple_white',
-            height=400,
-            yaxis_title='PPDA',
-            title=dict(text=f"<b>{match_2023}</b> - PPDA by Half", x=0.5),
-            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center')
-        )
-        st.plotly_chart(fig_2023, use_container_width=True)
+    # 2024 trace
+    fig_rolling.add_trace(go.Scatter(
+        x=df_2024_sorted["Round"],
+        y=df_2024_sorted["Rolling"],
+        mode='lines+markers',
+        name="2024",
+        line=dict(color="#00843D", width=2),
+        text=df_2024_sorted["Match"],
+        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Round:</b> %{x}"
+    ))
 
-    with tab2:
-        st.markdown("#### PPDA Comparison – 2024")
+    fig_rolling.update_layout(
+        template="simple_white",
+        height=500,
+        xaxis_title="Round (most recent on left)",
+        yaxis_title=f"{ppda_option} – Rolling PPDA",
+        title=dict(
+            text=f"<b>Rolling PPDA – {ppda_option}</b>",
+            x=0.5,
+            xanchor='center'
+        ),
+        legend=dict(orientation="h", y=-0.25, x=0.5, xanchor='center')
+    )
 
-        val_1st = matches_2024[matches_2024["Match"] == match_2024]["PPDA 1st Half"].values[0]
-        val_2nd = matches_2024[matches_2024["Match"] == match_2024]["PPDA 2nd Half"].values[0]
-        val_full = matches_2024[matches_2024["Match"] == match_2024]["PPDA"].values[0]
-        rolling_1st = df_2024[df_2024["Round"] <= round_2024]["PPDA 1st Half"].expanding().mean().iloc[-1]
-        rolling_2nd = df_2024[df_2024["Round"] <= round_2024]["PPDA 2nd Half"].expanding().mean().iloc[-1]
-
-        fig_2024 = go.Figure()
-
-        if option != "2nd Half Only":
-            fig_2024.add_trace(go.Bar(
-                x=["1st Half"],
-                y=[val_1st],
-                name="Match Value",
-                text=[f"<b>{val_1st:.2f}</b>"],
-                textposition="outside",
-                marker_color="#C8102E"
-            ))
-            fig_2024.add_trace(go.Bar(
-                x=["1st Half"],
-                y=[rolling_1st],
-                name="Rolling Avg",
-                text=[f"<b>{rolling_1st:.2f}</b>"],
-                textposition="outside",
-                marker_color="#6C6C6C"
-            ))
-
-        if option != "1st Half Only":
-            fig_2024.add_trace(go.Bar(
-                x=["2nd Half"],
-                y=[val_2nd],
-                name="Match Value",
-                text=[f"<b>{val_2nd:.2f}</b>"],
-                textposition="outside",
-                marker_color="#00843D"
-            ))
-            fig_2024.add_trace(go.Bar(
-                x=["2nd Half"],
-                y=[rolling_2nd],
-                name="Rolling Avg",
-                text=[f"<b>{rolling_2nd:.2f}</b>"],
-                textposition="outside",
-                marker_color="#6C6C6C"
-            ))
-
-        fig_2024.update_layout(
-            barmode='group',
-            template='simple_white',
-            height=400,
-            yaxis_title='PPDA',
-            title=dict(text=f"<b>{match_2024}</b> - PPDA by Half", x=0.5),
-            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center')
-        )
-        st.plotly_chart(fig_2024, use_container_width=True)
+    st.plotly_chart(fig_rolling, use_container_width=True)
