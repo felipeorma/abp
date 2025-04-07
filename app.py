@@ -2,6 +2,7 @@ import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
 from modules.heatmaps import heatmaps_page
+from modules.evolucion import evolucion_page  # Nueva pestaña
 from utils.i18n import get_text
 
 # Configuración de página
@@ -38,7 +39,8 @@ def main():
         opciones_navegacion = [
             get_text(lang, "live_registration"),
             get_text(lang, "analytics_panel"),
-            get_text(lang, "heatmaps_tab")
+            get_text(lang, "heatmaps_tab"),
+            get_text(lang, "evolution_tab")  # Nueva pestaña
         ]
 
         pagina = st.radio(
@@ -57,6 +59,9 @@ def main():
         analitica_page(lang)
     elif pagina_idx == 2:
         heatmaps_page()
+    elif pagina_idx == 3:
+        evolucion_page(lang)
 
 if __name__ == "__main__":
     main()
+
