@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 def evolucion_page(lang):
-    st.markdown("<h1 style='text-align: center;'>📈 PPDA Evolution by Round</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>\ud83d\udcc8 PPDA Evolution by Round</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 16px; color: gray;'>Analyze pressure intensity trends between past and current seasons</p>", unsafe_allow_html=True)
 
     # Load data
@@ -24,7 +24,7 @@ def evolucion_page(lang):
     # --- KPI Benchmarks ---
     st.markdown("""
     <div style='background-color:#f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
-        <h4 style='margin-bottom: 10px;'>📊 <span style='color:#C8102E;'>2023 Season Averages</span></h4>
+        <h4 style='margin-bottom: 10px;'>\ud83d\udcca <span style='color:#C8102E;'>2023 Season Averages</span></h4>
     """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
@@ -37,25 +37,36 @@ def evolucion_page(lang):
 
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- PPDA filter: Half or Full ---
+    st.markdown("### \u2699\ufe0f Choose PPDA Type to Compare")
+    ppda_compare_option = st.selectbox("PPDA Type", ["Full Match (90 mins)", "1st Half", "2nd Half"])
+
+    ppda_col_map = {
+        "Full Match (90 mins)": "PPDA",
+        "1st Half": "PPDA 1st Half",
+        "2nd Half": "PPDA 2nd Half"
+    }
+    selected_ppda_col = ppda_col_map[ppda_compare_option]
+
     # --- Select match from 2023 ---
-    st.markdown("### 🔙 Select from 2023 season")
+    st.markdown("### \ud83d\udd19 Select from 2023 season")
     round_2023 = st.selectbox("Round", sorted(df_2023["Round"].unique()))
     matches_2023 = df_2023[df_2023["Round"] == round_2023]
     match_2023 = st.selectbox("Match", matches_2023["Match"].tolist())
 
     # --- Select match from 2024 ---
-    st.markdown("### 🔜 Select from current season (2024)")
+    st.markdown("### \ud83d\udd1c Select from current season (2024)")
     round_2024 = st.selectbox("Round ", sorted(df_2024["Round"].unique()))
     matches_2024 = df_2024[df_2024["Round"] == round_2024]
     match_2024 = st.selectbox("Match ", matches_2024["Match"].tolist())
 
     # --- Extract values ---
-    val_2023 = matches_2023[matches_2023["Match"] == match_2023]["PPDA"].values[0]
-    val_2024 = matches_2024[matches_2024["Match"] == match_2024]["PPDA"].values[0]
-    avg_2023 = df_2023["PPDA"].mean()
+    val_2023 = matches_2023[matches_2023["Match"] == match_2023][selected_ppda_col].values[0]
+    val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].values[0]
+    avg_2023 = df_2023[selected_ppda_col].mean()
 
     # --- Show comparison ---
-    st.markdown("### 📍 PPDA Match Comparison")
+    st.markdown("### \ud83d\udccd PPDA Match Comparison")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(f"{match_2023} (2023)", round(val_2023, 2))
@@ -73,7 +84,7 @@ def evolucion_page(lang):
         name=f"{match_2023} (2023)",
         text=[f"<b>{val_2023:.2f}</b>"],
         textposition='outside',
-        marker_color="#C8102E"  # Rojo
+        marker_color="#C8102E"
     ))
 
     fig.add_trace(go.Bar(
@@ -82,7 +93,7 @@ def evolucion_page(lang):
         name=f"{match_2024} (2024)",
         text=[f"<b>{val_2024:.2f}</b>"],
         textposition='outside',
-        marker_color="#00843D"  # Verde
+        marker_color="#00843D"
     ))
 
     fig.add_trace(go.Bar(
@@ -91,13 +102,13 @@ def evolucion_page(lang):
         name="2023 Season Avg",
         text=[f"<b>{avg_2023:.2f}</b>"],
         textposition='outside',
-        marker_color="#000000"  # Negro
+        marker_color="#000000"
     ))
 
     fig.update_layout(
         barmode='group',
         title=dict(
-            text="<b>PPDA Comparison by Round</b>",
+            text=f"<b>PPDA Comparison by Round – {ppda_compare_option}</b>",
             x=0.5,
             xanchor='center',
             font=dict(size=20)
@@ -112,10 +123,9 @@ def evolucion_page(lang):
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Rolling PPDA Comparison by Season (Mejorado) ---
-    st.markdown("### 🌟 Rolling PPDA Comparison – 2023 vs 2024")
+    st.markdown("### \ud83c\udf1f Rolling PPDA Comparison – 2023 vs 2024")
 
     ppda_option = st.selectbox("Select PPDA Type", ["1st Half", "2nd Half", "Full Match (90 mins)"])
-
     col_map = {
         "1st Half": "PPDA 1st Half",
         "2nd Half": "PPDA 2nd Half",
@@ -138,7 +148,6 @@ def evolucion_page(lang):
 
     fig_rolling = go.Figure()
 
-    # 2023 trace
     fig_rolling.add_trace(go.Scatter(
         x=df_2023_sorted["Date"],
         y=df_2023_sorted["Rolling"],
@@ -150,7 +159,6 @@ def evolucion_page(lang):
         hovertemplate="<b>2023</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
     ))
 
-    # 2024 trace
     fig_rolling.add_trace(go.Scatter(
         x=df_2024_sorted["Date"],
         y=df_2024_sorted["Rolling"],
@@ -162,7 +170,6 @@ def evolucion_page(lang):
         hovertemplate="<b>2024</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
     ))
 
-    # Líneas horizontales de promedio
     fig_rolling.add_trace(go.Scatter(
         x=[df_2023_sorted["Date"].min(), df_2023_sorted["Date"].max()],
         y=[avg_2023, avg_2023],
@@ -205,6 +212,18 @@ def evolucion_page(lang):
     )
 
     st.plotly_chart(fig_rolling, use_container_width=True)
+
+    # --- Footer signature ---
+    st.markdown(
+        """
+        <hr style='margin-top: 40px; margin-bottom: 10px'>
+        <div style='text-align: center; font-size: 14px; color: gray;'>
+            <strong>Felipe Ormazabal</strong> &nbsp;|&nbsp; Soccer Scout & Data Analyst
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
  # --- Footer signature ---
     st.markdown(
