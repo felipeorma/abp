@@ -251,6 +251,6 @@
         "auth_header": "🔐 Acceso Restringido - Ingrese el código de acceso",
         "auth_code": "Código de acceso:",
         "auth_button": "Verificar código",
-        "auth_error": "❌ Código incorrecto, intente nuevamente"
+        "auth_error": "❌ Código incorrecto"
     
 }
