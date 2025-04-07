@@ -248,7 +248,11 @@
         "strategy_yes": "Yes",
         "execution_type": "Execution Type",
         "exec_type_cross": "Cross",
-        "heatmaps_tab": "🗺️ Heatmaps"
+        "heatmaps_tab": "🗺️ Heatmaps",
+        "auth_header": "🔐 Restricted Access - Enter Access Code",
+        "auth_code": "Access code:",
+        "auth_button": "Verify Code",
+        "auth_error": "❌ Incorrect code, please try again",
         },
     "es": {
         "analytics_title": "Panel de Análisis Táctico Profesional",
@@ -499,7 +503,11 @@
         "strategy_yes": "Sí",
         "execution_type": "Tipo de Ejecución",
         "exec_type_cross": "Centro",
-        "heatmaps_tab": "🗺️ Heatmaps"
+        "heatmaps_tab": "🗺️ Heatmaps",
+        "auth_header": "🔐 Acceso Restringido - Ingrese el código de acceso",
+        "auth_code": "Código de acceso:",
+        "auth_button": "Verificar código",
+        "auth_error": "❌ Código incorrecto, intente nuevamente",
 
     }
 }
