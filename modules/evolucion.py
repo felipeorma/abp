@@ -213,9 +213,7 @@ def evolucion_page(lang):
 
     st.plotly_chart(fig_rolling, use_container_width=True)
 
-
-
- # --- Footer signature ---
+    # --- Footer signature ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
@@ -225,5 +223,3 @@ def evolucion_page(lang):
         """,
         unsafe_allow_html=True
     )
-
-
