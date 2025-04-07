@@ -111,6 +111,52 @@ def evolucion_page(lang):
 
     st.plotly_chart(fig, use_container_width=True)
 
+    # --- PPDA by Half + Rolling Average ---
+    st.markdown("### 🧠 PPDA by Half vs Rolling Average")
+
+    # Valores actuales
+    val_2023_1st = matches_2023[matches_2023["Match"] == match_2023]["PPDA 1st Half"].values[0]
+    val_2023_2nd = matches_2023[matches_2023["Match"] == match_2023]["PPDA 2nd Half"].values[0]
+    val_2024_1st = matches_2024[matches_2024["Match"] == match_2024]["PPDA 1st Half"].values[0]
+    val_2024_2nd = matches_2024[matches_2024["Match"] == match_2024]["PPDA 2nd Half"].values[0]
+
+    # Rolling averages hasta la ronda seleccionada
+    rolling_2023_1st = df_2023[df_2023["Round"] <= round_2023]["PPDA 1st Half"].expanding().mean().iloc[-1]
+    rolling_2023_2nd = df_2023[df_2023["Round"] <= round_2023]["PPDA 2nd Half"].expanding().mean().iloc[-1]
+    rolling_2024_1st = df_2024[df_2024["Round"] <= round_2024]["PPDA 1st Half"].expanding().mean().iloc[-1]
+    rolling_2024_2nd = df_2024[df_2024["Round"] <= round_2024]["PPDA 2nd Half"].expanding().mean().iloc[-1]
+
+    # --- Mostrar en dos columnas por temporada ---
+    st.markdown("#### 🔙 2023 Season")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("1st Half", round(val_2023_1st, 2))
+    with col2:
+        st.metric("2nd Half", round(val_2023_2nd, 2))
+    with col3:
+        st.metric("90 mins Avg", round(val_2023, 2))
+
+    col4, col5 = st.columns(2)
+    with col4:
+        st.metric("Rolling Avg 1st Half", round(rolling_2023_1st, 2))
+    with col5:
+        st.metric("Rolling Avg 2nd Half", round(rolling_2023_2nd, 2))
+
+    st.markdown("#### 🔜 2024 Season")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("1st Half", round(val_2024_1st, 2))
+    with col2:
+        st.metric("2nd Half", round(val_2024_2nd, 2))
+    with col3:
+        st.metric("90 mins Avg", round(val_2024, 2))
+
+    col4, col5 = st.columns(2)
+    with col4:
+        st.metric("Rolling Avg 1st Half", round(rolling_2024_1st, 2))
+    with col5:
+        st.metric("Rolling Avg 2nd Half", round(rolling_2024_2nd, 2))
+
     # --- Footer signature ---
     st.markdown(
         """
@@ -121,4 +167,3 @@ def evolucion_page(lang):
         """,
         unsafe_allow_html=True
     )
-
