@@ -32,7 +32,7 @@ def evolucion_page(lang):
     with col2:
         st.metric("PPDA", round(df_2023['PPDA'].mean(), 2))
     with col3:
-        st.metric("Possession", f"{round(df_2023['Possession'].mean(), 1)}%" if 'Possession' in df_2023.columns else "N/A")
+        st.metric("Possession", f"{round(df_2023['Possession, %'].mean(), 1)}%" if 'Possession, %' in df_2023.columns else "N/A")
 
     # --- Select match from 2023 ---
     round_2023 = st.selectbox("📅 Select round from **2023 season**", sorted(df_2023["Round"].unique()))
