@@ -54,7 +54,7 @@ def main():
     elif pagina_idx == 1:
         analitica_page(lang)
     elif pagina_idx == 2:
-        heatmaps_page(lang)
+        heatmaps_page()
 
 if __name__ == "__main__":
     main()
