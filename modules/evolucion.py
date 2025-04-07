@@ -16,9 +16,9 @@ def evolucion_page(lang):
         st.error(f"Error loading files: {str(e)}")
         return
 
-    # Validate 'Round' column
-    if 'Round' not in df_2024.columns:
-        st.error("The 2024 file must contain a 'Round' column.")
+    # Validate required columns
+    if 'Round' not in df_2024.columns or 'Match' not in df_2024.columns:
+        st.error("The 2024 file must contain both 'Round' and 'Match' columns.")
         return
 
     # --- KPI Benchmarks from 2023 ---
@@ -39,20 +39,16 @@ def evolucion_page(lang):
     matches_r1 = df_2024[df_2024['Round'] == round_1]
     matches_r2 = df_2024[df_2024['Round'] == round_2]
 
-    # Choose identifier column for matches
-    id_cols = [col for col in ['Date', 'Opponent', 'Home'] if col in df_2024.columns]
-    match_label = id_cols[0] if id_cols else df_2024.columns[0]
-
-    match_1 = st.selectbox(f"🆚 Match from Round {round_1}", matches_r1[match_label].tolist())
-    match_2 = st.selectbox(f"🆚 Match from Round {round_2}", matches_r2[match_label].tolist())
+    match_1 = st.selectbox(f"🆚 Match from Round {round_1}", matches_r1["Match"].tolist())
+    match_2 = st.selectbox(f"🆚 Match from Round {round_2}", matches_r2["Match"].tolist())
 
     # Select metric to compare
     metric_columns = [col for col in df_2023.columns if col in df_2024.columns and df_2023[col].dtype != 'O']
     selected_metric = st.selectbox("📈 Select metric to compare", metric_columns)
 
     # Extract values
-    val_1 = matches_r1[matches_r1[match_label] == match_1][selected_metric].values[0]
-    val_2 = matches_r2[matches_r2[match_label] == match_2][selected_metric].values[0]
+    val_1 = matches_r1[matches_r1["Match"] == match_1][selected_metric].values[0]
+    val_2 = matches_r2[matches_r2["Match"] == match_2][selected_metric].values[0]
     avg_2023 = df_2023[selected_metric].mean()
 
     # Display metrics
@@ -73,4 +69,3 @@ def evolucion_page(lang):
     }, index=[selected_metric])
 
     st.bar_chart(df_chart.T)
-
