@@ -15,6 +15,10 @@ st.set_page_config(
 LOGO_PATH = "Cavalry_FC_logo.svg"
 
 def main():
+    # Inicialización de estado de sesión
+    st.session_state.setdefault("registro", [])
+    
+    # Configuración inicial de idioma
     lang = "es"
 
     with st.sidebar:
@@ -43,12 +47,10 @@ def main():
             index=0
         )
 
-    # Gestión del estado de sesión
-    st.session_state.setdefault("registro", [])
-
-    # Navegación
+    # Gestión de navegación
     pagina_idx = opciones_navegacion.index(pagina)
 
+    # Router de módulos
     if pagina_idx == 0:
         registro_page(lang)
     elif pagina_idx == 1:
