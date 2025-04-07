@@ -123,12 +123,16 @@ def evolucion_page(lang):
         "2nd Half": "PPDA 2nd Half",
         "Full Match (90 mins)": "PPDA"
     }
-
     col_selected = col_map[ppda_option]
 
-    # Ordenar por ronda descendente (mayor a menor)
-    df_2023_sorted = df_2023.sort_values("Round", ascending=False).copy()
-    df_2024_sorted = df_2024.sort_values("Round", ascending=False).copy()
+    # Convertir fechas si no lo están
+    for df in [df_2023, df_2024]:
+        if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
+            df["Date"] = pd.to_datetime(df["Date"])
+
+    # Ordenar por fecha ascendente
+    df_2023_sorted = df_2023.sort_values("Date").copy()
+    df_2024_sorted = df_2024.sort_values("Date").copy()
 
     df_2023_sorted["Rolling"] = df_2023_sorted[col_selected].rolling(window=3, min_periods=1).mean()
     df_2024_sorted["Rolling"] = df_2024_sorted[col_selected].rolling(window=3, min_periods=1).mean()
@@ -137,35 +141,39 @@ def evolucion_page(lang):
 
     # 2023 trace
     fig_rolling.add_trace(go.Scatter(
-        x=df_2023_sorted["Round"],
+        x=df_2023_sorted["Date"],
         y=df_2023_sorted["Rolling"],
         mode='lines+markers',
         name="2023",
         line=dict(color="#C8102E", width=2),
         text=df_2023_sorted["Match"],
-        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Round:</b> %{x}"
+        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Date:</b> %{x|%b %d}"
     ))
 
     # 2024 trace
     fig_rolling.add_trace(go.Scatter(
-        x=df_2024_sorted["Round"],
+        x=df_2024_sorted["Date"],
         y=df_2024_sorted["Rolling"],
         mode='lines+markers',
         name="2024",
         line=dict(color="#00843D", width=2),
         text=df_2024_sorted["Match"],
-        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Round:</b> %{x}"
+        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Date:</b> %{x|%b %d}"
     ))
 
     fig_rolling.update_layout(
         template="simple_white",
         height=500,
-        xaxis_title="Round (most recent on left)",
+        xaxis_title="Date",
         yaxis_title=f"{ppda_option} – Rolling PPDA",
         title=dict(
-            text=f"<b>Rolling PPDA – {ppda_option}</b>",
+            text=f"<b>Rolling PPDA over Time – {ppda_option}</b>",
             x=0.5,
             xanchor='center'
+        ),
+        xaxis=dict(
+            tickformat="%b %d",
+            tickangle=-45
         ),
         legend=dict(orientation="h", y=-0.25, x=0.5, xanchor='center')
     )
