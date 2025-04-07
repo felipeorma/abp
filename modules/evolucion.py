@@ -111,13 +111,11 @@ def evolucion_page(lang):
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Rolling PPDA Comparison by Season ---
-    st.markdown("### 🔁 Rolling PPDA Comparison – 2023 vs 2024")
+    # --- Rolling PPDA Comparison by Season (Mejorado) ---
+    st.markdown("### 🌟 Rolling PPDA Comparison – 2023 vs 2024")
 
-    # Filtro de tipo
     ppda_option = st.selectbox("Select PPDA Type", ["1st Half", "2nd Half", "Full Match (90 mins)"])
 
-    # Mapeo de columnas
     col_map = {
         "1st Half": "PPDA 1st Half",
         "2nd Half": "PPDA 2nd Half",
@@ -125,17 +123,18 @@ def evolucion_page(lang):
     }
     col_selected = col_map[ppda_option]
 
-    # Convertir fechas si no lo están
     for df in [df_2023, df_2024]:
         if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
             df["Date"] = pd.to_datetime(df["Date"])
 
-    # Ordenar por fecha ascendente
     df_2023_sorted = df_2023.sort_values("Date").copy()
     df_2024_sorted = df_2024.sort_values("Date").copy()
 
     df_2023_sorted["Rolling"] = df_2023_sorted[col_selected].rolling(window=3, min_periods=1).mean()
     df_2024_sorted["Rolling"] = df_2024_sorted[col_selected].rolling(window=3, min_periods=1).mean()
+
+    avg_2023 = df_2023_sorted[col_selected].mean()
+    avg_2024 = df_2024_sorted[col_selected].mean()
 
     fig_rolling = go.Figure()
 
@@ -145,9 +144,10 @@ def evolucion_page(lang):
         y=df_2023_sorted["Rolling"],
         mode='lines+markers',
         name="2023",
+        marker=dict(symbol='circle', size=8, color="#C8102E"),
         line=dict(color="#C8102E", width=2),
         text=df_2023_sorted["Match"],
-        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Date:</b> %{x|%b %d}"
+        hovertemplate="<b>2023</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
     ))
 
     # 2024 trace
@@ -156,24 +156,50 @@ def evolucion_page(lang):
         y=df_2024_sorted["Rolling"],
         mode='lines+markers',
         name="2024",
+        marker=dict(symbol='square', size=8, color="#00843D"),
         line=dict(color="#00843D", width=2),
         text=df_2024_sorted["Match"],
-        hovertemplate="<b>Match:</b> %{text}<br><b>PPDA:</b> %{y:.2f}<br><b>Date:</b> %{x|%b %d}"
+        hovertemplate="<b>2024</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
+    ))
+
+    # Líneas horizontales de promedio
+    fig_rolling.add_trace(go.Scatter(
+        x=[df_2023_sorted["Date"].min(), df_2023_sorted["Date"].max()],
+        y=[avg_2023, avg_2023],
+        mode='lines',
+        name="2023 Avg",
+        line=dict(color="#C8102E", width=1, dash="dot"),
+        showlegend=True
+    ))
+
+    fig_rolling.add_trace(go.Scatter(
+        x=[df_2024_sorted["Date"].min(), df_2024_sorted["Date"].max()],
+        y=[avg_2024, avg_2024],
+        mode='lines',
+        name="2024 Avg",
+        line=dict(color="#00843D", width=1, dash="dot"),
+        showlegend=True
     ))
 
     fig_rolling.update_layout(
         template="simple_white",
-        height=500,
+        height=550,
         xaxis_title="Date",
         yaxis_title=f"{ppda_option} – Rolling PPDA",
         title=dict(
             text=f"<b>Rolling PPDA over Time – {ppda_option}</b>",
             x=0.5,
-            xanchor='center'
+            font=dict(size=20)
         ),
         xaxis=dict(
             tickformat="%b %d",
-            tickangle=-45
+            tickangle=-45,
+            showgrid=True,
+            gridcolor='rgba(200,200,200,0.2)'
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor='rgba(200,200,200,0.2)'
         ),
         legend=dict(orientation="h", y=-0.25, x=0.5, xanchor='center')
     )
