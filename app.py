@@ -1,7 +1,7 @@
 import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from modules.heatmaps import heatmaps_page   # 🔥 NUEVA IMPORTACIÓN
+from modules.heatmaps import heatmaps_page
 from utils.i18n import get_text
 
 # Configuración de página
@@ -13,6 +13,17 @@ st.set_page_config(
 )
 
 LOGO_PATH = "Cavalry_FC_logo.svg"
+
+def handle_authentication(lang):
+    st.subheader(get_text(lang, "auth_header"))
+    code = st.text_input(get_text(lang, "auth_code"), type="password")
+    
+    if st.button(get_text(lang, "auth_button")):
+        if code == "CAV2025":  # Código de acceso
+            st.session_state.auth = True
+            st.experimental_rerun()
+        else:
+            st.error(get_text(lang, "auth_error"))
 
 def main():
     lang = "es"
@@ -34,7 +45,7 @@ def main():
         opciones_navegacion = [
             get_text(lang, "live_registration"),
             get_text(lang, "analytics_panel"),
-            get_text(lang, "heatmaps_tab")  # 🔥 NUEVA PESTAÑA
+            get_text(lang, "heatmaps_tab")
         ]
 
         pagina = st.radio(
@@ -45,11 +56,15 @@ def main():
 
     # Gestión del estado de sesión
     st.session_state.setdefault("registro", [])
+    st.session_state.setdefault("auth", False)
 
     # Navegación
     pagina_idx = opciones_navegacion.index(pagina)
 
     if pagina_idx == 0:
+        if not st.session_state.auth:
+            handle_authentication(lang)
+            return
         registro_page(lang)
     elif pagina_idx == 1:
         analitica_page(lang)
@@ -58,4 +73,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
