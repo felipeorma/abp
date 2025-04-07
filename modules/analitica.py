@@ -359,7 +359,7 @@ def configurar_descarga(lang: str, df):
         help=get_text(lang, "export_data_help")
     )
 
-# --- Footer signature ---
+    # --- Footer signature ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
