@@ -3,10 +3,10 @@ import pandas as pd
 import plotly.graph_objects as go
 
 def evolucion_page(lang):
-    st.title("📈 PPDA Evolution")
+    st.title("📈 PPDA Evolution by Round")
 
     st.markdown(
-        "Compare the PPDA metric between a match from last season and one from the current season. Visualize performance shifts with Cavalry FC color style."
+        "Compare PPDA between a match from 2023 and one from the current season, selecting by round and match."
     )
 
     # Load data
@@ -17,10 +17,12 @@ def evolucion_page(lang):
         st.error(f"Error loading files: {str(e)}")
         return
 
-    # Validate required columns
-    if 'Match' not in df_2023.columns or 'Match' not in df_2024.columns or 'PPDA' not in df_2023.columns or 'PPDA' not in df_2024.columns:
-        st.error("Both files must contain 'Match' and 'PPDA' columns.")
-        return
+    # Validate columns
+    for df, year in [(df_2023, "2023"), (df_2024, "2024")]:
+        for col in ["Round", "Match", "PPDA"]:
+            if col not in df.columns:
+                st.error(f"The {year} file must contain a '{col}' column.")
+                return
 
     # --- KPI Benchmarks ---
     st.subheader("📊 2023 Season Averages")
@@ -32,26 +34,32 @@ def evolucion_page(lang):
     with col3:
         st.metric("Possession", f"{round(df_2023['Possession'].mean(), 1)}%" if 'Possession' in df_2023.columns else "N/A")
 
-    # Match selection
-    match_2023 = st.selectbox("📅 Select a match from **2023 season**", df_2023["Match"].tolist())
-    match_2024 = st.selectbox("📅 Select a match from **current season (2024)**", df_2024["Match"].tolist())
+    # --- Select match from 2023 ---
+    round_2023 = st.selectbox("📅 Select round from **2023 season**", sorted(df_2023["Round"].unique()))
+    matches_2023 = df_2023[df_2023["Round"] == round_2023]
+    match_2023 = st.selectbox("🆚 Select match", matches_2023["Match"].tolist())
 
-    # Extract PPDA values
-    val_2023 = df_2023[df_2023["Match"] == match_2023]["PPDA"].values[0]
-    val_2024 = df_2024[df_2024["Match"] == match_2024]["PPDA"].values[0]
+    # --- Select match from 2024 ---
+    round_2024 = st.selectbox("📅 Select round from **2024 season**", sorted(df_2024["Round"].unique()))
+    matches_2024 = df_2024[df_2024["Round"] == round_2024]
+    match_2024 = st.selectbox("🆚 Select match", matches_2024["Match"].tolist())
+
+    # --- Extract values ---
+    val_2023 = matches_2023[matches_2023["Match"] == match_2023]["PPDA"].values[0]
+    val_2024 = matches_2024[matches_2024["Match"] == match_2024]["PPDA"].values[0]
     avg_2023 = df_2023["PPDA"].mean()
 
-    # Show comparison
+    # --- Show comparison ---
     st.subheader("🔍 Comparison of **PPDA**")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(f"{match_2023}", round(val_2023, 2))
+        st.metric(f"{match_2023} (2023)", round(val_2023, 2))
     with col2:
-        st.metric(f"{match_2024}", round(val_2024, 2))
+        st.metric(f"{match_2024} (2024)", round(val_2024, 2))
     with col3:
         st.metric("Difference", f"{(val_2024 - val_2023):+.2f}")
 
-    # Plotly bar chart with Cavalry FC colors
+    # --- Plotly bar chart with Cavalry FC colors ---
     fig = go.Figure()
 
     fig.add_trace(go.Bar(
@@ -60,7 +68,7 @@ def evolucion_page(lang):
         name=f"{match_2023} (2023)",
         text=[f"<b>{val_2023:.2f}</b>"],
         textposition='outside',
-        marker_color="#C8102E"  # Rojo Cavalry FC
+        marker_color="#C8102E"  # Rojo
     ))
 
     fig.add_trace(go.Bar(
@@ -69,13 +77,13 @@ def evolucion_page(lang):
         name=f"{match_2024} (2024)",
         text=[f"<b>{val_2024:.2f}</b>"],
         textposition='outside',
-        marker_color="#00843D"  # Verde Cavalry FC
+        marker_color="#00843D"  # Verde
     ))
 
     fig.add_trace(go.Bar(
         x=["PPDA"],
         y=[avg_2023],
-        name="2023 Avg",
+        name="2023 Season Avg",
         text=[f"<b>{avg_2023:.2f}</b>"],
         textposition='outside',
         marker_color="#000000"  # Negro
@@ -84,7 +92,7 @@ def evolucion_page(lang):
     fig.update_layout(
         barmode='group',
         title=dict(
-            text="<b>PPDA Comparison</b>",
+            text="<b>PPDA Comparison by Round</b>",
             x=0.5,
             xanchor='center',
             font=dict(size=20)
