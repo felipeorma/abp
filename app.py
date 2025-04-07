@@ -14,17 +14,6 @@ st.set_page_config(
 
 LOGO_PATH = "Cavalry_FC_logo.svg"
 
-def handle_authentication(lang):
-    st.subheader(get_text(lang, "auth_header"))
-    code = st.text_input(get_text(lang, "auth_code"), type="password")
-    
-    if st.button(get_text(lang, "auth_button")):
-        if code == "CAV2025":  # Código de acceso
-            st.session_state.auth = True
-            st.experimental_rerun()
-        else:
-            st.error(get_text(lang, "auth_error"))
-
 def main():
     lang = "es"
 
@@ -56,19 +45,30 @@ def main():
 
     # Gestión del estado de sesión
     st.session_state.setdefault("registro", [])
-    st.session_state.setdefault("auth", False)
+    st.session_state.setdefault("auth", False)  # Nuevo estado para autenticación
 
     # Navegación
     pagina_idx = opciones_navegacion.index(pagina)
 
-    if pagina_idx == 0:
+    if pagina_idx == 0:  # Live Registration
         if not st.session_state.auth:
-            handle_authentication(lang)
-            return
+            st.subheader("🔐 Acceso Restringido - Solo personal autorizado")
+            codigo = st.text_input("Ingrese el código de acceso:", type="password", key="access_code")
+            
+            if st.button("Verificar código"):
+                if codigo == "CAV2025":  # Código personalizable
+                    st.session_state.auth = True
+                    st.experimental_rerun()
+                else:
+                    st.error("Código incorrecto, intente nuevamente")
+            return  # Bloquear acceso hasta código correcto
+        
         registro_page(lang)
-    elif pagina_idx == 1:
+    
+    elif pagina_idx == 1:  # Analytics Panel
         analitica_page(lang)
-    elif pagina_idx == 2:
+    
+    elif pagina_idx == 2:  # Heatmaps
         heatmaps_page()
 
 if __name__ == "__main__":
