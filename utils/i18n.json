@@ -252,7 +252,13 @@
         "auth_header": "🔐 Restricted Access - Enter Access Code",
         "auth_code": "Access code:",
         "auth_button": "Verify Code",
-        "auth_error": "❌ Incorrect code"
+        "auth_error": "❌ Incorrect code",
+        "live_registration": "Live Registration",
+        "analytics_panel": "Analytics Panel",
+        "heatmaps_tab": "Heatmaps",
+        "evolution_tab": "Metrics Evolution",
+        "select_module": "Select a module",
+        "logo_error": "Error loading logo: {error}"
         },
     "es": {
         "analytics_title": "Panel de Análisis Táctico Profesional",
@@ -507,7 +513,13 @@
         "auth_header": "🔐 Acceso Restringido - Ingrese el código de acceso",
         "auth_code": "Código de acceso:",
         "auth_button": "Verificar código",
-        "auth_error": "❌ Código incorrecto"
+        "auth_error": "❌ Código incorrecto",
+        "live_registration": "Registro en Vivo",
+        "analytics_panel": "Panel de Análisis",
+        "heatmaps_tab": "Mapas de Calor",
+        "evolution_tab": "Evolución de Métricas",
+        "select_module": "Selecciona un módulo",
+        "logo_error": "Error al cargar el logo: {error}"
 
     }
 }
