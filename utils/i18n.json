@@ -252,7 +252,7 @@
         "auth_header": "🔐 Restricted Access - Enter Access Code",
         "auth_code": "Access code:",
         "auth_button": "Verify Code",
-        "auth_error": "❌ Incorrect code, please try again"
+        "auth_error": "❌ Incorrect code"
         },
     "es": {
         "analytics_title": "Panel de Análisis Táctico Profesional",
@@ -507,7 +507,7 @@
         "auth_header": "🔐 Acceso Restringido - Ingrese el código de acceso",
         "auth_code": "Código de acceso:",
         "auth_button": "Verificar código",
-        "auth_error": "❌ Código incorrecto, intente nuevamente"
+        "auth_error": "❌ Código incorrecto"
 
     }
 }
