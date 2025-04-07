@@ -1,7 +1,7 @@
 import streamlit as st
 from modules.registro import registro_page
 from modules.analitica import analitica_page
-from modules.heatmaps import heatmaps_page
+from modules.heatmaps import heatmaps_page   # 🔥 NUEVA IMPORTACIÓN
 from utils.i18n import get_text
 
 # Configuración de página
@@ -34,7 +34,7 @@ def main():
         opciones_navegacion = [
             get_text(lang, "live_registration"),
             get_text(lang, "analytics_panel"),
-            get_text(lang, "heatmaps_tab")
+            get_text(lang, "heatmaps_tab")  # 🔥 NUEVA PESTAÑA
         ]
 
         pagina = st.radio(
@@ -45,31 +45,17 @@ def main():
 
     # Gestión del estado de sesión
     st.session_state.setdefault("registro", [])
-    st.session_state.setdefault("auth", False)  # Nuevo estado para autenticación
 
     # Navegación
     pagina_idx = opciones_navegacion.index(pagina)
 
-    if pagina_idx == 0:  # Live Registration
-        if not st.session_state.auth:
-            st.subheader("🔐 Acceso Restringido - Solo personal autorizado")
-            codigo = st.text_input("Ingrese el código de acceso:", type="password", key="access_code")
-            
-            if st.button("Verificar código"):
-                if codigo == "CAV2025":  # Código personalizable
-                    st.session_state.auth = True
-                    st.experimental_rerun()
-                else:
-                    st.error("Código incorrecto, intente nuevamente")
-            return  # Bloquear acceso hasta código correcto
-        
+    if pagina_idx == 0:
         registro_page(lang)
-    
-    elif pagina_idx == 1:  # Analytics Panel
+    elif pagina_idx == 1:
         analitica_page(lang)
-    
-    elif pagina_idx == 2:  # Heatmaps
+    elif pagina_idx == 2:
         heatmaps_page()
 
 if __name__ == "__main__":
     main()
+
