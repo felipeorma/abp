@@ -3,11 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 
 def evolucion_page(lang):
-    st.title("📈 PPDA Evolution by Round")
-
-    st.markdown(
-        "Compare PPDA between a match from 2023 and one from the current season, selecting by round and match."
-    )
+    st.markdown("<h1 style='text-align: center;'>📈 PPDA Evolution by Round</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 16px; color: gray;'>Analyze pressure intensity trends between past and current seasons</p>", unsafe_allow_html=True)
 
     # Load data
     try:
@@ -25,24 +22,32 @@ def evolucion_page(lang):
                 return
 
     # --- KPI Benchmarks ---
-    st.subheader("📊 2023 Season Averages")
+    st.markdown("""
+    <div style='background-color:#f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+        <h4 style='margin-bottom: 10px;'>📊 <span style='color:#C8102E;'>2023 Season Averages</span></h4>
+    """, unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("xG", round(df_2023['xG'].mean(), 2) if 'xG' in df_2023.columns else "N/A")
     with col2:
         st.metric("PPDA", round(df_2023['PPDA'].mean(), 2))
     with col3:
-        st.metric("Possession", f"{round(df_2023['Possession, %'].mean(), 1)}%" if 'Possession, %' in df_2023.columns else "N/A")
+        st.metric("Possession", f"{round(df_2023['Possession'].mean(), 1)}%" if 'Possession' in df_2023.columns else "N/A")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # --- Select match from 2023 ---
-    round_2023 = st.selectbox("📅 Select round from **2023 season**", sorted(df_2023["Round"].unique()))
+    st.markdown("### 🔙 Select from 2023 season")
+    round_2023 = st.selectbox("Round", sorted(df_2023["Round"].unique()))
     matches_2023 = df_2023[df_2023["Round"] == round_2023]
-    match_2023 = st.selectbox("🆚 Select match", matches_2023["Match"].tolist())
+    match_2023 = st.selectbox("Match", matches_2023["Match"].tolist())
 
     # --- Select match from 2024 ---
-    round_2024 = st.selectbox("📅 Select round from **2024 season**", sorted(df_2024["Round"].unique()))
+    st.markdown("### 🔜 Select from current season (2024)")
+    round_2024 = st.selectbox("Round ", sorted(df_2024["Round"].unique()))
     matches_2024 = df_2024[df_2024["Round"] == round_2024]
-    match_2024 = st.selectbox("🆚 Select match", matches_2024["Match"].tolist())
+    match_2024 = st.selectbox("Match ", matches_2024["Match"].tolist())
 
     # --- Extract values ---
     val_2023 = matches_2023[matches_2023["Match"] == match_2023]["PPDA"].values[0]
@@ -50,7 +55,7 @@ def evolucion_page(lang):
     avg_2023 = df_2023["PPDA"].mean()
 
     # --- Show comparison ---
-    st.subheader("🔍 Comparison of **PPDA**")
+    st.markdown("### 📍 PPDA Match Comparison")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(f"{match_2023} (2023)", round(val_2023, 2))
