@@ -358,3 +358,14 @@ def configurar_descarga(lang: str, df):
         mime="text/csv",
         help=get_text(lang, "export_data_help")
     )
+
+    # --- Footer signature ---
+    st.markdown(
+        """
+        <hr style='margin-top: 40px; margin-bottom: 10px'>
+        <div style='text-align: center; font-size: 14px; color: gray;'>
+            <strong>Felipe Ormazabal</strong> &nbsp;|&nbsp; Soccer Scout & Data Analyst
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
