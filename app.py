@@ -54,7 +54,11 @@ def main():
 
     # Router de módulos
     if pagina_idx == 0:
-        registro_page(lang)
+        access_code = st.text_input("🔐 Enter access code to proceed:", type="password")
+        if access_code == "CAV25":
+            registro_page(lang)
+        else:
+            st.warning("Access denied. Please enter the correct code.")
     elif pagina_idx == 1:
         analitica_page(lang)
     elif pagina_idx == 2:
