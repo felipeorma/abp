@@ -3,7 +3,7 @@ import pandas as pd
 
 def evolucion_page(lang):
     st.title("📈 Evolución de Métricas" if lang == "es" else "📈 Metrics Evolution")
-    st.markdown("Compara métricas de partidos entre temporadas." if lang == "es" else "Compare match metrics across seasons.")
+    st.markdown("Compara métricas clave entre dos partidos y las temporadas anteriores." if lang == "es" else "Compare key metrics between matches and past seasons.")
 
     # Cargar datos
     try:
@@ -13,34 +13,52 @@ def evolucion_page(lang):
         st.error(f"Error cargando archivos: {str(e)}")
         return
 
-    # Mostrar columnas para debug
-    with st.expander("🧪 Ver columnas de ambos archivos"):
-        st.write("2023:", df_2023.columns.tolist())
-        st.write("2024:", df_2024.columns.tolist())
-
-    # Identificar columnas comparables (comunes)
+    # Detectar columnas numéricas comunes
     columnas_metricas = [col for col in df_2023.columns if col in df_2024.columns and df_2023[col].dtype != 'O']
 
     if not columnas_metricas:
         st.error("No hay métricas numéricas comunes entre ambos archivos.")
         return
 
-    metrica = st.selectbox(
-        "Selecciona una métrica a comparar" if lang == "es" else "Select a metric to compare",
-        columnas_metricas
-    )
+    # Selección de partidos (suponiendo que hay una columna identificadora)
+    columnas_identificadoras = [col for col in df_2024.columns if df_2024[col].dtype == 'O']
+    partido_id_col = st.selectbox("Columna para identificar partidos", columnas_identificadoras)
+    
+    partidos_disponibles = df_2024[partido_id_col].tolist()
+    partido_1 = st.selectbox("📊 Partido 1", partidos_disponibles, index=0)
+    partido_2 = st.selectbox("📊 Partido 2", partidos_disponibles, index=1 if len(partidos_disponibles) > 1 else 0)
 
-    # Mostrar valor promedio 2023 y última fila 2024 (supongamos que es el partido reciente)
-    valor_2023 = df_2023[metrica].mean()
-    valor_2024 = df_2024[metrica].iloc[-1]
+    # Selección de métrica a comparar
+    metrica = st.selectbox("Selecciona una métrica a comparar", columnas_metricas)
 
+    # KPIs Generales (encabezado)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if 'xG' in df_2023.columns:
+            st.metric("Promedio xG temporadas", round(df_2023['xG'].mean(), 2))
+    with col2:
+        if 'PPDA' in df_2023.columns:
+            st.metric("PPDA promedio", round(df_2023['PPDA'].mean(), 2))
+    with col3:
+        if 'Posesión' in df_2023.columns:
+            st.metric("Posesión promedio", f"{round(df_2023['Posesión'].mean(), 1)}%")
+
+    # Extraer valores de los partidos seleccionados
+    val_1 = df_2024[df_2024[partido_id_col] == partido_1][metrica].values[0]
+    val_2 = df_2024[df_2024[partido_id_col] == partido_2][metrica].values[0]
+    val_avg_2023 = df_2023[metrica].mean()
+
+    # Mostrar métricas comparativas
     st.subheader(f"{metrica}")
-    st.metric("Promedio 2023", round(valor_2023, 2))
-    st.metric("Último partido 2024", round(valor_2024, 2))
-    st.metric("Cambio", f"{(valor_2024 - valor_2023):+.2f}")
+    st.metric(f"{partido_1}", round(val_1, 2))
+    st.metric(f"{partido_2}", round(val_2, 2))
+    st.metric("Cambio", f"{(val_2 - val_1):+.2f}")
 
-    # Gráfico de barras comparativo
-    st.bar_chart(pd.DataFrame({
-        "Promedio 2023": [valor_2023],
-        "Último 2024": [valor_2024]
-    }, index=[metrica]))
+    # Gráfico comparativo
+    df_chart = pd.DataFrame({
+        partido_1: [val_1],
+        partido_2: [val_2],
+        "Promedio 2023": [val_avg_2023]
+    }, index=[metrica])
+
+    st.bar_chart(df_chart.T)
