@@ -202,14 +202,16 @@ def heatmaps_page():
                     except:
                         st.warning(f"Could not load heatmap for Round {row['Round']}")
 
-    # Footer
-    st.markdown("""
-    ---
-    <div class='footer'>
-        Created by Felipe Ormazabal<br>
-        Soccer Scout & Data Analyst
-    </div>
-    """, unsafe_allow_html=True)
+    # --- Footer signature ---
+    st.markdown(
+        """
+        <hr style='margin-top: 40px; margin-bottom: 10px'>
+        <div style='text-align: center; font-size: 14px; color: gray;'>
+            <strong>Felipe Ormazabal</strong><br>Soccer Scout - Data Analyst
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
     heatmaps_page()
