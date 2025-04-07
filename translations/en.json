@@ -251,5 +251,5 @@
         "auth_header": "🔐 Restricted Access - Enter Access Code",
         "auth_code": "Access code:",
         "auth_button": "Verify Code",
-        "auth_error": "❌ Incorrect code, please try again"
+        "auth_error": "❌ Incorrect code"
 }
