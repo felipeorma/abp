@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
-import os
 
 def evolucion_page(lang):
     st.title("📈 Evolución de Métricas" if lang == "es" else "📈 Metrics Evolution")
-
-    st.markdown("Compara métricas clave entre temporadas." if lang == "es" else "Compare key metrics across seasons.")
+    st.markdown("Compara métricas de partidos entre temporadas." if lang == "es" else "Compare match metrics across seasons.")
 
     # Cargar datos
     try:
@@ -15,34 +13,34 @@ def evolucion_page(lang):
         st.error(f"Error cargando archivos: {str(e)}")
         return
 
-    # Selección de métrica
+    # Mostrar columnas para debug
+    with st.expander("🧪 Ver columnas de ambos archivos"):
+        st.write("2023:", df_2023.columns.tolist())
+        st.write("2024:", df_2024.columns.tolist())
+
+    # Identificar columnas comparables (comunes)
+    columnas_metricas = [col for col in df_2023.columns if col in df_2024.columns and df_2023[col].dtype != 'O']
+
+    if not columnas_metricas:
+        st.error("No hay métricas numéricas comunes entre ambos archivos.")
+        return
+
     metrica = st.selectbox(
-        "Selecciona una métrica" if lang == "es" else "Select a metric",
-        [col for col in df_2023.columns if col in df_2024.columns and col not in ["Jugador", "Nombre", "Name"]]
+        "Selecciona una métrica a comparar" if lang == "es" else "Select a metric to compare",
+        columnas_metricas
     )
 
-    # Selección de jugador
-    jugador = st.selectbox(
-        "Selecciona un jugador" if lang == "es" else "Select a player",
-        df_2023["Jugador"] if "Jugador" in df_2023.columns else df_2023["Name"]
-    )
+    # Mostrar valor promedio 2023 y última fila 2024 (supongamos que es el partido reciente)
+    valor_2023 = df_2023[metrica].mean()
+    valor_2024 = df_2024[metrica].iloc[-1]
 
-    col_jugador = "Jugador" if "Jugador" in df_2023.columns else "Name"
+    st.subheader(f"{metrica}")
+    st.metric("Promedio 2023", round(valor_2023, 2))
+    st.metric("Último partido 2024", round(valor_2024, 2))
+    st.metric("Cambio", f"{(valor_2024 - valor_2023):+.2f}")
 
-    # Extraer valores
-    valor_2023 = df_2023[df_2023[col_jugador] == jugador][metrica].values[0]
-    valor_2024 = df_2024[df_2024[col_jugador] == jugador][metrica].values[0]
-
-    # Mostrar comparación
-    st.subheader(f"{metrica} - {jugador}")
-    st.metric("2023", round(valor_2023, 2))
-    st.metric("2024", round(valor_2024, 2))
-    diff = valor_2024 - valor_2023
-    st.metric("Cambio", f"{diff:+.2f}")
-
-    # Gráfico simple de barras
+    # Gráfico de barras comparativo
     st.bar_chart(pd.DataFrame({
-        "Temporada 2023": [valor_2023],
-        "Temporada 2024": [valor_2024]
+        "Promedio 2023": [valor_2023],
+        "Último 2024": [valor_2024]
     }, index=[metrica]))
-
