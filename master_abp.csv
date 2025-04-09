@@ -1,7 +1,7 @@
 jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
 Rueda 1,4/9/2025,Forge FC,Visitante,1T,13,Córner,Rival,Rival,2,5,Tom Field,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,30
 Rueda 1,4/5/2025,Forge FC,Visitante,1T,39,Córner,Rival,Rival,1,7,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,120,0,114,40
-Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Tiro libre,Rival,Rival,1,1,,,,No,Disparo desviado,Hábil,No,Disparo directo,120,0,120,0
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Tiro libre,Rival,Rival,1,1,None,None,,No,Disparo desviado,Hábil,No,Disparo directo,120,0,120,0
 Rueda 1,4/6/2025,Forge FC,Visitante,2T,52,Tiro libre,Rival,Rival,4,4,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,93,71,93,71
 Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Córner,Cavalry FC,Ali Musse,2,15,Sergio Camargo,Pie,,No,Disparo desviado,Hábil,Sí,Pase corto,120,80,93,51
 Rueda 1,4/5/2025,Forge FC,Visitante,2T,45,Córner,Cavalry FC,Sergio Camargo,1,6,Fraser Aird,Pie,Sergio Camargo,No,Disparo desviado,Hábil,Sí,Pase corto,120,0,114,50
