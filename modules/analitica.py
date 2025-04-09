@@ -71,7 +71,23 @@ def cargar_datos(lang: str):
     if not all(col in df.columns for col in required_columns):
         return pd.DataFrame()
     
-    return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
+    # Acciones que requieren zonas y ejecutor para análisis espacial
+    acciones_espaciales = [
+        get_text(lang, 'corner'),
+        get_text(lang, 'free_kick'),
+        get_text(lang, 'throw_in'),
+        get_text(lang, 'penalty'),
+        get_text(lang, 'cross'),
+        get_text(lang, 'shot')
+    ]
+    
+    # Solo exigir Zona Saque, Zona Remate y Ejecutor si es una acción espacial
+    df = df[
+        (~df['Acción'].isin(acciones_espaciales)) |
+        df[['Zona Saque', 'Zona Remate', 'Ejecutor']].notna().all(axis=1)
+    ]
+    
+    return df
 
 def configurar_filtros(lang: str, df):
     with st.sidebar:
