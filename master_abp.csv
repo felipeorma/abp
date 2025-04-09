@@ -1,17 +1,18 @@
 jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
-Rueda 1,Forge FC,Visitante,4/9/2025,13,1T,Córner,Rival,Rival,2,5,Tom Field,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,30
-Rueda 1,Forge FC,Visitante,4/5/2025,39,1T,Córner,Rival,Rival,1,7,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,120,0,114,40
-Rueda 1,Forge FC,Visitante,4/5/2025,19,1T,Tiro libre,Rival,Rival,1,1,,,,No,Disparo desviado,Hábil,No,Disparo directo,120,0,120,0
-Rueda 1,Forge FC,Visitante,4/6/2025,52,2T,Tiro libre,Rival,Rival,4,4,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,93,71,93,71
-Rueda 1,Forge FC,Visitante,4/5/2025,19,1T,Córner,Cavalry FC,Ali Musse,2,15,Sergio Camargo,Pie,,No,Disparo desviado,Hábil,Sí,Pase corto,120,80,93,51
-Rueda 1,Forge FC,Visitante,4/5/2025,45,2T,Córner,Cavalry FC,Sergio Camargo,1,6,Fraser Aird,Pie,Sergio Camargo,No,Disparo desviado,Hábil,Sí,Pase corto,120,0,114,50
-Rueda 1,Forge FC,Visitante,4/5/2025,77,2T,Córner,Cavalry FC,Sergio Camargo,1,10,Opponent,Cabeza,,No,Despeje,Hábil,No,Centro,120,0,105,35
-Rueda 1,Forge FC,Visitante,4/5/2025,85,2T,Córner,Cavalry FC,Ali Musse,2,6,Opponent,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,114,50
-Rueda 1,Forge FC,Visitante,4/5/2025,86,2T,Córner,Cavalry FC,Fraser Aird,1,10,Opponent,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,105,35
-Rueda 1,Forge FC,Visitante,4/5/2025,91,2T,Córner,Cavalry FC,Sergio Camargo,1,13,Fraser Aird,Pie,Sergio Camargo,No,Disparo desviado,Hábil,Sí,Pase corto,120,0,105,55
-Rueda 1,Forge FC,Visitante,4/5/2025,91,2T,Córner,Cavalry FC,Ali Musse,2,7,Opponent,Otro,Mihail Gherasimencov,No,Disparo al arco,Hábil,No,Centro,120,80,114,40
-Rueda 1,Forge FC,Visitante,4/5/2025,91,2T,Córner,Cavalry FC,Ali Musse,2,15,Fraser Aird,Pie,Ali Musse,No,Despeje,Hábil,Sí,Pase corto,120,80,93,51
-Rueda 1,Forge FC,Visitante,4/5/2025,24,1T,Tiro libre,Cavalry FC,Ali Musse,15,15,Opponent,Otro,,No,Despeje,Hábil,No,Disparo directo,93,51,93,51
-Rueda 1,Forge FC,Visitante,4/5/2025,41,1T,Tiro libre,Cavalry FC,Fraser Aird,16,13,Opponent,Cabeza,Tom Field,No,Posesión rival,Hábil,Sí,Centro,72,20,105,55
-Rueda 1,Forge FC,Visitante,4/5/2025,45,2T,Tiro libre,Cavalry FC,Ali Musse,17,10,Opponent,Cabeza,,No,Posesión rival,Hábil,No,Centro,72,60,105,35
-Rueda 1,Forge FC,Visitante,4/5/2025,82,2T,Tiro libre,Cavalry FC,Ali Musse,13,11,Opponent,Cabeza,,No,Despeje,Hábil,No,Centro,105,55,105,45
+jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
+Rueda 1,4/9/2025,Forge FC,Visitante,1T,13,Córner,Rival,Rival,2,5,Tom Field,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,30
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,39,Córner,Rival,Rival,1,7,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,120,0,114,40
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Tiro libre,Rival,Rival,1,1,,,,No,Disparo desviado,Hábil,No,Disparo directo,120,0,120,0
+Rueda 1,4/6/2025,Forge FC,Visitante,2T,52,Tiro libre,Rival,Rival,4,4,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,93,71,93,71
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Córner,Cavalry FC,Ali Musse,2,15,Sergio Camargo,Pie,,No,Disparo desviado,Hábil,Sí,Pase corto,120,80,93,51
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,45,Córner,Cavalry FC,Sergio Camargo,1,6,Fraser Aird,Pie,Sergio Camargo,No,Disparo desviado,Hábil,Sí,Pase corto,120,0,114,50
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,77,Córner,Cavalry FC,Sergio Camargo,1,10,Opponent,Cabeza,,No,Despeje,Hábil,No,Centro,120,0,105,35
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,85,Córner,Cavalry FC,Ali Musse,2,6,Opponent,Cabeza,,No,Posesión rival,Hábil,No,Centro,120,80,114,50
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,86,Córner,Cavalry FC,Fraser Aird,1,10,Opponent,Cabeza,,No,Despeje,Hábil,Sí,Centro,120,0,105,35
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,91,Córner,Cavalry FC,Sergio Camargo,1,13,Fraser Aird,Pie,Sergio Camargo,No,Disparo desviado,Hábil,Sí,Pase corto,120,0,105,55
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,91,Córner,Cavalry FC,Ali Musse,2,7,Opponent,Otro,Mihail Gherasimencov,No,Disparo al arco,Hábil,No,Centro,120,80,114,40
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,91,Córner,Cavalry FC,Ali Musse,2,15,Fraser Aird,Pie,Ali Musse,No,Despeje,Hábil,Sí,Pase corto,120,80,93,51
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,24,Tiro libre,Cavalry FC,Ali Musse,15,15,Opponent,Otro,,No,Despeje,Hábil,No,Disparo directo,93,51,93,51
+Rueda 1,4/5/2025,Forge FC,Visitante,1T,41,Tiro libre,Cavalry FC,Fraser Aird,16,13,Opponent,Cabeza,Tom Field,No,Posesión rival,Hábil,Sí,Centro,72,20,105,55
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,45,Tiro libre,Cavalry FC,Ali Musse,17,10,Opponent,Cabeza,,No,Posesión rival,Hábil,No,Centro,72,60,105,35
+Rueda 1,4/5/2025,Forge FC,Visitante,2T,82,Tiro libre,Cavalry FC,Ali Musse,13,11,Opponent,Cabeza,,No,Despeje,Hábil,No,Centro,105,55,105,45
