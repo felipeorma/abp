@@ -1,5 +1,4 @@
 jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
-jornada,fecha,rival,condición,periodo,minuto,acción,equipo,ejecutor,zona_saque,zona_remate,primer_contacto,parte_cuerpo,segundo_contacto,gol,resultado,perfil,estrategia,tipo_ejecución,x_saque,y_saque,x_remate,y_remate
 Rueda 1,4/9/2025,Forge FC,Visitante,1T,13,Córner,Rival,Rival,2,5,Tom Field,Cabeza,,No,Despeje,Hábil,No,Centro,120,80,114,30
 Rueda 1,4/5/2025,Forge FC,Visitante,1T,39,Córner,Rival,Rival,1,7,Marco Carducci,Otro,,No,Posesión rival,Hábil,No,Centro,120,0,114,40
 Rueda 1,4/5/2025,Forge FC,Visitante,1T,19,Tiro libre,Rival,Rival,1,1,,,,No,Disparo desviado,Hábil,No,Disparo directo,120,0,120,0
