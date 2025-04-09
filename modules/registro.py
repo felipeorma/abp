@@ -350,9 +350,7 @@ def generar_heatmaps(lang: str, df, zonas):
         st.pyplot(fig2)
 
         # Descargar CSV
-        csv = df.drop(columns=["coords_saque", "coords_remate", 
-                             "x_saque", "y_saque", 
-                             "x_remate", "y_remate"]).to_csv(index=False).encode('utf-8')
+        csv = df.to_csv(index=False).encode('utf-8')
         
         st.download_button(
             f"⬇️ {get_text(lang, 'download_csv')}",
