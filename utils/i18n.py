@@ -1,11 +1,14 @@
 import json
 from pathlib import Path
 
-# Cargar traducciones desde archivo JSON válido
-TRANSLATIONS_FILE = Path(__file__).parent / "translations.json"
+# Configuración correcta de rutas
+TRANSLATIONS_PATH = Path(__file__).parent / "translations.json"
 
-with open(TRANSLATIONS_FILE, "r", encoding="utf-8") as f:
-    translations = json.load(f)
+try:
+    with open(TRANSLATIONS_PATH, "r", encoding="utf-8") as f:
+        translations = json.load(f)
+except Exception as e:
+    raise RuntimeError(f"Error loading translations: {str(e)}") from e
 
 def get_text(lang: str, key: str) -> str:
     return translations.get(lang, {}).get(key, f"[[{key}]]")
