@@ -26,11 +26,9 @@ def analitica_page(lang: str):
     mostrar_ranking_parte_cuerpo(lang, df_filtrado)
 
 def cargar_datos(lang: str):
-    # Cargar datos desde GitHub
     url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
     df = pd.read_csv(url)
     
-    # Renombrar columnas según el CSV
     df = df.rename(columns={
         'jornada': 'Jornada',
         'fecha': 'Fecha',
@@ -48,14 +46,12 @@ def cargar_datos(lang: str):
         'parte_cuerpo': 'Parte Cuerpo'
     })
     
-    # Procesamiento de fechas
     df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce')
     df = df.dropna(subset=['Fecha'])
     
-    # Traducir valores clave
-    df['Gol'] = df['Gol'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
+    # NEW: Mapeo completo de valores
+    df['Gol'] = df['Gol'].map({'Sí': 'yes', 'No': 'no'}).apply(lambda x: get_text(lang, x))
     
-    # Mapeo de acciones
     action_translation = {
         'Córner': 'corner',
         'Tiro libre': 'free_kick',
@@ -66,12 +62,29 @@ def cargar_datos(lang: str):
     }
     df['Acción'] = df['Acción'].map(action_translation).apply(lambda x: get_text(lang, x))
     
-    # Validación final
+    # NEW: Traducir todos los valores de datos
+    df['Resultado'] = df['Resultado'].map({
+        'Gol': 'goal',
+        'Fallado': 'missed',
+        'Atajado': 'saved',
+        'Palo': 'post'
+    }).apply(lambda x: get_text(lang, x))
+    
+    df['Periodo'] = df['Periodo'].map({
+        'Primer Tiempo': 'first_half',
+        'Segundo Tiempo': 'second_half'
+    }).apply(lambda x: get_text(lang, x))
+    
+    df['Parte Cuerpo'] = df['Parte Cuerpo'].map({
+        'Cabeza': 'head',
+        'Pierna': 'leg',
+        'Otra': 'other'
+    }).apply(lambda x: get_text(lang, x))
+    
     required_columns = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in required_columns):
         return pd.DataFrame()
     
-    # Acciones que requieren zonas y ejecutor para análisis espacial
     acciones_espaciales = [
         get_text(lang, 'corner'),
         get_text(lang, 'free_kick'),
@@ -81,7 +94,6 @@ def cargar_datos(lang: str):
         get_text(lang, 'shot')
     ]
     
-    # Solo exigir Zona Saque, Zona Remate y Ejecutor si es una acción espacial
     df = df[
         (~df['Acción'].isin(acciones_espaciales)) |
         df[['Zona Saque', 'Zona Remate', 'Ejecutor']].notna().all(axis=1)
@@ -93,7 +105,6 @@ def configurar_filtros(lang: str, df):
     with st.sidebar:
         st.header(get_text(lang, "advanced_filters"))
         
-        # Procesar fechas para mostrar
         df = df.sort_values('Fecha', ascending=False)
         df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
         df['Partido'] = df.apply(
@@ -101,7 +112,6 @@ def configurar_filtros(lang: str, df):
             axis=1
         )
         
-        # Filtros interactivos
         partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
             options=df['Partido'].unique(),
@@ -231,10 +241,14 @@ def generar_mapa_calor(lang: str, df, tipo='saque'):
         zorder=2
     )
     
-    ax.set_title(get_text(lang, "density_title").format(tipo=get_text(lang, tipo)), 
-                fontsize=16, 
-                pad=20,
-                fontweight='bold')
+    # NEW: Traducción mejorada del título
+    tipo_traduccion = get_text(lang, "origin") if tipo == 'saque' else get_text(lang, "shot")
+    ax.set_title(
+        get_text(lang, "density_title").format(tipo=tipo_traduccion), 
+        fontsize=16, 
+        pad=20,
+        fontweight='bold'
+    )
     
     st.pyplot(fig)
     plt.close()
@@ -249,7 +263,12 @@ def generar_seccion_temporal(lang: str, df):
             x='Jornada', 
             color='Periodo',
             title=get_text(lang, "actions_by_round"),
-            labels={'count': get_text(lang, "actions")}
+            labels={
+                'count': get_text(lang, "actions"),
+                'Jornada': get_text(lang, "round"),
+                'Periodo': get_text(lang, "period")
+            },
+            category_orders={"Periodo": [get_text(lang, "first_half"), get_text(lang, "second_half")]}
         )
         st.plotly_chart(fig, use_container_width=True)
         
@@ -260,6 +279,11 @@ def generar_seccion_temporal(lang: str, df):
             y='Minuto',
             color='Equipo', 
             title=get_text(lang, "time_distribution"),
+            labels={
+                'Minuto': get_text(lang, "minutes"),
+                'Acción': get_text(lang, "actions"),
+                'Equipo': get_text(lang, "team")
+            },
             points="all"
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -280,7 +304,12 @@ def generar_seccion_efectividad(lang: str, df):
             y='Goles',
             size='Goles', 
             color='Ejecutor',
-            title=get_text(lang, "actions_goals_relation")
+            title=get_text(lang, "actions_goals_relation"),
+            labels={
+                'Acciones': get_text(lang, "actions"),
+                'Goles': get_text(lang, "goals"),
+                'Ejecutor': get_text(lang, "player")
+            }
         )
         fig.update_traces(marker=dict(line=dict(width=1, color='black')))
         fig.update_layout(plot_bgcolor='#F9F9F9', paper_bgcolor='#F9F9F9')
@@ -316,7 +345,6 @@ def generar_seccion_efectividad(lang: str, df):
 def mostrar_ranking_parte_cuerpo(lang: str, df):
     st.header(get_text(lang, "body_part_ranking"))
     
-    # Definir acciones ofensivas usando claves de traducción
     ACCIONES_OFENSIVAS = [
         get_text(lang, "corner"),
         get_text(lang, "free_kick"),
@@ -357,7 +385,11 @@ def mostrar_ranking_parte_cuerpo(lang: str, df):
             orientation='h',
             text='Cantidad',
             title=get_text(lang, "players_actions_by_body").format(tipo=tipo),
-            labels={'Cantidad': get_text(lang, "actions"), 'Ejecutor': get_text(lang, "player")},
+            labels={
+                'Cantidad': get_text(lang, "quantity"),
+                'Ejecutor': get_text(lang, "player"),
+                'Parte Cuerpo': get_text(lang, "body_part")
+            },
             color_discrete_map=color_map,
             category_orders={'Ejecutor': total_jugadores.index.tolist()}
         )
@@ -375,7 +407,6 @@ def configurar_descarga(lang: str, df):
         help=get_text(lang, "export_data_help")
     )
 
-    # --- Footer signature ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
