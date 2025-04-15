@@ -1,14 +1,17 @@
 import json
+import os
 from pathlib import Path
 
-# Configuración correcta de rutas
-TRANSLATIONS_PATH = Path(__file__).parent / "translations.json"
-
-try:
-    with open(TRANSLATIONS_PATH, "r", encoding="utf-8") as f:
-        translations = json.load(f)
-except Exception as e:
-    raise RuntimeError(f"Error loading translations: {str(e)}") from e
-
 def get_text(lang: str, key: str) -> str:
-    return translations.get(lang, {}).get(key, f"[[{key}]]")
+    try:
+        # Ruta absoluta confiable
+        current_dir = Path(__file__).parent
+        file_path = current_dir / "i18n.json"
+        
+        with open(file_path, "r", encoding="utf-8") as f:
+            translations = json.load(f)
+            
+        return translations.get(lang, {}).get(key, f"[{key}]")
+    
+    except Exception as e:
+        return f"⚠️ Error: {str(e)}"
