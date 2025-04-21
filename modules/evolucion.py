@@ -8,26 +8,18 @@ def evolucion_page(lang):
 
     # Load data
     try:
-        df_2024 = pd.read_excel("Cavalry2024stats.xlsx")  
-        df_2025 = pd.read_excel("Cavalry2025stats.xlsx")  
+        df_2024 = pd.read_excel("Cavalry2024stats.xlsx")  # Temporada pasada
+        df_2025 = pd.read_excel("Cavalry2025stats.xlsx")  # Temporada actual
     except Exception as e:
         st.error(f"Error loading files: {str(e)}")
         return
 
-    # ==== CORRECCIÓN 1: Validar TODAS las columnas críticas ====
-    required_cols = ["Round", "Match", "PPDA", "PPDA 1st Half", "PPDA 2nd Half"]
+    # Validate columns
     for df, year in [(df_2024, "2024"), (df_2025, "2025")]:
-        for col in required_cols:
+        for col in ["Round", "Match", "PPDA"]:
             if col not in df.columns:
-                st.error(f"Columna '{col}' no encontrada en {year}. Revisa el Excel.")
+                st.error(f"The {year} file must contain a '{col}' column.")
                 return
-            elif not pd.api.types.is_numeric_dtype(df[col]):
-                st.error(f"Columna '{col}' en {year} no es numérica. Corrige el formato.")
-                return
-
-    # ==== CORRECCIÓN 2: Normalizar formato de "Round" ====
-    for df in [df_2024, df_2025]:
-        df["Round"] = df["Round"].str.replace(r"(\D)(\d)", r"\1 \2", regex=True).str.strip()  # Ej: "Round1" → "Round 1"
 
     # --- KPI Benchmarks ---
     st.markdown("""
@@ -56,31 +48,28 @@ def evolucion_page(lang):
     }
     selected_ppda_col = ppda_col_map[ppda_compare_option]
 
-    # ==== CORRECCIÓN 3: Forzar mostrar todas las rondas disponibles ====
+    # --- Select match from 2024 ---
     st.markdown("### 🔙 Select from 2024 season")
-    round_2024 = st.selectbox("Round (2024)", sorted(df_2024["Round"].unique(), key=lambda x: int(x.split()[-1])))
+    round_2024 = st.selectbox("Round (2024)", sorted(df_2024["Round"].unique()))
     matches_2024 = df_2024[df_2024["Round"] == round_2024]
     match_2024 = st.selectbox("Match (2024)", matches_2024["Match"].tolist())
 
+    # --- Select match from 2025 ---
     st.markdown("### 🔜 Select from current season (2025)")
-    round_2025 = st.selectbox("Round (2025)", sorted(df_2025["Round"].unique(), key=lambda x: int(x.split()[-1])))
+    round_2025 = st.selectbox("Round (2025)", sorted(df_2025["Round"].unique()))
     matches_2025 = df_2025[df_2025["Round"] == round_2025]
     match_2025 = st.selectbox("Match (2025)", matches_2025["Match"].tolist())
 
-    # ==== CORRECCIÓN 4: Extracción robusta con iloc ====
-    try:
-        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].iloc[0]  # .iloc[0] en lugar de .values[0]
-        val_2025 = matches_2025[matches_2025["Match"] == match_2025][selected_ppda_col].iloc[0]
-        avg_2024 = df_2024[selected_ppda_col].mean()
-    except IndexError:
-        st.error("No se encontró el partido seleccionado. Verifica los datos.")
-        return
-    except Exception as e:
-        st.error(f"Error crítico: {str(e)}")
-        return
+    # --- Extract values ---
+    st.markdown(f"#### 🔍 Comparing PPDA ({ppda_compare_option})")
 
-    # ==== CORRECCIÓN 5: Depuración en tiempo real ====
-    st.write(f"DEBUG - Valor 2025 ({selected_ppda_col}):", val_2025)  # Verificar valor crudo
+    try:
+        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].values[0]
+        val_2025 = matches_2025[matches_2025["Match"] == match_2025][selected_ppda_col].values[0]
+        avg_2024 = df_2024[selected_ppda_col].mean()
+    except Exception as e:
+        st.error(f"Error extracting values: {str(e)}")
+        return
 
     # --- Show comparison ---
     col1, col2, col3 = st.columns(3)
@@ -95,28 +84,45 @@ def evolucion_page(lang):
     fig = go.Figure()
 
     fig.add_trace(go.Bar(
-        x=["PPDA"], y=[val_2024], name=f"{match_2024} (2024)",
-        text=[f"<b>{val_2024:.2f}</b>"], textposition='outside', marker_color="#C8102E"
+        x=["PPDA"],
+        y=[val_2024],
+        name=f"{match_2024} (2024)",
+        text=[f"<b>{val_2024:.2f}</b>"],
+        textposition='outside',
+        marker_color="#C8102E"
     ))
 
     fig.add_trace(go.Bar(
-        x=["PPDA"], y=[val_2025], name=f"{match_2025} (2025)",
-        text=[f"<b>{val_2025:.2f}</b>"], textposition='outside', marker_color="#00843D"
+        x=["PPDA"],
+        y=[val_2025],
+        name=f"{match_2025} (2025)",
+        text=[f"<b>{val_2025:.2f}</b>"],
+        textposition='outside',
+        marker_color="#00843D"
     ))
 
     fig.add_trace(go.Bar(
-        x=["PPDA"], y=[avg_2024], name="2024 Season Avg",
-        text=[f"<b>{avg_2024:.2f}</b>"], textposition='outside', marker_color="#000000"
+        x=["PPDA"],
+        y=[avg_2024],
+        name="2024 Season Avg",
+        text=[f"<b>{avg_2024:.2f}</b>"],
+        textposition='outside',
+        marker_color="#000000"
     ))
 
     fig.update_layout(
         barmode='group',
-        title=dict(text=f"<b>PPDA Comparison by Round – {ppda_compare_option}</b>", x=0.5),
+        title=dict(
+            text=f"<b>PPDA Comparison by Round – {ppda_compare_option}</b>",
+            x=0.5,
+            xanchor='center',
+            font=dict(size=20)
+        ),
         yaxis_title="<b>PPDA</b>",
         template="simple_white",
         height=500,
         margin=dict(t=80, b=60),
-        legend=dict(orientation="h", y=-0.25, x=0.5)
+        legend=dict(orientation="h", y=-0.25, x=0.5, xanchor='center')
     )
 
     st.plotly_chart(fig, use_container_width=True)
@@ -127,38 +133,62 @@ def evolucion_page(lang):
     col_selected = ppda_col_map[ppda_option]
 
     for df in [df_2024, df_2025]:
-        df["Date"] = pd.to_datetime(df["Date"])
+        if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
+            df["Date"] = pd.to_datetime(df["Date"])
 
     df_2024_sorted = df_2024.sort_values("Date").copy()
     df_2024_sorted["Rolling"] = df_2024_sorted[col_selected].rolling(window=3, min_periods=1).mean()
     avg_2024 = df_2024_sorted[col_selected].mean()
 
     fig_rolling = go.Figure()
+
+    # Add 2024 trace
     fig_rolling.add_trace(go.Scatter(
-        x=df_2024_sorted["Date"], y=df_2024_sorted["Rolling"], name="2024",
-        mode='lines+markers', marker=dict(color="#C8102E"), line=dict(width=2),
-        hovertemplate="<b>2024</b><br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
+        x=df_2024_sorted["Date"],
+        y=df_2024_sorted["Rolling"],
+        mode='lines+markers',
+        name="2024",
+        marker=dict(symbol='circle', size=8, color="#C8102E"),
+        line=dict(color="#C8102E", width=2),
+        text=df_2024_sorted["Match"],
+        hovertemplate="<b>2024</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
     ))
 
+    # Add 2025 trace if available
     if len(df_2025) > 0:
         df_2025_sorted = df_2025.sort_values("Date").copy()
         df_2025_sorted["Rolling"] = df_2025_sorted[col_selected].rolling(window=3, min_periods=1).mean()
         avg_2025 = df_2025_sorted[col_selected].mean()
 
         fig_rolling.add_trace(go.Scatter(
-            x=df_2025_sorted["Date"], y=df_2025_sorted["Rolling"], name="2025",
-            mode='lines+markers', marker=dict(color="#00843D"), line=dict(width=2),
-            hovertemplate="<b>2025</b><br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
+            x=df_2025_sorted["Date"],
+            y=df_2025_sorted["Rolling"],
+            mode='lines+markers',
+            name="2025",
+            marker=dict(symbol='square', size=8, color="#00843D"),
+            line=dict(color="#00843D", width=2),
+            text=df_2025_sorted["Match"],
+            hovertemplate="<b>2025</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
         ))
 
         fig_rolling.add_trace(go.Scatter(
-            x=[df_2025_sorted["Date"].min(), df_2025_sorted["Date"].max()], y=[avg_2025, avg_2025],
-            mode='lines', name="2025 Avg", line=dict(color="#00843D", dash="dot")
+            x=[df_2025_sorted["Date"].min(), df_2025_sorted["Date"].max()],
+            y=[avg_2025, avg_2025],
+            mode='lines',
+            name="2025 Avg",
+            line=dict(color="#00843D", width=1, dash="dot"),
+            showlegend=True
         ))
+    else:
+        st.warning("Not enough 2025 data to display a rolling average.")
 
     fig_rolling.add_trace(go.Scatter(
-        x=[df_2024_sorted["Date"].min(), df_2024_sorted["Date"].max()], y=[avg_2024, avg_2024],
-        mode='lines', name="2024 Avg", line=dict(color="#C8102E", dash="dot")
+        x=[df_2024_sorted["Date"].min(), df_2024_sorted["Date"].max()],
+        y=[avg_2024, avg_2024],
+        mode='lines',
+        name="2024 Avg",
+        line=dict(color="#C8102E", width=1, dash="dot"),
+        showlegend=True
     ))
 
     fig_rolling.update_layout(
@@ -166,9 +196,22 @@ def evolucion_page(lang):
         height=550,
         xaxis_title="Date",
         yaxis_title=f"{ppda_option} – Rolling PPDA",
-        title=dict(text=f"<b>Rolling PPDA over Time – {ppda_option}</b>", x=0.5),
-        xaxis=dict(tickformat="%b %d", tickangle=-45),
-        legend=dict(orientation="h", y=-0.25, x=0.5)
+        title=dict(
+            text=f"<b>Rolling PPDA over Time – {ppda_option}</b>",
+            x=0.5,
+            font=dict(size=20)
+        ),
+        xaxis=dict(
+            tickformat="%b %d",
+            tickangle=-45,
+            showgrid=True,
+            gridcolor='rgba(200,200,200,0.2)'
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor='rgba(200,200,200,0.2)'
+        ),
+        legend=dict(orientation="h", y=-0.25, x=0.5, xanchor='center')
     )
 
     st.plotly_chart(fig_rolling, use_container_width=True)
