@@ -60,7 +60,7 @@ def main():
         else:
             st.warning("Access denied. Please enter the correct code.")
     elif pagina_idx == 1:
-        analitica_page(lang)
+        analytics_page(lang)
     elif pagina_idx == 2:
         heatmaps_page()
     elif pagina_idx == 3:
