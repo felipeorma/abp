@@ -14,12 +14,20 @@ def evolucion_page(lang):
         st.error(f"Error loading files: {str(e)}")
         return
 
-    # Validate columns
+    # ==== CORRECCIÓN 1: Validar columnas de PPDA ====
+    required_cols = ["Round", "Match", "PPDA", "PPDA 1st Half", "PPDA 2nd Half"]
     for df, year in [(df_2024, "2024"), (df_2025, "2025")]:
-        for col in ["Round", "Match", "PPDA"]:
+        for col in required_cols:
             if col not in df.columns:
-                st.error(f"The {year} file must contain a '{col}' column.")
+                st.error(f"Columna obligatoria faltante: '{col}' en {year}.")
                 return
+            elif not pd.api.types.is_numeric_dtype(df[col]):
+                st.error(f"¡Error! La columna '{col}' en {year} debe ser numérica.")
+                return
+
+    # ==== CORRECCIÓN 2: Normalizar formato de "Round" ====
+    for df in [df_2024, df_2025]:
+        df["Round"] = df["Round"].str.replace(r"(\D)(\d)", r"\1 \2", regex=True).str.strip()  # Ej: Round1 → Round 1
 
     # --- KPI Benchmarks ---
     st.markdown("""
@@ -48,28 +56,31 @@ def evolucion_page(lang):
     }
     selected_ppda_col = ppda_col_map[ppda_compare_option]
 
-    # --- Select match from 2024 ---
+    # ==== CORRECCIÓN 3: Ordenar rondas numéricamente ====
     st.markdown("### 🔙 Select from 2024 season")
-    round_2024 = st.selectbox("Round (2024)", sorted(df_2024["Round"].unique()))
+    round_2024 = st.selectbox("Round (2024)", sorted(df_2024["Round"].unique(), key=lambda x: int(x.split()[-1])))
     matches_2024 = df_2024[df_2024["Round"] == round_2024]
     match_2024 = st.selectbox("Match (2024)", matches_2024["Match"].tolist())
 
-    # --- Select match from 2025 ---
     st.markdown("### 🔜 Select from current season (2025)")
-    round_2025 = st.selectbox("Round (2025)", sorted(df_2025["Round"].unique()))
+    round_2025 = st.selectbox("Round (2025)", sorted(df_2025["Round"].unique(), key=lambda x: int(x.split()[-1])))
     matches_2025 = df_2025[df_2025["Round"] == round_2025]
     match_2025 = st.selectbox("Match (2025)", matches_2025["Match"].tolist())
 
-    # --- Extract values ---
-    st.markdown(f"#### 🔍 Comparing PPDA ({ppda_compare_option})")
-
+    # ==== CORRECCIÓN 4: Extracción robusta con .iloc ====
     try:
-        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].values[0]
-        val_2025 = matches_2025[matches_2025["Match"] == match_2025][selected_ppda_col].values[0]
+        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].iloc[0]  # <--- Clave
+        val_2025 = matches_2025[matches_2025["Match"] == match_2025][selected_ppda_col].iloc[0]
         avg_2024 = df_2024[selected_ppda_col].mean()
-    except Exception as e:
-        st.error(f"Error extracting values: {str(e)}")
+    except IndexError:
+        st.error("El partido seleccionado no existe en los datos.")
         return
+    except Exception as e:
+        st.error(f"Error crítico: {str(e)}")
+        return
+
+    # ==== CORRECCIÓN 5: Debugging (opcional) ====
+    # st.write(f"DEBUG - Valor 2025: {val_2025}")  # Descomentar para verificar
 
     # --- Show comparison ---
     col1, col2, col3 = st.columns(3)
