@@ -33,7 +33,7 @@ def load_data(lang: str):
     # Rename columns
     df = df.rename(columns={
         'jornada': 'Round',
-        'fecha': 'Date',          # Antes: 'Fecha'
+        'Fecha': 'Date',          # Antes: 'Fecha'
         'rival': 'Opponent',      # Antes: 'Rival'
         'condición': 'Condition', # Antes: 'Condición'
         'periodo': 'Period',      # Antes: 'Periodo'
