@@ -39,7 +39,15 @@ def evolucion_page(lang):
 
     # 3. Ordenamiento numérico de rondas
     def sort_rounds(rounds):
-        return sorted(rounds, key=lambda x: int(x.split()[-1]))
+        def custom_key(round_str):
+            try:
+                # Extraer el último elemento y convertirlo a entero
+                return int(round_str.split()[-1])
+            except (ValueError, IndexError):
+                # Si falla, devolver un número grande para ponerlo al final
+                return float('inf')
+        
+        return sorted(rounds, key=custom_key)
 
     # --- KPI Benchmarks ---
     st.markdown("""
