@@ -33,19 +33,19 @@ def load_data(lang: str):
     # Rename columns
     df = df.rename(columns={
         'jornada': 'Round',
-        'fecha': 'Date',
-        'rival': 'Opponent',
-        'condición': 'Condition',
-        'periodo': 'Period',
-        'minuto': 'Minute',
-        'acción': 'Action',
-        'equipo': 'Team',
-        'ejecutor': 'Executor',
-        'zona_saque': 'StartZone',
-        'zona_remate': 'EndZone',
-        'gol': 'Goal',
-        'resultado': 'Result',
-        'parte_cuerpo': 'BodyPart'
+        'fecha': 'Date',          # Antes: 'Fecha'
+        'rival': 'Opponent',      # Antes: 'Rival'
+        'condición': 'Condition', # Antes: 'Condición'
+        'periodo': 'Period',      # Antes: 'Periodo'
+        'minuto': 'Minute',       # Antes: 'Minuto'
+        'acción': 'Action',       # Antes: 'Acción'
+        'equipo': 'Team',         # Antes: 'Equipo'
+        'ejecutor': 'Executor',   # Antes: 'Ejecutor'
+        'zona_saque': 'StartZone',# Antes: 'Zona Saque'
+        'zona_remate': 'EndZone', # Antes: 'Zona Remate'
+        'gol': 'Goal',            # Antes: 'Gol'
+        'resultado': 'Result',    # Antes: 'Resultado'
+        'parte_cuerpo': 'BodyPart'# Antes: 'Parte Cuerpo'
     })
     
     # Date processing
