@@ -73,11 +73,12 @@ def cargar_datos(lang: str):
     
     return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
 
-def configurar_filtros(lang: str, df):
+def configurar_filtros(lang: str, df_original):
     with st.sidebar:
         st.header(get_text(lang, "advanced_filters"))
         
         # Procesar fechas para mostrar
+        df = df_original.copy()
         df = df.sort_values('Fecha', ascending=False)
         df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
         df['Partido'] = df.apply(
@@ -85,7 +86,6 @@ def configurar_filtros(lang: str, df):
             axis=1
         )
         
-        # Configurar claves únicas para widgets
         widget_keys = {
             'partidos': f"{lang}_partidos",
             'jornadas': f"{lang}_jornadas",
@@ -95,64 +95,69 @@ def configurar_filtros(lang: str, df):
             'minutos': f"{lang}_minutos"
         }
         
-        # Filtros interactivos con estado persistente
+        # 1. Filtro inicial: Todos los partidos
+        partidos_disponibles = df['Partido'].unique()
         partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
-            options=df['Partido'].unique(),
-            default=st.session_state.get(widget_keys['partidos'], df['Partido'].unique()),
-            help=get_text(lang, "select_matches_help"),
+            options=partidos_disponibles,
+            default=st.session_state.get(widget_keys['partidos'], partidos_disponibles),
             key=widget_keys['partidos']
         )
+        df_filtrado = df[df['Partido'].isin(partidos_seleccionados)]
         
-        col1, col2 = st.columns(2)
-        with col1:
-            jornadas = st.multiselect(
-                get_text(lang, "round"),
-                options=df['Jornada'].unique(),
-                default=st.session_state.get(widget_keys['jornadas'], df['Jornada'].unique()),
-                key=widget_keys['jornadas']
-            )
-        with col2:
-            condiciones = st.multiselect(
-                get_text(lang, "condition"),
-                options=df['Condición'].unique(),
-                default=st.session_state.get(widget_keys['condiciones'], df['Condición'].unique()),
-                format_func=lambda x: get_text(lang, f"condition_{x}"),
-                key=widget_keys['condiciones']
-            )
-
-        col3, col4 = st.columns(2)
-        with col3:
-            acciones = st.multiselect(
-                get_text(lang, "actions"),
-                options=df['Acción'].unique(),
-                default=st.session_state.get(widget_keys['acciones'], df['Acción'].unique()),
-                key=widget_keys['acciones']
-            )
-        with col4:
-            jugadores = st.multiselect(
-                get_text(lang, "players"),
-                options=df['Ejecutor'].unique(),
-                default=st.session_state.get(widget_keys['jugadores'], df['Ejecutor'].unique()),
-                key=widget_keys['jugadores']
-            )
-
-        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
+        # 2. Filtro de jornadas basado en partidos seleccionados
+        jornadas_disponibles = df_filtrado['Jornada'].unique()
+        jornadas_seleccionadas = st.multiselect(
+            get_text(lang, "round"),
+            options=jornadas_disponibles,
+            default=st.session_state.get(widget_keys['jornadas'], jornadas_disponibles),
+            key=widget_keys['jornadas']
+        )
+        df_filtrado = df_filtrado[df_filtrado['Jornada'].isin(jornadas_seleccionadas)]
+        
+        # 3. Filtro de condiciones basado en selecciones anteriores
+        condiciones_disponibles = df_filtrado['Condición'].unique()
+        condiciones_seleccionadas = st.multiselect(
+            get_text(lang, "condition"),
+            options=condiciones_disponibles,
+            default=st.session_state.get(widget_keys['condiciones'], condiciones_disponibles),
+            format_func=lambda x: get_text(lang, f"condition_{x}"),
+            key=widget_keys['condiciones']
+        )
+        df_filtrado = df_filtrado[df_filtrado['Condición'].isin(condiciones_seleccionadas)]
+        
+        # 4. Filtro de acciones basado en selecciones anteriores
+        acciones_disponibles = df_filtrado['Acción'].unique()
+        acciones_seleccionadas = st.multiselect(
+            get_text(lang, "actions"),
+            options=acciones_disponibles,
+            default=st.session_state.get(widget_keys['acciones'], acciones_disponibles),
+            key=widget_keys['acciones']
+        )
+        df_filtrado = df_filtrado[df_filtrado['Acción'].isin(acciones_seleccionadas)]
+        
+        # 5. Filtro de jugadores basado en selecciones anteriores
+        jugadores_disponibles = df_filtrado['Ejecutor'].unique()
+        jugadores_seleccionados = st.multiselect(
+            get_text(lang, "players"),
+            options=jugadores_disponibles,
+            default=st.session_state.get(widget_keys['jugadores'], jugadores_disponibles),
+            key=widget_keys['jugadores']
+        )
+        df_filtrado = df_filtrado[df_filtrado['Ejecutor'].isin(jugadores_seleccionados)]
+        
+        # 6. Filtro de minutos basado en selecciones anteriores
+        min_min = int(df_filtrado['Minuto'].min()) if not df_filtrado.empty else 0
+        max_min = int(df_filtrado['Minuto'].max()) if not df_filtrado.empty else 0
         rango_minutos = st.slider(
             get_text(lang, "minutes"),
             min_min, max_min,
             value=st.session_state.get(widget_keys['minutos'], (min_min, max_min)),
             key=widget_keys['minutos']
         )
+        df_filtrado = df_filtrado[df_filtrado['Minuto'].between(*rango_minutos)]
         
-    return df[
-        (df['Partido'].isin(partidos_seleccionados)) &
-        (df['Jornada'].isin(jornadas)) &
-        (df['Condición'].isin(condiciones)) &
-        (df['Acción'].isin(acciones)) &
-        (df['Ejecutor'].isin(jugadores)) &
-        (df['Minuto'].between(*rango_minutos))
-    ]
+    return df_filtrado
 
 def mostrar_kpis(lang: str, df):
     cols = st.columns(5)
