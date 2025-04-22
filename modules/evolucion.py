@@ -158,44 +158,41 @@ def evolucion_page(lang):
     st.markdown("### 🌟 Rolling PPDA Comparison – 2024 vs 2025")
     ppda_option = st.selectbox("Select Rolling PPDA Type", ["1st Half", "2nd Half", "Full Match (90 mins)"])
     col_selected = ppda_col_map[ppda_option]
-
+    
+    # ==== CORRECCIÓN: Usar los valores reales, no la media móvil ====
     for df in [df_2024, df_2025]:
-        if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
-            df["Date"] = pd.to_datetime(df["Date"])
-
+        df["Date"] = pd.to_datetime(df["Date"])
+    
     df_2024_sorted = df_2024.sort_values("Date").copy()
-    df_2024_sorted["Rolling"] = df_2024_sorted[col_selected].rolling(window=3, min_periods=1).mean()
-    avg_2024 = df_2024_sorted[col_selected].mean()
-
+    df_2024_sorted["Rolling"] = df_2024_sorted[col_selected]  # Valor real, no media
+    avg_2024 = df_2024[col_selected].mean()
+    
     fig_rolling = go.Figure()
-
+    
     # Add 2024 trace
     fig_rolling.add_trace(go.Scatter(
         x=df_2024_sorted["Date"],
-        y=df_2024_sorted["Rolling"],
+        y=df_2024_sorted["Rolling"],  # <-- Aquí se usan los valores directos
         mode='lines+markers',
         name="2024",
         marker=dict(symbol='circle', size=8, color="#C8102E"),
         line=dict(color="#C8102E", width=2),
-        text=df_2024_sorted["Match"],
-        hovertemplate="<b>2024</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
+        hovertemplate="<b>2024</b><br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
     ))
-
-    # Add 2025 trace if available
+    
     if len(df_2025) > 0:
         df_2025_sorted = df_2025.sort_values("Date").copy()
-        df_2025_sorted["Rolling"] = df_2025_sorted[col_selected].rolling(window=3, min_periods=1).mean()
+        df_2025_sorted["Rolling"] = df_2025_sorted[col_selected]  # <-- Valor real
         avg_2025 = df_2025_sorted[col_selected].mean()
-
+    
         fig_rolling.add_trace(go.Scatter(
             x=df_2025_sorted["Date"],
-            y=df_2025_sorted["Rolling"],
+            y=df_2025_sorted["Rolling"],  # <-- Sin media móvil
             mode='lines+markers',
             name="2025",
             marker=dict(symbol='square', size=8, color="#00843D"),
             line=dict(color="#00843D", width=2),
-            text=df_2025_sorted["Match"],
-            hovertemplate="<b>2025</b><br>Match: %{text}<br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
+            hovertemplate="<b>2025</b><br>PPDA: %{y:.2f}<br>Date: %{x|%b %d}"
         ))
 
         fig_rolling.add_trace(go.Scatter(
