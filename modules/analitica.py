@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
 from utils.i18n import get_text
+from modules.analytics import analytics_page
 
 def analytics_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
