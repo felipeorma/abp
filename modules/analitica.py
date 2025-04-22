@@ -77,15 +77,7 @@ def configurar_filtros(lang: str, df_original):
     with st.sidebar:
         st.header(get_text(lang, "advanced_filters"))
         
-        # Procesar fechas para mostrar
-        df = df_original.copy()
-        df = df.sort_values('Fecha', ascending=False)
-        df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
-        df['Partido'] = df.apply(
-            lambda x: f"{x['Fecha_str']} vs {x['Rival']}", 
-            axis=1
-        )
-        
+        # Inicializar claves de session_state si no existen
         widget_keys = {
             'partidos': f"{lang}_partidos",
             'jornadas': f"{lang}_jornadas",
@@ -95,60 +87,83 @@ def configurar_filtros(lang: str, df_original):
             'minutos': f"{lang}_minutos"
         }
         
-        # 1. Filtro inicial: Todos los partidos
-        partidos_disponibles = df['Partido'].unique()
-        partidos_seleccionados = st.multiselect(
+        # 1. Preparar datos base -------------------------------------------------
+        df = df_original.copy()
+        df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
+        df['Partido'] = df.apply(lambda x: f"{x['Fecha_str']} vs {x['Rival']}", axis=1)
+        
+        # 2. Sistema reactivo de dependencias ------------------------------------
+        def actualizar_opciones(filtro_actual, df_filtrado):
+            # Actualizar opciones disponibles y valores seleccionados
+            opciones = df_filtrado[filtro_actual].unique().tolist()
+            
+            # Obtener valores actuales del session_state
+            current_values = st.session_state.get(widget_keys[filtro_actual], opciones)
+            
+            # Filtrar valores válidos
+            valores_validos = [v for v in current_values if v in opciones]
+            
+            # Actualizar session_state solo si hay cambios
+            if set(valores_validos) != set(current_values):
+                st.session_state[widget_keys[filtro_actual]] = valores_validos
+            
+            return opciones, valores_validos
+        
+        # 3. Jerarquía de filtros ------------------------------------------------
+        # Nivel 1: Partidos
+        opc_partidos, sel_partidos = actualizar_opciones('partidos', df)
+        partidos = st.multiselect(
             get_text(lang, "select_matches"),
-            options=partidos_disponibles,
-            default=st.session_state.get(widget_keys['partidos'], partidos_disponibles),
+            options=opc_partidos,
+            default=sel_partidos,
             key=widget_keys['partidos']
         )
-        df_filtrado = df[df['Partido'].isin(partidos_seleccionados)]
+        df_filtrado = df[df['Partido'].isin(partidos)] if partidos else df
         
-        # 2. Filtro de jornadas basado en partidos seleccionados
-        jornadas_disponibles = df_filtrado['Jornada'].unique()
-        jornadas_seleccionadas = st.multiselect(
+        # Nivel 2: Jornadas (depende de partidos)
+        opc_jornadas, sel_jornadas = actualizar_opciones('jornadas', df_filtrado)
+        jornadas = st.multiselect(
             get_text(lang, "round"),
-            options=jornadas_disponibles,
-            default=st.session_state.get(widget_keys['jornadas'], jornadas_disponibles),
+            options=opc_jornadas,
+            default=sel_jornadas,
             key=widget_keys['jornadas']
         )
-        df_filtrado = df_filtrado[df_filtrado['Jornada'].isin(jornadas_seleccionadas)]
+        df_filtrado = df_filtrado[df_filtrado['Jornada'].isin(jornadas)] if jornadas else df_filtrado
         
-        # 3. Filtro de condiciones basado en selecciones anteriores
-        condiciones_disponibles = df_filtrado['Condición'].unique()
-        condiciones_seleccionadas = st.multiselect(
+        # Nivel 3: Condiciones (depende de partidos y jornadas)
+        opc_condiciones, sel_condiciones = actualizar_opciones('condiciones', df_filtrado)
+        condiciones = st.multiselect(
             get_text(lang, "condition"),
-            options=condiciones_disponibles,
-            default=st.session_state.get(widget_keys['condiciones'], condiciones_disponibles),
+            options=opc_condiciones,
+            default=sel_condiciones,
             format_func=lambda x: get_text(lang, f"condition_{x}"),
             key=widget_keys['condiciones']
         )
-        df_filtrado = df_filtrado[df_filtrado['Condición'].isin(condiciones_seleccionadas)]
+        df_filtrado = df_filtrado[df_filtrado['Condición'].isin(condiciones)] if condiciones else df_filtrado
         
-        # 4. Filtro de acciones basado en selecciones anteriores
-        acciones_disponibles = df_filtrado['Acción'].unique()
-        acciones_seleccionadas = st.multiselect(
+        # Nivel 4: Acciones (depende de los 3 anteriores)
+        opc_acciones, sel_acciones = actualizar_opciones('acciones', df_filtrado)
+        acciones = st.multiselect(
             get_text(lang, "actions"),
-            options=acciones_disponibles,
-            default=st.session_state.get(widget_keys['acciones'], acciones_disponibles),
+            options=opc_acciones,
+            default=sel_acciones,
             key=widget_keys['acciones']
         )
-        df_filtrado = df_filtrado[df_filtrado['Acción'].isin(acciones_seleccionadas)]
+        df_filtrado = df_filtrado[df_filtrado['Acción'].isin(acciones)] if acciones else df_filtrado
         
-        # 5. Filtro de jugadores basado en selecciones anteriores
-        jugadores_disponibles = df_filtrado['Ejecutor'].unique()
-        jugadores_seleccionados = st.multiselect(
+        # Nivel 5: Jugadores (depende de todos los anteriores)
+        opc_jugadores, sel_jugadores = actualizar_opciones('jugadores', df_filtrado)
+        jugadores = st.multiselect(
             get_text(lang, "players"),
-            options=jugadores_disponibles,
-            default=st.session_state.get(widget_keys['jugadores'], jugadores_disponibles),
+            options=opc_jugadores,
+            default=sel_jugadores,
             key=widget_keys['jugadores']
         )
-        df_filtrado = df_filtrado[df_filtrado['Ejecutor'].isin(jugadores_seleccionados)]
+        df_filtrado = df_filtrado[df_filtrado['Ejecutor'].isin(jugadores)] if jugadores else df_filtrado
         
-        # 6. Filtro de minutos basado en selecciones anteriores
-        min_min = int(df_filtrado['Minuto'].min()) if not df_filtrado.empty else 0
-        max_min = int(df_filtrado['Minuto'].max()) if not df_filtrado.empty else 0
+        # Nivel 6: Minutos (depende de todo lo anterior)
+        min_min = df_filtrado['Minuto'].min() if not df_filtrado.empty else 0
+        max_min = df_filtrado['Minuto'].max() if not df_filtrado.empty else 0
         rango_minutos = st.slider(
             get_text(lang, "minutes"),
             min_min, max_min,
