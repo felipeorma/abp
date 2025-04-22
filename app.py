@@ -1,6 +1,6 @@
 import streamlit as st
 from modules.registro import registro_page
-from modules.analitica import analitica_page
+from modules.analytics import analytics_page
 from modules.heatmaps import heatmaps_page
 from modules.evolucion import evolucion_page  # Nueva pestaña
 from utils.i18n import get_text
