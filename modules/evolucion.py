@@ -8,26 +8,38 @@ def evolucion_page(lang):
 
     # Load data
     try:
-        df_2024 = pd.read_excel("Cavalry2024stats.xlsx")  # Temporada pasada
-        df_2025 = pd.read_excel("Cavalry2025stats.xlsx")  # Temporada actual
+        df_2024 = pd.read_excel("Cavalry2024stats.xlsx")
+        df_2025 = pd.read_excel("Cavalry2025stats.xlsx")
     except Exception as e:
         st.error(f"Error loading files: {str(e)}")
         return
 
-    # ==== CORRECCIÓN 1: Validar columnas de PPDA ====
-    required_cols = ["Round", "Match", "PPDA", "PPDA 1st Half", "PPDA 2nd Half"]
+    # ========== CORRECCIONES CLAVE ==========
+    # 1. Validación mejorada de columnas
+    required_cols = {
+        "Round": "categorical",
+        "Match": "categorical",
+        "PPDA": "numeric",
+        "PPDA 1st Half": "numeric",
+        "PPDA 2nd Half": "numeric"
+    }
+
     for df, year in [(df_2024, "2024"), (df_2025, "2025")]:
-        for col in required_cols:
+        for col, dtype in required_cols.items():
             if col not in df.columns:
-                st.error(f"Columna obligatoria faltante: '{col}' en {year}.")
+                st.error(f"Columna faltante: '{col}' en {year}.")
                 return
-            elif not pd.api.types.is_numeric_dtype(df[col]):
-                st.error(f"¡Error! La columna '{col}' en {year} debe ser numérica.")
+            if dtype == "numeric" and not pd.api.types.is_numeric_dtype(df[col]):
+                st.error(f"Error de formato: '{col}' en {year} debe contener números.")
                 return
 
-    # ==== CORRECCIÓN 2: Normalizar formato de "Round" ====
+    # 2. Normalizar formato de rondas
     for df in [df_2024, df_2025]:
-        df["Round"] = df["Round"].str.replace(r"(\D)(\d)", r"\1 \2", regex=True).str.strip()  # Ej: Round1 → Round 1
+        df["Round"] = df["Round"].astype(str).str.replace(r"(\D)(\d)", r"\1 \2", regex=True).str.strip()
+
+    # 3. Ordenamiento numérico de rondas
+    def sort_rounds(rounds):
+        return sorted(rounds, key=lambda x: int(x.split()[-1]))
 
     # --- KPI Benchmarks ---
     st.markdown("""
@@ -56,31 +68,27 @@ def evolucion_page(lang):
     }
     selected_ppda_col = ppda_col_map[ppda_compare_option]
 
-    # ==== CORRECCIÓN 3: Ordenar rondas numéricamente ====
+    # --- Select match from 2024 ---
     st.markdown("### 🔙 Select from 2024 season")
-    round_2024 = st.selectbox("Round (2024)", sorted(df_2024["Round"].unique(), key=lambda x: int(x.split()[-1])))
+    round_2024 = st.selectbox("Round (2024)", sort_rounds(df_2024["Round"].unique()))
     matches_2024 = df_2024[df_2024["Round"] == round_2024]
     match_2024 = st.selectbox("Match (2024)", matches_2024["Match"].tolist())
 
+    # --- Select match from 2025 ---
     st.markdown("### 🔜 Select from current season (2025)")
-    round_2025 = st.selectbox("Round (2025)", sorted(df_2025["Round"].unique(), key=lambda x: int(x.split()[-1])))
+    round_2025 = st.selectbox("Round (2025)", sort_rounds(df_2025["Round"].unique()))
     matches_2025 = df_2025[df_2025["Round"] == round_2025]
     match_2025 = st.selectbox("Match (2025)", matches_2025["Match"].tolist())
 
-    # ==== CORRECCIÓN 4: Extracción robusta con .iloc ====
+    # --- Extract values ---
     try:
-        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].iloc[0]  # <--- Clave
+        # 4. Extracción robusta con iloc
+        val_2024 = matches_2024[matches_2024["Match"] == match_2024][selected_ppda_col].iloc[0]
         val_2025 = matches_2025[matches_2025["Match"] == match_2025][selected_ppda_col].iloc[0]
         avg_2024 = df_2024[selected_ppda_col].mean()
-    except IndexError:
-        st.error("El partido seleccionado no existe en los datos.")
-        return
     except Exception as e:
-        st.error(f"Error crítico: {str(e)}")
+        st.error(f"Error al extraer valores: {str(e)}")
         return
-
-    # ==== CORRECCIÓN 5: Debugging (opcional) ====
-    # st.write(f"DEBUG - Valor 2025: {val_2025}")  # Descomentar para verificar
 
     # --- Show comparison ---
     col1, col2, col3 = st.columns(3)
@@ -190,8 +198,6 @@ def evolucion_page(lang):
             line=dict(color="#00843D", width=1, dash="dot"),
             showlegend=True
         ))
-    else:
-        st.warning("Not enough 2025 data to display a rolling average.")
 
     fig_rolling.add_trace(go.Scatter(
         x=[df_2024_sorted["Date"].min(), df_2024_sorted["Date"].max()],
