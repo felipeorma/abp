@@ -9,7 +9,7 @@ def analytics_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
     
     try:
-        df = load_data(lang)
+        df = cargar_datos(lang)
         if df.empty:
             st.warning(get_text(lang, "empty_db_warning"))
             return
@@ -17,45 +17,45 @@ def analytics_page(lang: str):
         st.error(get_text(lang, "critical_error").format(error=str(e)))
         return
 
-    filtered_df = configure_filters(lang, df)
-    show_kpis(lang, filtered_df)
-    generate_spatial_section(lang, filtered_df)
-    generate_temporal_section(lang, filtered_df)
-    generate_effectiveness_section(lang, filtered_df)
-    setup_download(lang, filtered_df)
-    show_body_part_ranking(lang, filtered_df)
+    df_filtrado = configurar_filtros(lang, df)
+    mostrar_kpis(lang, df_filtrado)
+    generar_seccion_espacial(lang, df_filtrado)
+    generar_seccion_temporal(lang, df_filtrado)
+    generar_seccion_efectividad(lang, df_filtrado)
+    configurar_descarga(lang, df_filtrado)
+    mostrar_ranking_parte_cuerpo(lang, df_filtrado)
 
-def load_data(lang: str):
-    # Load data from GitHub
+def cargar_datos(lang: str):
+    # Cargar datos desde GitHub
     url = "https://raw.githubusercontent.com/felipeorma/abp/main/master_abp.csv"
     df = pd.read_csv(url)
     
-    # Rename columns
+    # Renombrar columnas según el CSV
     df = df.rename(columns={
-        'jornada': 'Round',
-        'Fecha': 'Date',          # Antes: 'Fecha'
-        'Rival': 'Opponent',      # Antes: 'Rival'
-        'Condición': 'Condition', # Antes: 'Condición'
-        'Periodo': 'Period',      # Antes: 'Periodo'
-        'Minuto': 'Minute',       # Antes: 'Minuto'
-        'Acción': 'Action',       # Antes: 'Acción'
-        'Equipo': 'Team',         # Antes: 'Equipo'
-        'Ejecutor': 'Executor',   # Antes: 'Ejecutor'
-        'Zona_saque': 'StartZone',# Antes: 'Zona Saque'
-        'Zona_remate': 'EndZone', # Antes: 'Zona Remate'
-        'Gol': 'Goal',            # Antes: 'Gol'
-        'Resultado': 'Result',    # Antes: 'Resultado'
-        'Parte_cuerpo': 'BodyPart'# Antes: 'Parte Cuerpo'
+        'jornada': 'Jornada',
+        'fecha': 'Fecha',
+        'rival': 'Rival',
+        'condición': 'Condición',
+        'periodo': 'Periodo',
+        'minuto': 'Minuto',
+        'acción': 'Acción',
+        'equipo': 'Equipo',
+        'ejecutor': 'Ejecutor',
+        'zona_saque': 'Zona Saque',
+        'zona_remate': 'Zona Remate',
+        'gol': 'Gol',
+        'resultado': 'Resultado',
+        'parte_cuerpo': 'Parte Cuerpo'
     })
     
-    # Date processing
-    df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
-    df = df.dropna(subset=['Date'])
+    # Procesamiento de fechas
+    df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce')
+    df = df.dropna(subset=['Fecha'])
     
-    # Translate key values
-    df['Goal'] = df['Goal'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
+    # Traducir valores clave
+    df['Gol'] = df['Gol'].map({'Sí': get_text(lang, 'yes'), 'No': get_text(lang, 'no')})
     
-    # Action mapping
+    # Mapeo de acciones
     action_translation = {
         'Córner': 'corner',
         'Tiro libre': 'free_kick',
@@ -64,128 +64,113 @@ def load_data(lang: str):
         'Centro': 'cross',
         'Remate': 'shot'
     }
-    df['Action'] = df['Action'].map(action_translation).apply(lambda x: get_text(lang, x))
+    df['Acción'] = df['Acción'].map(action_translation).apply(lambda x: get_text(lang, x))
     
-    # Validation
-    required_columns = ['Round', 'Opponent', 'Period', 'Minute', 'Action', 'Team', 'Date']
+    # Validación final
+    required_columns = ['Jornada', 'Rival', 'Periodo', 'Minuto', 'Acción', 'Equipo', 'Fecha']
     if not all(col in df.columns for col in required_columns):
         return pd.DataFrame()
     
-    return df.dropna(subset=['StartZone', 'EndZone', 'Executor'])
+    return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
 
-def configure_filters(lang: str, df):
+def configurar_filtros(lang: str, df):
     with st.sidebar:
         st.header(get_text(lang, "advanced_filters"))
         
-        # Date formatting
-        df = df.sort_values('Date', ascending=False)
-        df['Date_str'] = df['Date'].dt.strftime('%d %b')
-        df['Match'] = df.apply(
-            lambda x: f"{x['Date_str']} vs {x['Opponent']}", 
+        # Procesar fechas para mostrar
+        df = df.sort_values('Fecha', ascending=False)
+        df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
+        df['Partido'] = df.apply(
+            lambda x: f"{x['Fecha_str']} vs {x['Rival']}", 
             axis=1
         )
         
-        # Widget keys
-        widget_keys = {
-            'matches': f"{lang}_matches",
-            'rounds': f"{lang}_rounds",
-            'conditions': f"{lang}_conditions",
-            'actions': f"{lang}_actions",
-            'players': f"{lang}_players",
-            'minutes': f"{lang}_minutes"
-        }
-        
-        # Interactive filters
-        selected_matches = st.multiselect(
+        # Filtros interactivos
+        partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
-            options=df['Match'].unique(),
-            default=st.session_state.get(widget_keys['matches'], df['Match'].unique()),
-            key=widget_keys['matches']
+            options=df['Partido'].unique(),
+            default=df['Partido'].unique(),
+            help=get_text(lang, "select_matches_help")
         )
         
         col1, col2 = st.columns(2)
         with col1:
-            rounds = st.multiselect(
+            jornadas = st.multiselect(
                 get_text(lang, "round"),
-                options=df['Round'].unique(),
-                default=st.session_state.get(widget_keys['rounds'], df['Round'].unique()),
-                key=widget_keys['rounds']
+                options=df['Jornada'].unique(),
+                default=df['Jornada'].unique()
             )
         with col2:
-            conditions = st.multiselect(
+            condiciones = st.multiselect(
                 get_text(lang, "condition"),
-                options=df['Condition'].unique(),
-                default=st.session_state.get(widget_keys['conditions'], df['Condition'].unique()),
-                format_func=lambda x: get_text(lang, f"condition_{x}"),
-                key=widget_keys['conditions']
+                options=df['Condición'].unique(),
+                default=df['Condición'].unique(),
+                format_func=lambda x: get_text(lang, f"condition_{x}")
             )
 
         col3, col4 = st.columns(2)
         with col3:
-            actions = st.multiselect(
+            acciones = st.multiselect(
                 get_text(lang, "actions"),
-                options=df['Action'].unique(),
-                default=st.session_state.get(widget_keys['actions'], df['Action'].unique()),
-                key=widget_keys['actions']
+                options=df['Acción'].unique(),
+                default=df['Acción'].unique()
             )
         with col4:
-            players = st.multiselect(
+            jugadores = st.multiselect(
                 get_text(lang, "players"),
-                options=df['Executor'].unique(),
-                default=st.session_state.get(widget_keys['players'], df['Executor'].unique()),
-                key=widget_keys['players']
+                options=df['Ejecutor'].unique(),
+                default=df['Ejecutor'].unique()
             )
 
-        min_min, max_min = int(df['Minute'].min()), int(df['Minute'].max())
-        minute_range = st.slider(
+        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
+        rango_minutos = st.slider(
             get_text(lang, "minutes"),
             min_min, max_min,
-            value=st.session_state.get(widget_keys['minutes'], (min_min, max_min)),
-            key=widget_keys['minutes']
+            (min_min, max_min)
         )
         
     return df[
-        (df['Match'].isin(selected_matches)) &
-        (df['Round'].isin(rounds)) &
-        (df['Condition'].isin(conditions)) &
-        (df['Action'].isin(actions)) &
-        (df['Executor'].isin(players)) &
-        (df['Minute'].between(*minute_range))
+        (df['Partido'].isin(partidos_seleccionados)) &
+        (df['Jornada'].isin(jornadas)) &
+        (df['Condición'].isin(condiciones)) &
+        (df['Acción'].isin(acciones)) &
+        (df['Ejecutor'].isin(jugadores)) &
+        (df['Minuto'].between(*rango_minutos))
     ]
 
-def show_kpis(lang: str, df):
+def mostrar_kpis(lang: str, df):
     cols = st.columns(5)
     
     with cols[0]:
         st.metric(get_text(lang, "registered_actions"), df.shape[0])
     
-    goals_for = df[(df['Goal'] == get_text(lang, 'yes')) & (df['Team'] == 'Cavalry FC')].shape[0]
+    goles_favor = df[(df['Gol'] == get_text(lang, 'yes')) & (df['Equipo'] == 'Cavalry FC')].shape[0]
     with cols[1]:
-        st.metric(get_text(lang, "goals_for"), goals_for)
+        st.metric(get_text(lang, "goals_for"), goles_favor)
     
-    goals_against = df[(df['Goal'] == get_text(lang, 'yes')) & (df['Team'] != 'Cavalry FC')].shape[0]
+    goles_contra = df[(df['Gol'] == get_text(lang, 'yes')) & (df['Equipo'] != 'Cavalry FC')].shape[0]
     with cols[2]:
-        st.metric(get_text(lang, "goals_against"), goals_against)
+        st.metric(get_text(lang, "goals_against"), goles_contra)
     
-    attack_eff = (goals_for / df.shape[0] * 100) if df.shape[0] > 0 else 0
+    eficacia = (goles_favor / df.shape[0] * 100) if df.shape[0] > 0 else 0
     with cols[3]:
-        st.metric(get_text(lang, "offensive_effectiveness"), f"{attack_eff:.1f}%")
+        st.metric(get_text(lang, "offensive_effectiveness"), f"{eficacia:.1f}%")
     
-    defense_eff = 100 - (goals_against / df.shape[0] * 100) if df.shape[0] > 0 else 0
+    eficacia_def = 100 - (goles_contra / df.shape[0] * 100) if df.shape[0] > 0 else 0
     with cols[4]:
-        st.metric(get_text(lang, "defensive_effectiveness"), f"{defense_eff:.1f}%")
+        st.metric(get_text(lang, "defensive_effectiveness"), f"{eficacia_def:.1f}%")
 
-def generate_spatial_section(lang: str, df):
+def generar_seccion_espacial(lang: str, df):
     st.header(get_text(lang, "tactical_mapping"))
     col1, col2 = st.columns(2)
     
     with col1:
-        generate_heatmap(lang, df, zone_type='start')
+        generar_mapa_calor(lang, df, tipo='saque')
     with col2:
-        generate_heatmap(lang, df, zone_type='end')
+        generar_mapa_calor(lang, df, tipo='remate')
 
-def generate_heatmap(lang: str, df, zone_type='start'):
-    zone_coords = {
+def generar_mapa_calor(lang: str, df, tipo='saque'):
+    zonas_coords = {
         1: (120, 0), 2: (120, 80), 3: (93, 9), 4: (93, 71),
         5: (114, 30), 6: (114, 50), 7: (114, 40), 8: (111, 15),
         9: (111, 65), 10: (105, 35), 11: (105, 45), 12: (105, 25),
@@ -193,19 +178,19 @@ def generate_heatmap(lang: str, df, zone_type='start'):
         17: (72, 60), "Penal": (108, 40)
     }
     
-    coord_col = 'StartZone' if zone_type == 'start' else 'EndZone'
+    coord_col = 'Zona Saque' if tipo == 'saque' else 'Zona Remate'
     
-    temp_df = df.copy()
-    temp_df[coord_col] = temp_df[coord_col].apply(
+    df_temp = df.copy()
+    df_temp[coord_col] = df_temp[coord_col].apply(
         lambda x: int(x) if str(x).isdigit() else x
     )
-    coord_df = temp_df[coord_col].map(zone_coords).dropna().apply(pd.Series)
+    df_coords = df_temp[coord_col].map(zonas_coords).dropna().apply(pd.Series)
     
-    if coord_df.empty:
-        st.warning(get_text(lang, "no_data_warning").format(tipo=get_text(lang, zone_type)))
+    if df_coords.empty:
+        st.warning(get_text(lang, "no_data_warning").format(tipo=get_text(lang, tipo)))
         return
     
-    coord_df.columns = ['x', 'y']
+    df_coords.columns = ['x', 'y']
     
     pitch = VerticalPitch(
         pitch_type='statsbomb',
@@ -220,9 +205,9 @@ def generate_heatmap(lang: str, df, zone_type='start'):
     pitch.draw(ax=ax)
     
     pitch.kdeplot(
-        coord_df['x'], coord_df['y'],
+        df_coords['x'], df_coords['y'],
         ax=ax,
-        cmap='Greens' if zone_type == 'start' else 'Reds',
+        cmap='Greens' if tipo == 'saque' else 'Reds',
         levels=100,
         fill=True,
         alpha=0.75,
@@ -230,7 +215,7 @@ def generate_heatmap(lang: str, df, zone_type='start'):
         zorder=2
     )
     
-    ax.set_title(get_text(lang, "density_title").format(tipo=get_text(lang, zone_type)), 
+    ax.set_title(get_text(lang, "density_title").format(tipo=get_text(lang, tipo)), 
                 fontsize=16, 
                 pad=20,
                 fontweight='bold')
@@ -238,15 +223,15 @@ def generate_heatmap(lang: str, df, zone_type='start'):
     st.pyplot(fig)
     plt.close()
 
-def generate_temporal_section(lang: str, df):
+def generar_seccion_temporal(lang: str, df):
     st.header(get_text(lang, "temporal_evolution"))
     col1, col2 = st.columns(2)
     
     with col1:
         fig = px.histogram(
             df, 
-            x='Round', 
-            color='Period',
+            x='Jornada', 
+            color='Periodo',
             title=get_text(lang, "actions_by_round"),
             labels={'count': get_text(lang, "actions")}
         )
@@ -255,30 +240,30 @@ def generate_temporal_section(lang: str, df):
     with col2:
         fig = px.box(
             df, 
-            x='Action', 
-            y='Minute',
-            color='Team', 
+            x='Acción', 
+            y='Minuto',
+            color='Equipo', 
             title=get_text(lang, "time_distribution"),
             points="all"
         )
         st.plotly_chart(fig, use_container_width=True)
 
-def generate_effectiveness_section(lang: str, df):
+def generar_seccion_efectividad(lang: str, df):
     st.header(get_text(lang, "effectiveness_section"))
     col1, col2 = st.columns(2)
     
     with col1:
-        effectiveness_df = df.groupby('Executor').agg(
-            Actions=('Executor', 'count'),
-            Goals=('Goal', lambda x: (x == get_text(lang, 'yes')).sum())
+        df_efectividad = df.groupby('Ejecutor').agg(
+            Acciones=('Ejecutor', 'count'),
+            Goles=('Gol', lambda x: (x == get_text(lang, 'yes')).sum())
         ).reset_index()
 
         fig = px.scatter(
-            effectiveness_df, 
-            x='Actions', 
-            y='Goals',
-            size='Goals', 
-            color='Executor',
+            df_efectividad, 
+            x='Acciones', 
+            y='Goles',
+            size='Goles', 
+            color='Ejecutor',
             title=get_text(lang, "actions_goals_relation")
         )
         fig.update_traces(marker=dict(line=dict(width=1, color='black')))
@@ -286,37 +271,37 @@ def generate_effectiveness_section(lang: str, df):
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
-        sunburst_df = df.groupby(['Action', 'Result']).size().reset_index(name='Count')
-        sunburst_df = sunburst_df[sunburst_df['Result'].notna()]
+        df_sun = df.groupby(['Acción', 'Resultado']).size().reset_index(name='Cantidad')
+        df_sun = df_sun[df_sun['Resultado'].notna()]
 
-        total = sunburst_df['Count'].sum()
-        sunburst_df['Percentage'] = sunburst_df['Count'] / total * 100
+        total = df_sun['Cantidad'].sum()
+        df_sun['Porcentaje'] = df_sun['Cantidad'] / total * 100
 
-        action_df = sunburst_df.groupby('Action')['Count'].sum().reset_index()
-        action_df['Result'] = get_text(lang, "total")
-        action_df['Percentage'] = action_df['Count'] / total * 100
+        df_accion = df_sun.groupby('Acción')['Cantidad'].sum().reset_index()
+        df_accion['Resultado'] = get_text(lang, "total")
+        df_accion['Porcentaje'] = df_accion['Cantidad'] / total * 100
 
-        combined_df = pd.concat([sunburst_df, action_df], ignore_index=True)
-        combined_df['Percentage'] = combined_df['Percentage'].fillna(0)
+        df_sunburst = pd.concat([df_sun, df_accion], ignore_index=True)
+        df_sunburst['Porcentaje'] = df_sunburst['Porcentaje'].fillna(0)
 
         fig = px.sunburst(
-            combined_df,
-            path=['Action', 'Result'],
-            values='Count',
+            df_sunburst,
+            path=['Acción', 'Resultado'],
+            values='Cantidad',
             title=get_text(lang, "results_composition"),
             branchvalues='total',
-            custom_data=['Count', 'Percentage']
+            custom_data=['Cantidad', 'Porcentaje']
         )
         fig.update_traces(
             hovertemplate=f'<b>%{{label}}</b><br>{get_text(lang, "quantity")}: %{{customdata[0]}}<br>{get_text(lang, "percentage")}: %{{customdata[1]:.1f}}%<extra></extra>'
         )
         st.plotly_chart(fig, use_container_width=True)
 
-def show_body_part_ranking(lang: str, df):
+def mostrar_ranking_parte_cuerpo(lang: str, df):
     st.header(get_text(lang, "body_part_ranking"))
     
-    # Define offensive actions
-    OFFENSIVE_ACTIONS = [
+    # Definir acciones ofensivas usando claves de traducción
+    ACCIONES_OFENSIVAS = [
         get_text(lang, "corner"),
         get_text(lang, "free_kick"),
         get_text(lang, "throw_in"),
@@ -325,8 +310,8 @@ def show_body_part_ranking(lang: str, df):
         get_text(lang, "shot")
     ]
     
-    df['ActionType'] = df['Action'].apply(
-        lambda x: get_text(lang, "offensive") if x in OFFENSIVE_ACTIONS else get_text(lang, "defensive")
+    df['Tipo Acción'] = df['Acción'].apply(
+        lambda x: get_text(lang, "offensive") if x in ACCIONES_OFENSIVAS else get_text(lang, "defensive")
     )
 
     color_map = {
@@ -335,46 +320,46 @@ def show_body_part_ranking(lang: str, df):
         get_text(lang, "other"): '#4B4B4B'
     }
 
-    for action_type in [get_text(lang, "offensive"), get_text(lang, "defensive")]:
-        type_df = df[(df['ActionType'] == action_type) & (df['BodyPart'].notna())]
-        ranking_df = type_df.groupby(['Executor', 'BodyPart']).size().reset_index(name='Count')
+    for tipo in [get_text(lang, "offensive"), get_text(lang, "defensive")]:
+        df_tipo = df[(df['Tipo Acción'] == tipo) & (df['Parte Cuerpo'].notna())]
+        df_ranking = df_tipo.groupby(['Ejecutor', 'Parte Cuerpo']).size().reset_index(name='Cantidad')
         
-        total_players = ranking_df.groupby('Executor')['Count'].sum().sort_values(ascending=False)
-        ranking_df['Executor'] = pd.Categorical(
-            ranking_df['Executor'], 
-            categories=total_players.index, 
+        total_jugadores = df_ranking.groupby('Ejecutor')['Cantidad'].sum().sort_values(ascending=False)
+        df_ranking['Ejecutor'] = pd.Categorical(
+            df_ranking['Ejecutor'], 
+            categories=total_jugadores.index, 
             ordered=True
         )
 
-        st.subheader(f"{'⚔️' if action_type == get_text(lang, "offensive") else '🛡️'} {action_type} {get_text(lang, "actions")}")
+        st.subheader(f"{'⚔️' if tipo == get_text(lang, "offensive") else '🛡️'} {tipo} {get_text(lang, "actions")}")
 
         fig = px.bar(
-            ranking_df,
-            x='Count',
-            y='Executor',
-            color='BodyPart',
+            df_ranking,
+            x='Cantidad',
+            y='Ejecutor',
+            color='Parte Cuerpo',
             orientation='h',
-            text='Count',
-            title=get_text(lang, "players_actions_by_body").format(tipo=action_type),
-            labels={'Count': get_text(lang, "actions"), 'Executor': get_text(lang, "player")},
+            text='Cantidad',
+            title=get_text(lang, "players_actions_by_body").format(tipo=tipo),
+            labels={'Cantidad': get_text(lang, "actions"), 'Ejecutor': get_text(lang, "player")},
             color_discrete_map=color_map,
-            category_orders={'Executor': total_players.index.tolist()}
+            category_orders={'Ejecutor': total_jugadores.index.tolist()}
         )
         fig.update_layout(barmode='stack')
         st.plotly_chart(fig, use_container_width=True)
 
-def setup_download(lang: str, df):
+def configurar_descarga(lang: str, df):
     st.divider()
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button(
         get_text(lang, "export_data"),
         data=csv,
-        file_name="tactical_analysis.csv",
+        file_name="analisis_tactico.csv",
         mime="text/csv",
         help=get_text(lang, "export_data_help")
     )
 
-    # Footer
+    # --- Footer signature ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
