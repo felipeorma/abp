@@ -34,18 +34,18 @@ def load_data(lang: str):
     df = df.rename(columns={
         'jornada': 'Round',
         'Fecha': 'Date',          # Antes: 'Fecha'
-        'rival': 'Opponent',      # Antes: 'Rival'
-        'condición': 'Condition', # Antes: 'Condición'
-        'periodo': 'Period',      # Antes: 'Periodo'
-        'minuto': 'Minute',       # Antes: 'Minuto'
-        'acción': 'Action',       # Antes: 'Acción'
-        'equipo': 'Team',         # Antes: 'Equipo'
-        'ejecutor': 'Executor',   # Antes: 'Ejecutor'
-        'zona_saque': 'StartZone',# Antes: 'Zona Saque'
-        'zona_remate': 'EndZone', # Antes: 'Zona Remate'
-        'gol': 'Goal',            # Antes: 'Gol'
-        'resultado': 'Result',    # Antes: 'Resultado'
-        'parte_cuerpo': 'BodyPart'# Antes: 'Parte Cuerpo'
+        'Rival': 'Opponent',      # Antes: 'Rival'
+        'Condición': 'Condition', # Antes: 'Condición'
+        'Periodo': 'Period',      # Antes: 'Periodo'
+        'Minuto': 'Minute',       # Antes: 'Minuto'
+        'Acción': 'Action',       # Antes: 'Acción'
+        'Equipo': 'Team',         # Antes: 'Equipo'
+        'Ejecutor': 'Executor',   # Antes: 'Ejecutor'
+        'Zona_saque': 'StartZone',# Antes: 'Zona Saque'
+        'Zona_remate': 'EndZone', # Antes: 'Zona Remate'
+        'Gol': 'Goal',            # Antes: 'Gol'
+        'Resultado': 'Result',    # Antes: 'Resultado'
+        'Parte_cuerpo': 'BodyPart'# Antes: 'Parte Cuerpo'
     })
     
     # Date processing
