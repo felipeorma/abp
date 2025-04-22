@@ -3,7 +3,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
-from utils.i18n import get_text  # Asegúrate de tener este módulo de traducción
+from utils.i18n import get_text
 
 def analitica_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
@@ -73,106 +73,70 @@ def cargar_datos(lang: str):
     
     return df.dropna(subset=['Zona Saque', 'Zona Remate', 'Ejecutor'])
 
-def configurar_filtros(lang: str, df_original):
+def configurar_filtros(lang: str, df):
     with st.sidebar:
         st.header(get_text(lang, "advanced_filters"))
         
-        # Inicializar claves de session_state si no existen
-        widget_keys = {
-            'partidos': f"{lang}_partidos",
-            'jornadas': f"{lang}_jornadas",
-            'condiciones': f"{lang}_condiciones",
-            'acciones': f"{lang}_acciones",
-            'jugadores': f"{lang}_jugadores",
-            'minutos': f"{lang}_minutos"
-        }
-        
-        # 1. Preparar datos base -------------------------------------------------
-        df = df_original.copy()
+        # Procesar fechas para mostrar
+        df = df.sort_values('Fecha', ascending=False)
         df['Fecha_str'] = df['Fecha'].dt.strftime('%d %b')
-        df['Partido'] = df.apply(lambda x: f"{x['Fecha_str']} vs {x['Rival']}", axis=1)
+        df['Partido'] = df.apply(
+            lambda x: f"{x['Fecha_str']} vs {x['Rival']}", 
+            axis=1
+        )
         
-        # 2. Sistema reactivo de dependencias ------------------------------------
-        def actualizar_opciones(filtro_actual, df_filtrado):
-            # Actualizar opciones disponibles y valores seleccionados
-            opciones = df_filtrado[filtro_actual].unique().tolist()
-            
-            # Obtener valores actuales del session_state
-            current_values = st.session_state.get(widget_keys[filtro_actual], opciones)
-            
-            # Filtrar valores válidos
-            valores_validos = [v for v in current_values if v in opciones]
-            
-            # Actualizar session_state solo si hay cambios
-            if set(valores_validos) != set(current_values):
-                st.session_state[widget_keys[filtro_actual]] = valores_validos
-            
-            return opciones, valores_validos
-        
-        # 3. Jerarquía de filtros ------------------------------------------------
-        # Nivel 1: Partidos
-        opc_partidos, sel_partidos = actualizar_opciones('partidos', df)
-        partidos = st.multiselect(
+        # Filtros interactivos
+        partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
-            options=opc_partidos,
-            default=sel_partidos,
-            key=widget_keys['partidos']
+            options=df['Partido'].unique(),
+            default=df['Partido'].unique(),
+            help=get_text(lang, "select_matches_help")
         )
-        df_filtrado = df[df['Partido'].isin(partidos)] if partidos else df
         
-        # Nivel 2: Jornadas (depende de partidos)
-        opc_jornadas, sel_jornadas = actualizar_opciones('jornadas', df_filtrado)
-        jornadas = st.multiselect(
-            get_text(lang, "round"),
-            options=opc_jornadas,
-            default=sel_jornadas,
-            key=widget_keys['jornadas']
-        )
-        df_filtrado = df_filtrado[df_filtrado['Jornada'].isin(jornadas)] if jornadas else df_filtrado
-        
-        # Nivel 3: Condiciones (depende de partidos y jornadas)
-        opc_condiciones, sel_condiciones = actualizar_opciones('condiciones', df_filtrado)
-        condiciones = st.multiselect(
-            get_text(lang, "condition"),
-            options=opc_condiciones,
-            default=sel_condiciones,
-            format_func=lambda x: get_text(lang, f"condition_{x}"),
-            key=widget_keys['condiciones']
-        )
-        df_filtrado = df_filtrado[df_filtrado['Condición'].isin(condiciones)] if condiciones else df_filtrado
-        
-        # Nivel 4: Acciones (depende de los 3 anteriores)
-        opc_acciones, sel_acciones = actualizar_opciones('acciones', df_filtrado)
-        acciones = st.multiselect(
-            get_text(lang, "actions"),
-            options=opc_acciones,
-            default=sel_acciones,
-            key=widget_keys['acciones']
-        )
-        df_filtrado = df_filtrado[df_filtrado['Acción'].isin(acciones)] if acciones else df_filtrado
-        
-        # Nivel 5: Jugadores (depende de todos los anteriores)
-        opc_jugadores, sel_jugadores = actualizar_opciones('jugadores', df_filtrado)
-        jugadores = st.multiselect(
-            get_text(lang, "players"),
-            options=opc_jugadores,
-            default=sel_jugadores,
-            key=widget_keys['jugadores']
-        )
-        df_filtrado = df_filtrado[df_filtrado['Ejecutor'].isin(jugadores)] if jugadores else df_filtrado
-        
-        # Nivel 6: Minutos (depende de todo lo anterior)
-        min_min = df_filtrado['Minuto'].min() if not df_filtrado.empty else 0
-        max_min = df_filtrado['Minuto'].max() if not df_filtrado.empty else 0
+        col1, col2 = st.columns(2)
+        with col1:
+            jornadas = st.multiselect(
+                get_text(lang, "round"),
+                options=df['Jornada'].unique(),
+                default=df['Jornada'].unique()
+            )
+        with col2:
+            condiciones = st.multiselect(
+                get_text(lang, "condition"),
+                options=df['Condición'].unique(),
+                default=df['Condición'].unique(),
+                format_func=lambda x: get_text(lang, f"condition_{x}")
+            )
+
+        col3, col4 = st.columns(2)
+        with col3:
+            acciones = st.multiselect(
+                get_text(lang, "actions"),
+                options=df['Acción'].unique(),
+                default=df['Acción'].unique()
+            )
+        with col4:
+            jugadores = st.multiselect(
+                get_text(lang, "players"),
+                options=df['Ejecutor'].unique(),
+                default=df['Ejecutor'].unique()
+            )
+
+        min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
         rango_minutos = st.slider(
             get_text(lang, "minutes"),
             min_min, max_min,
-            value=st.session_state.get(widget_keys['minutos'], (min_min, max_min)),
-            key=widget_keys['minutos']
+            (min_min, max_min)
         )
-        df_filtrado = df_filtrado[df_filtrado['Minuto'].between(*rango_minutos)]
         
-    return df_filtrado
+    return df[
+        (df['Partido'].isin(partidos_seleccionados)) &
+        (df['Jornada'].isin(jornadas)) &
+        (df['Condición'].isin(condiciones)) &
+        (df['Acción'].isin(acciones)) &
+        (df['Ejecutor'].isin(jugadores)) &
+        (df['Minuto'].between(*rango_minutos))
+    ]
 
 def mostrar_kpis(lang: str, df):
     cols = st.columns(5)
@@ -395,7 +359,7 @@ def configurar_descarga(lang: str, df):
         help=get_text(lang, "export_data_help")
     )
 
-    # --- Firma del footer ---
+    # --- Footer signature ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
