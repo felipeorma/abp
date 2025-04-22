@@ -3,7 +3,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mplsoccer import VerticalPitch
-from utils.i18n import get_text
+from utils.i18n import get_text  # Asegúrate de tener este módulo de traducción
 
 def analitica_page(lang: str):
     st.title(get_text(lang, "analytics_title"))
@@ -85,12 +85,23 @@ def configurar_filtros(lang: str, df):
             axis=1
         )
         
-        # Filtros interactivos
+        # Configurar claves únicas para widgets
+        widget_keys = {
+            'partidos': f"{lang}_partidos",
+            'jornadas': f"{lang}_jornadas",
+            'condiciones': f"{lang}_condiciones",
+            'acciones': f"{lang}_acciones",
+            'jugadores': f"{lang}_jugadores",
+            'minutos': f"{lang}_minutos"
+        }
+        
+        # Filtros interactivos con estado persistente
         partidos_seleccionados = st.multiselect(
             get_text(lang, "select_matches"),
             options=df['Partido'].unique(),
-            default=df['Partido'].unique(),
-            help=get_text(lang, "select_matches_help")
+            default=st.session_state.get(widget_keys['partidos'], df['Partido'].unique()),
+            help=get_text(lang, "select_matches_help"),
+            key=widget_keys['partidos']
         )
         
         col1, col2 = st.columns(2)
@@ -98,14 +109,16 @@ def configurar_filtros(lang: str, df):
             jornadas = st.multiselect(
                 get_text(lang, "round"),
                 options=df['Jornada'].unique(),
-                default=df['Jornada'].unique()
+                default=st.session_state.get(widget_keys['jornadas'], df['Jornada'].unique()),
+                key=widget_keys['jornadas']
             )
         with col2:
             condiciones = st.multiselect(
                 get_text(lang, "condition"),
                 options=df['Condición'].unique(),
-                default=df['Condición'].unique(),
-                format_func=lambda x: get_text(lang, f"condition_{x}")
+                default=st.session_state.get(widget_keys['condiciones'], df['Condición'].unique()),
+                format_func=lambda x: get_text(lang, f"condition_{x}"),
+                key=widget_keys['condiciones']
             )
 
         col3, col4 = st.columns(2)
@@ -113,20 +126,23 @@ def configurar_filtros(lang: str, df):
             acciones = st.multiselect(
                 get_text(lang, "actions"),
                 options=df['Acción'].unique(),
-                default=df['Acción'].unique()
+                default=st.session_state.get(widget_keys['acciones'], df['Acción'].unique()),
+                key=widget_keys['acciones']
             )
         with col4:
             jugadores = st.multiselect(
                 get_text(lang, "players"),
                 options=df['Ejecutor'].unique(),
-                default=df['Ejecutor'].unique()
+                default=st.session_state.get(widget_keys['jugadores'], df['Ejecutor'].unique()),
+                key=widget_keys['jugadores']
             )
 
         min_min, max_min = int(df['Minuto'].min()), int(df['Minuto'].max())
         rango_minutos = st.slider(
             get_text(lang, "minutes"),
             min_min, max_min,
-            (min_min, max_min)
+            value=st.session_state.get(widget_keys['minutos'], (min_min, max_min)),
+            key=widget_keys['minutos']
         )
         
     return df[
@@ -359,7 +375,7 @@ def configurar_descarga(lang: str, df):
         help=get_text(lang, "export_data_help")
     )
 
-    # --- Footer signature ---
+    # --- Firma del footer ---
     st.markdown(
         """
         <hr style='margin-top: 40px; margin-bottom: 10px'>
